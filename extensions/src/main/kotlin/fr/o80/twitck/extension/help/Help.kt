@@ -1,4 +1,4 @@
-package fr.o80.twitck.example.extension.help
+package fr.o80.twitck.extension.help
 
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Badge
@@ -36,7 +36,11 @@ class Help(
         return if (split.size == 1) {
             Command(messageEvent.badges, split[0])
         } else {
-            Command(messageEvent.badges, split[0], split.subList(1, split.size))
+            Command(
+                messageEvent.badges,
+                split[0],
+                split.subList(1, split.size)
+            )
         }
     }
 

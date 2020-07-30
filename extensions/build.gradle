@@ -12,8 +12,5 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
-    implementation project(':lib')
-    implementation project(':extensions')
-
-    implementation 'com.github.ajalt:clikt:2.6.0'
+    compileOnly project(':lib')
 }

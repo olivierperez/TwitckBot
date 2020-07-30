@@ -3,11 +3,11 @@ package fr.o80.twitck.example
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
-import fr.o80.twitck.example.extension.Channel
-import fr.o80.twitck.example.extension.Presence
-import fr.o80.twitck.example.extension.Welcome
-import fr.o80.twitck.example.extension.Whisper
-import fr.o80.twitck.example.extension.help.Help
+import fr.o80.twitck.extension.Channel
+import fr.o80.twitck.extension.Presence
+import fr.o80.twitck.extension.Welcome
+import fr.o80.twitck.extension.Whisper
+import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.twitckBot
