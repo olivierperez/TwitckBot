@@ -1,0 +1,3 @@
+rootProject.name = 'TwitckBot'
+
+include ':lib', ':example'
