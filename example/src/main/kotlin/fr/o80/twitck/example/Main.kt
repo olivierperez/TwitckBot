@@ -86,7 +86,7 @@ class Main : CliktCommand() {
                                 else -> println("Quelque chose ne va pas dans la demande : \"${whisper.message}\"")
                             }
                         }
-                        whisper.message =="!unhost" -> {
+                        whisper.message == "!unhost" -> {
                             bot.send(botChannel, "/unhost")
                         }
                         whisper.message.startsWith("!shuto") -> {
