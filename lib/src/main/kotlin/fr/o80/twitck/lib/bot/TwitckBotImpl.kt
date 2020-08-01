@@ -16,13 +16,11 @@ import fr.o80.twitck.lib.service.line.JoinLineHandler
 import fr.o80.twitck.lib.service.line.LineInterpreter
 import fr.o80.twitck.lib.service.line.PrivMsgLineHandler
 import fr.o80.twitck.lib.service.line.WhisperLineHandler
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import org.jibble.pircbot.PircBot
 
 class TwitckBotImpl(
     private val oauthToken: String,
-    private val configuration: TwitckConfiguration
+    configuration: TwitckConfiguration
 ) : PircBot(), TwitckBot {
 
     private val initializer = TwitckInitializer()
@@ -37,7 +35,7 @@ class TwitckBotImpl(
 
     private val lineInterpreter = LineInterpreter(privMsgLineHandler, joinLineHandler, whisperLineHandler)
 
-    override suspend fun connectToServer() = coroutineScope {
+    override  fun connectToServer() {
         println("Attempting to connect to irc.twitch.tv...")
 
         connect(HOST, PORT, "oauth:$oauthToken")
@@ -52,7 +50,7 @@ class TwitckBotImpl(
         sendRawLine(SERVER_TAGREG)
 
         while (!initializer.initialized) {
-            delay(1000)
+            Thread.sleep(1000)
             if (!initializer.initialized) println("Not yet initialized")
         }
 

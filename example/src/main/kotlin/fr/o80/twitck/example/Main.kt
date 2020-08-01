@@ -11,7 +11,6 @@ import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.twitckBot
-import kotlinx.coroutines.runBlocking
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -36,13 +35,11 @@ class Main : CliktCommand() {
             presenceName
         )
 
-        runBlocking {
-            bot.connectToServer()
-            println("Initialized!")
+        bot.connectToServer()
+        println("Initialized!")
 
-            bot.send(hostChannel, "En position !")
-            println("Ready to go!")
-        }
+        bot.send(hostChannel, "En position !")
+        println("Ready to go!")
     }
 
     private fun configureBot(

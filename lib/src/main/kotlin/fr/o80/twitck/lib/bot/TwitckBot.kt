@@ -2,7 +2,7 @@ package fr.o80.twitck.lib.bot
 
 interface TwitckBot {
 
-    suspend fun connectToServer()
+    fun connectToServer()
 
     fun join(
         channel: String
