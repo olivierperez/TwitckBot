@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub release](https://img.shields.io/github/release/Naereen/StrapDown.js.svg?style=flat-square)](https://GitHub.com/Naereen/StrapDown.js/releases/)
+[![GitHub release](https://img.shields.io/github/release/olivierperez/TwitckBot.svg?style=flat-square)](https://GitHub.com/Naereen/StrapDown.js/releases/)
 
 Every streamers need a bot, and it's not that easy to find the perfect bot that matches what you really want.
 
