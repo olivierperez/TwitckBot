@@ -13,7 +13,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     implementation project(':lib')
+    // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.1'
     implementation project(':extensions')
+    // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.1'
 
     implementation 'com.github.ajalt:clikt:2.6.0'
 }

@@ -1,20 +1,26 @@
 # TwitckBot
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-orange.svg?style=flat-square)](http://makeapullrequest.com)
-[![GitHub release](https://img.shields.io/github/release/olivierperez/TwitckBot.svg?style=flat-square)](https://GitHub.com/Naereen/StrapDown.js/releases/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-orange.svg?style=flat-square)](http://makeapullrequest.com)
+[![Last release](https://jitpack.io/v/olivierperez/TwitckBot.svg?style=flat-square)](https://jitpack.io/#olivierperez/TwitckBot)
 
 Every streamers need a bot, and it's not that easy to find the perfect bot that matches what you really want.
 
 TwitckBot provides a good foundation to build your own bot, and allows you to extend it with whatever you're ready to develop.
 
-# Installation
+# Installation 👣
 
 First of all, add the TwitckBot lib as dependency:
 
 ```groovy
 // For Gradle
-implementation "TODO-lib"
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
+dependecies {
+    implementation 'com.github.olivierperez.TwitckBot:lib:0.0.1'
+}
 ```
 
 To work, TwitckBot only need a Twitch OAuth token.
@@ -28,12 +34,12 @@ fun main() {
     }
 
     bot.connectToServer()
-    bot.send(yourChannel, "In position !")
+    bot.send(yourChannel, "In position!")
     println("Ready to go!")
 }
 ```
 
-# Make him do things
+# Make him do things 🧰
 
 The `twitckBot` function is the place you want to setup your bot, do to that you will have to **install** some **Extension**s.
 The simplest one is `Welcome`, it will welcome everyone who is watching your stream:
@@ -47,13 +53,13 @@ fun main() {
     val bot = twitckBot(oauthToken) {
         install(Welcome) {
             channel(yourChannel)
-            host(hostName, "Hey $hostName ! At your service.")
+            host(hostName, "Hey $hostName! At your service.")
             addMessage("Hello #USER#, welcome!")
         }
     }
 
     bot.connectToServer()
-    bot.send(yourChannel, "In position !")
+    bot.send(yourChannel, "In position!")
     println("Ready to go!")
 }
 ```
@@ -63,22 +69,40 @@ fun main() {
 There's some extension you may want to use:
 
 - `Channel`: The more opened extension, it allows you to do whatever you want
-- `Help`: Responds to !help from the users
+- `Help`: Responds to `!help` from the users
 - `Presence`: Your bot will also connect (but won't operate) on a channel of your friend
 - `Welcome`: Welcomes everyone
 - `Whisper`: React to whispering
 
 ```groovy
 // For Gradle
-implementation "TODO-extensions"
+dependecies {
+    implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.1'
+}
 ```
 
-## Make your own extension
+## Make your own extension 🎨
 
 TODO
 
 # Example
 
-TODO link to example
+There's an [example](example/) to see how it could work.
 
-# 
+## License 📄
+
+```
+    Copyright (C) 2020 Olivier Perez.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+```
