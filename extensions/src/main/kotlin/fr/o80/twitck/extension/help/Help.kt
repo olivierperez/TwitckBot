@@ -8,15 +8,8 @@ import fr.o80.twitck.lib.extension.TwitckExtension
 
 class Help(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>,
-    registeredCommands: MutableMap<String, String?>
+    private val registeredCommands: MutableMap<String, String?>
 ) {
-
-    private val runtimeCommands = mutableMapOf<String, String?>()
-
-    init {
-        registeredCommands.forEach { (k, v) -> runtimeCommands[k] = v }
-    }
 
     fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
@@ -31,7 +24,6 @@ class Help(
     }
 
     private fun parseCommand(messageEvent: MessageEvent): Command {
-
         val split = messageEvent.message.split(" ")
         return if (split.size == 1) {
             Command(messageEvent.badges, split[0])
@@ -51,16 +43,10 @@ class Help(
     ) {
         when (command.tag) {
             "!help" -> {
-                bot.sendHelp(messageEvent.channel, runtimeCommands.keys)
+                bot.sendHelp(messageEvent.channel, registeredCommands.keys)
             }
-            "!addcmd" -> {
-                if (command.badges.any { it in privilegedBadges }) {
-                    val addedCommand = addCommand(command.options)
-                    bot.send(messageEvent.channel, "Commande $addedCommand ajoutée")
-                }
-            }
-            in runtimeCommands.keys -> {
-                runtimeCommands[command.tag]?.let { message ->
+            in registeredCommands.keys -> {
+                registeredCommands[command.tag]?.let { message ->
                     bot.send(messageEvent.channel, message)
                 }
             }
@@ -79,33 +65,17 @@ class Help(
         }
     }
 
-    private fun addCommand(options: List<String>): String {
-        val newCommand = options[0]
-        val message = options.subList(1, options.size).joinToString(" ")
-        runtimeCommands[newCommand] = message
-        return newCommand
-    }
-
     class Configuration {
 
         @DslMarker
-        annotation class HelpDsl
+        private annotation class HelpDsl
 
         private var channel: String? = null
-        private var badges: Array<out Badge>? = null
         private var registeredCommands = mutableMapOf<String, String?>()
 
         @HelpDsl
         fun channel(channel: String) {
             this.channel = channel
-        }
-
-        @HelpDsl
-        fun privilegedBadges(vararg badges: Badge) {
-            if (badges.isEmpty()) {
-                throw IllegalArgumentException("Impossible to set an empty list of privileged badges.")
-            }
-            this.badges = badges
         }
 
         @HelpDsl
@@ -116,9 +86,8 @@ class Help(
         fun build(): Help {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Help::class.simpleName}")
-            val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
 
-            return Help(channelName, theBadges, registeredCommands)
+            return Help(channelName, registeredCommands)
         }
     }
 
@@ -133,10 +102,10 @@ class Help(
         }
 
     }
-}
 
-private class Command(
-    val badges: List<Badge>,
-    val tag: String,
-    val options: List<String> = emptyList()
-)
+    private class Command(
+        val badges: List<Badge>,
+        val tag: String,
+        val options: List<String> = emptyList()
+    )
+}

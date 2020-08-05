@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Presence
+import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
 import fr.o80.twitck.extension.help.Help
@@ -62,16 +63,15 @@ class Main : CliktCommand() {
                 addMessage("#USER# vient de finir de lire les internets mondiaux.")
                 addMessage("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
             }
-            // TODO Découper cette extension en 2 ? Help + RuntimeCommand
-            // TODO Help ne gère que le listing des commandes possibles
-            // TODO RuntimeCommand gère l'ajout de commandes de type message au runtime (+ elle s'enregistre auprès de l'extension Help)
+            // TODO RuntimeCommand s'enregistre auprès de l'extension Help
             install(Help) {
                 channel(hostChannel)
-                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
                 registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
                 registerCommand("!none")
-//                addBasicWhisperHelp("!shuto")
-//                addBasicWhisperHelp("!mawashi")
+            }
+            install(RuntimeCommand) {
+                channel(hostChannel)
+                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
             }
             install(Whisper) {
                 whisper { bot, whisper ->
