@@ -1,5 +1,7 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.extension.help.Help
+import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bean.MessageEvent
@@ -8,7 +10,8 @@ import fr.o80.twitck.lib.extension.TwitckExtension
 
 class RuntimeCommand(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>
+    private val privilegedBadges: Array<out Badge>,
+    private val extensionProvider: ExtensionProvider
 ) {
 
     private val runtimeCommands = mutableMapOf<String, String?>()
@@ -62,10 +65,12 @@ class RuntimeCommand(
         val newCommand = options[0].let { cmd -> if(cmd[0] == '!') cmd else "!$cmd" }
         val message = options.subList(1, options.size).joinToString(" ")
         runtimeCommands[newCommand] = message
+        extensionProvider.provide(Help::class.java)
+            ?.registerCommand(newCommand)
         return newCommand
     }
 
-    class Configuration {
+    class Configuration(private val extensionProvider: ExtensionProvider) {
 
         @DslMarker
         private annotation class RuntimeCommandDsl
@@ -90,13 +95,13 @@ class RuntimeCommand(
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${RuntimeCommand::class.simpleName}")
             val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
-            return RuntimeCommand(channelName, theBadges)
+            return RuntimeCommand(channelName, theBadges, extensionProvider)
         }
     }
 
     companion object Extension : TwitckExtension<Configuration, RuntimeCommand> {
-        override fun install(pipeline: Pipeline, configure: Configuration.() -> Unit): RuntimeCommand {
-            return Configuration()
+        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): RuntimeCommand {
+            return Configuration(extensionProvider)
                 .apply(configure)
                 .build()
                 .also { runtimeCommand ->

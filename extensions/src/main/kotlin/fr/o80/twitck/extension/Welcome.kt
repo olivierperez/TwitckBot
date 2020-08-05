@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bot.TwitckBot
@@ -100,7 +101,7 @@ class Welcome(
     }
 
     companion object Extension : TwitckExtension<Configuration, Welcome> {
-        override fun install(pipeline: Pipeline, configure: Configuration.() -> Unit): Welcome {
+        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Welcome {
             return Configuration()
                 .apply(configure)
                 .build()

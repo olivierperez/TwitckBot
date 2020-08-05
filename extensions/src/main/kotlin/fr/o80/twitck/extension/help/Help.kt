@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension.help
 
+import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bean.MessageEvent
@@ -65,6 +66,10 @@ class Help(
         }
     }
 
+    fun registerCommand(command: String) {
+        registeredCommands[command] = null
+    }
+
     class Configuration {
 
         @DslMarker
@@ -92,7 +97,7 @@ class Help(
     }
 
     companion object Extension : TwitckExtension<Configuration, Help> {
-        override fun install(pipeline: Pipeline, configure: Configuration.() -> Unit): Help {
+        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Help {
             return Configuration()
                 .apply(configure)
                 .build()
@@ -103,7 +108,7 @@ class Help(
 
     }
 
-    private class Command(
+    class Command(
         val badges: List<Badge>,
         val tag: String,
         val options: List<String> = emptyList()

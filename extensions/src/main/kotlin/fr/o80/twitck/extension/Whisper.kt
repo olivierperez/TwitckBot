@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.extension.TwitckExtension
@@ -40,7 +41,7 @@ class Whisper(
     }
 
     companion object Extension : TwitckExtension<Configuration, Whisper> {
-        override fun install(pipeline: Pipeline, configure: Configuration.() -> Unit): Whisper {
+        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Whisper {
             return Configuration()
                 .apply(configure)
                 .build()

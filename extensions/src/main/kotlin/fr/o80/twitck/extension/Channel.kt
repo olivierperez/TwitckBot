@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bean.MessageEvent
@@ -95,7 +96,7 @@ class Channel(
     }
 
     companion object Extension : TwitckExtension<Configuration, Channel> {
-        override fun install(pipeline: Pipeline, configure: Configuration.() -> Unit): Channel {
+        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Channel {
             return Configuration()
                 .apply(configure)
                 .build()

@@ -21,12 +21,19 @@ class TwitckConfigurator {
     private val extensions: MutableList<Any> = mutableListOf()
     private val pipeline = PipelineImpl()
 
+    private val extensionProvider = object : ExtensionProvider {
+        override fun <T> provide(extensionClass: Class<T>): T? =
+            extensions
+                .firstOrNull { extension -> extensionClass.isAssignableFrom(extension::class.java) }
+                ?.let { extension -> extensionClass.cast(extension) }
+    }
+
     @TwitckConfigDsl
     fun <Configuration : Any, A : Any> install(
         extension: TwitckExtension<Configuration, A>,
         configure: Configuration.() -> Unit
     ) {
-        val installed = extension.install(pipeline, configure)
+        val installed = extension.install(pipeline, extensionProvider, configure)
         extensions += installed
     }
 
@@ -39,4 +46,10 @@ class TwitckConfigurator {
         )
     }
 
+}
+
+// TODO Sortir ailleurs
+// TODO Provider plusieurs extensions à partir d'une interface passée en params (+ créer un module qui liste les interfaces disponibles ? pour le cas où quelqu'un veuille développer sa propre extension Help)
+interface ExtensionProvider {
+    fun <T> provide(extensionClass: Class<T>): T?
 }
