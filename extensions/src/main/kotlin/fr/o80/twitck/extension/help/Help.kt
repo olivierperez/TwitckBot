@@ -5,12 +5,13 @@ import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.extension.ExtensionProvider
+import fr.o80.twitck.lib.extension.HelperExtension
 import fr.o80.twitck.lib.extension.TwitckExtension
 
 class Help(
     private val channel: String,
     private val registeredCommands: MutableMap<String, String?>
-) {
+) : HelperExtension {
 
     fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
@@ -22,6 +23,10 @@ class Help(
         reactToCommand(command, bot, messageEvent)
 
         return messageEvent
+    }
+
+    override fun registerCommand(command: String) {
+        registeredCommands[command] = null
     }
 
     // TODO OPZ Ca c'est du gros C/C
@@ -65,10 +70,6 @@ class Help(
             val commandsExamples = commands.joinToString(", ")
             this.send(channel, "Je sais faire un paquet de choses, par exemple : $commandsExamples")
         }
-    }
-
-    fun registerCommand(command: String) {
-        registeredCommands[command] = null
     }
 
     class Configuration {
