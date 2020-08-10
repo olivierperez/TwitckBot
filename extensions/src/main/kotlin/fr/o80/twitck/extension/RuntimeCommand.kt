@@ -8,12 +8,15 @@ import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.HelperExtension
 import fr.o80.twitck.lib.extension.TwitckExtension
+import fr.o80.twitck.lib.service.CommandParser
+import fr.o80.twitck.lib.service.ServiceLocator
 import java.util.Locale
 
 class RuntimeCommand(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
-    private val extensionProvider: ExtensionProvider
+    private val extensionProvider: ExtensionProvider,
+    private val commandParser: CommandParser
 ) {
 
     private val runtimeCommands = mutableMapOf<String, String?>()
@@ -24,25 +27,10 @@ class RuntimeCommand(
 
         println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
 
-        val command = parseCommand(messageEvent)
+        val command = commandParser.parse(messageEvent)
         reactToCommand(command, bot, messageEvent)
 
         return messageEvent
-    }
-
-    // TODO OPZ Ca c'est du gros C/C
-    private fun parseCommand(messageEvent: MessageEvent): Command {
-        val split = messageEvent.message.split(" ")
-        val tag = split[0].toLowerCase(Locale.FRENCH)
-        return if (split.size == 1) {
-            Command(messageEvent.badges, tag)
-        } else {
-            Command(
-                messageEvent.badges,
-                tag,
-                split.subList(1, split.size)
-            )
-        }
     }
 
     private fun reactToCommand(
@@ -74,7 +62,7 @@ class RuntimeCommand(
         return newCommand
     }
 
-    class Configuration(private val extensionProvider: ExtensionProvider) {
+    class Configuration {
 
         @DslMarker
         private annotation class RuntimeCommandDsl
@@ -95,19 +83,28 @@ class RuntimeCommand(
             this.badges = badges
         }
 
-        fun build(): RuntimeCommand {
+        fun build(serviceLocator: ServiceLocator): RuntimeCommand {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${RuntimeCommand::class.simpleName}")
             val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
-            return RuntimeCommand(channelName, theBadges, extensionProvider)
+            return RuntimeCommand(
+                channelName,
+                theBadges,
+                serviceLocator.provideExtensionProvider(),
+                serviceLocator.provideCommandParser()
+            )
         }
     }
 
     companion object Extension : TwitckExtension<Configuration, RuntimeCommand> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): RuntimeCommand {
-            return Configuration(extensionProvider)
+        override fun install(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configure: Configuration.() -> Unit
+        ): RuntimeCommand {
+            return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { runtimeCommand ->
                     pipeline.requestChannel(runtimeCommand.channel)
                     pipeline.interceptMessageEvent(runtimeCommand::interceptMessageEvent)
@@ -117,5 +114,5 @@ class RuntimeCommand(
 }
 
 private fun String.addPrefix(): String {
-    return if(this[0] == '!') this else "!$this"
+    return if (this[0] == '!') this else "!$this"
 }

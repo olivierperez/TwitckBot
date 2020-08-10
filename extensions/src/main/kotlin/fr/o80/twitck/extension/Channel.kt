@@ -5,9 +5,9 @@ import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
-import java.util.Locale
+import fr.o80.twitck.lib.service.CommandParser
+import fr.o80.twitck.lib.service.ServiceLocator
 
 /**
  * This extension provides basic configuration for a given channel.
@@ -18,7 +18,8 @@ import java.util.Locale
 class Channel(
     private val channel: String,
     private val joinCallbacks: Iterable<JoinCallback>,
-    private val commandCallbacks: Iterable<Pair<String, CommandCallback>>
+    private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
+    private val commandParser: CommandParser
 ) {
 
     fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
@@ -41,7 +42,7 @@ class Channel(
 
         println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
 
-        val command = parseCommand(messageEvent)
+        val command = commandParser.parse(messageEvent)
 
         commandCallbacks.forEach { (commandTag, callback) ->
             if (commandTag == command.tag) {
@@ -50,21 +51,6 @@ class Channel(
         }
 
         return messageEvent
-    }
-
-    // TODO OPZ Ca c'est du gros C/C
-    private fun parseCommand(messageEvent: MessageEvent): Command {
-        val split = messageEvent.message.split(" ")
-        val tag = split[0].toLowerCase(Locale.FRENCH)
-        return if (split.size == 1) {
-            Command(messageEvent.badges, tag)
-        } else {
-            Command(
-                messageEvent.badges,
-                tag,
-                split.subList(1, split.size)
-            )
-        }
     }
 
     class Configuration {
@@ -92,13 +78,14 @@ class Channel(
             joinCallbacks += callback
         }
 
-        fun build(): Channel {
+        fun build(serviceLocator: ServiceLocator): Channel {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Channel::class.simpleName}")
             return Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
-                commandCallbacks = commandCallbacks
+                commandCallbacks = commandCallbacks,
+                commandParser = serviceLocator.provideCommandParser()
             )
         }
     }
@@ -106,12 +93,12 @@ class Channel(
     companion object Extension : TwitckExtension<Configuration, Channel> {
         override fun install(
             pipeline: Pipeline,
-            extensionProvider: ExtensionProvider,
+            serviceLocator: ServiceLocator,
             configure: Configuration.() -> Unit
         ): Channel {
             return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { channel ->
                     pipeline.interceptJoinEvent(channel::interceptJoinEvent)
                     pipeline.interceptMessageEvent(channel::interceptMessageEvent)

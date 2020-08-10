@@ -5,6 +5,7 @@ import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.bot.TwitckBotImpl
 import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
+import fr.o80.twitck.lib.service.ServiceLocator
 
 @DslMarker
 annotation class TwitckConfigDsl
@@ -22,19 +23,21 @@ class TwitckConfigurator {
     private val extensions: MutableList<Any> = mutableListOf()
     private val pipeline = PipelineImpl()
 
-    private val extensionProvider = object : ExtensionProvider {
-        override fun <T> provide(extensionClass: Class<T>): T? =
-            extensions
-                .firstOrNull { extension -> extensionClass.isAssignableFrom(extension::class.java) }
-                ?.let { extension -> extensionClass.cast(extension) }
-    }
+    private val serviceLocator: ServiceLocator = ServiceLocator(
+        extensionProvider = object : ExtensionProvider {
+            override fun <T> provide(extensionClass: Class<T>): T? =
+                extensions
+                    .firstOrNull { extension -> extensionClass.isAssignableFrom(extension::class.java) }
+                    ?.let { extension -> extensionClass.cast(extension) }
+        }
+    )
 
     @TwitckConfigDsl
     fun <Configuration : Any, A : Any> install(
         extension: TwitckExtension<Configuration, A>,
         configure: Configuration.() -> Unit
     ) {
-        val installed = extension.install(pipeline, extensionProvider, configure)
+        val installed = extension.install(pipeline, serviceLocator, configure)
         extensions += installed
     }
 

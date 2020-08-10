@@ -1,8 +1,8 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.Pipeline
-import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
+import fr.o80.twitck.lib.service.ServiceLocator
 
 class Presence(
     private val channel: String
@@ -27,7 +27,11 @@ class Presence(
     }
 
     companion object Extension : TwitckExtension<Configuration, Presence> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Presence {
+        override fun install(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configure: Configuration.() -> Unit
+        ): Presence {
             return Configuration()
                 .apply(configure)
                 .build()

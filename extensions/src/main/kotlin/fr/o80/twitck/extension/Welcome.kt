@@ -3,9 +3,9 @@ package fr.o80.twitck.extension
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
-import java.util.*
+import fr.o80.twitck.lib.service.ServiceLocator
+import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class Welcome(
@@ -101,7 +101,11 @@ class Welcome(
     }
 
     companion object Extension : TwitckExtension<Configuration, Welcome> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Welcome {
+        override fun install(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configure: Configuration.() -> Unit
+        ): Welcome {
             return Configuration()
                 .apply(configure)
                 .build()
@@ -110,7 +114,6 @@ class Welcome(
                     pipeline.requestChannel(welcome.channel)
                 }
         }
-
     }
 }
 

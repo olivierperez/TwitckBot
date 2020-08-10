@@ -2,9 +2,9 @@ package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 import fr.o80.twitck.lib.handler.WhisperEvent
+import fr.o80.twitck.lib.service.ServiceLocator
 
 /**
  * This extension provides a way to react to whispers to the bot.
@@ -41,7 +41,11 @@ class Whisper(
     }
 
     companion object Extension : TwitckExtension<Configuration, Whisper> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Whisper {
+        override fun install(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configure: Configuration.() -> Unit
+        ): Whisper {
             return Configuration()
                 .apply(configure)
                 .build()

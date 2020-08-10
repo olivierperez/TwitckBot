@@ -4,14 +4,15 @@ import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.HelperExtension
 import fr.o80.twitck.lib.extension.TwitckExtension
-import java.util.Locale
+import fr.o80.twitck.lib.service.CommandParser
+import fr.o80.twitck.lib.service.ServiceLocator
 
 class Help(
     private val channel: String,
-    private val registeredCommands: MutableMap<String, String?>
+    private val registeredCommands: MutableMap<String, String?>,
+    private val commandParser: CommandParser
 ) : HelperExtension {
 
     fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
@@ -20,7 +21,7 @@ class Help(
 
         println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
 
-        val command = parseCommand(messageEvent)
+        val command = commandParser.parse(messageEvent)
         reactToCommand(command, bot, messageEvent)
 
         return messageEvent
@@ -28,21 +29,6 @@ class Help(
 
     override fun registerCommand(command: String) {
         registeredCommands[command] = null
-    }
-
-    // TODO OPZ Ca c'est du gros C/C
-    private fun parseCommand(messageEvent: MessageEvent): Command {
-        val split = messageEvent.message.split(" ")
-        val tag = split[0].toLowerCase(Locale.FRENCH)
-        return if (split.size == 1) {
-            Command(messageEvent.badges, tag)
-        } else {
-            Command(
-                messageEvent.badges,
-                tag,
-                split.subList(1, split.size)
-            )
-        }
     }
 
     private fun reactToCommand(
@@ -92,28 +78,27 @@ class Help(
             registeredCommands[command] = message
         }
 
-        fun build(): Help {
+        fun build(serviceLocator: ServiceLocator): Help {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Help::class.simpleName}")
 
-            return Help(channelName, registeredCommands)
+            return Help(channelName, registeredCommands, serviceLocator.provideCommandParser())
         }
     }
 
     companion object Extension : TwitckExtension<Configuration, Help> {
         override fun install(
             pipeline: Pipeline,
-            extensionProvider: ExtensionProvider,
+            serviceLocator: ServiceLocator,
             configure: Configuration.() -> Unit
         ): Help {
             return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { localHelp ->
                     pipeline.interceptMessageEvent(localHelp::interceptMessageEvent)
                 }
         }
-
     }
 
 
