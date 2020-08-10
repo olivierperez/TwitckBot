@@ -8,6 +8,7 @@ import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.HelperExtension
 import fr.o80.twitck.lib.extension.TwitckExtension
+import java.util.Locale
 
 class RuntimeCommand(
     private val channel: String,
@@ -32,12 +33,13 @@ class RuntimeCommand(
     // TODO OPZ Ca c'est du gros C/C
     private fun parseCommand(messageEvent: MessageEvent): Command {
         val split = messageEvent.message.split(" ")
+        val tag = split[0].toLowerCase(Locale.FRENCH)
         return if (split.size == 1) {
-            Command(messageEvent.badges, split[0])
+            Command(messageEvent.badges, tag)
         } else {
             Command(
                 messageEvent.badges,
-                split[0],
+                tag,
                 split.subList(1, split.size)
             )
         }
@@ -64,7 +66,7 @@ class RuntimeCommand(
     }
 
     private fun addCommand(options: List<String>): String {
-        val newCommand = options[0].let { cmd -> if(cmd[0] == '!') cmd else "!$cmd" }
+        val newCommand = options[0].addPrefix().toLowerCase(Locale.FRENCH)
         val message = options.subList(1, options.size).joinToString(" ")
         runtimeCommands[newCommand] = message
         extensionProvider.provide(HelperExtension::class.java)
@@ -112,4 +114,8 @@ class RuntimeCommand(
                 }
         }
     }
+}
+
+private fun String.addPrefix(): String {
+    return if(this[0] == '!') this else "!$this"
 }

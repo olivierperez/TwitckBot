@@ -63,7 +63,6 @@ class Main : CliktCommand() {
                 addMessage("#USER# vient de finir de lire les internets mondiaux.")
                 addMessage("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
             }
-            // TODO RuntimeCommand s'enregistre auprès de l'extension Help
             install(Help) {
                 channel(hostChannel)
                 registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")

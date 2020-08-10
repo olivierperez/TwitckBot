@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
+import java.util.Locale
 
 /**
  * This extension provides basic configuration for a given channel.
@@ -54,12 +55,13 @@ class Channel(
     // TODO OPZ Ca c'est du gros C/C
     private fun parseCommand(messageEvent: MessageEvent): Command {
         val split = messageEvent.message.split(" ")
+        val tag = split[0].toLowerCase(Locale.FRENCH)
         return if (split.size == 1) {
-            Command(messageEvent.badges, split[0])
+            Command(messageEvent.badges, tag)
         } else {
             Command(
                 messageEvent.badges,
-                split[0],
+                tag,
                 split.subList(1, split.size)
             )
         }
@@ -102,7 +104,11 @@ class Channel(
     }
 
     companion object Extension : TwitckExtension<Configuration, Channel> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Channel {
+        override fun install(
+            pipeline: Pipeline,
+            extensionProvider: ExtensionProvider,
+            configure: Configuration.() -> Unit
+        ): Channel {
             return Configuration()
                 .apply(configure)
                 .build()
