@@ -66,6 +66,7 @@ class Main : CliktCommand() {
             install(Help) {
                 channel(hostChannel)
                 registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
+                registerCommand("!language", "Ici on fait du Kotlin, best language ever")
                 registerCommand("!none")
             }
             install(RuntimeCommand) {
