@@ -8,7 +8,7 @@ import fr.o80.twitck.extension.Presence
 import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
-import fr.o80.twitck.extension.help.Help
+import fr.o80.twitck.extension.Help
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.twitckBot

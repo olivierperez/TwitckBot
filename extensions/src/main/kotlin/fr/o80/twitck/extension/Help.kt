@@ -1,4 +1,4 @@
-package fr.o80.twitck.extension.help
+package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Command
