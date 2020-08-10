@@ -1,10 +1,10 @@
 package fr.o80.twitck.extension.help
 
-import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
+import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 
 class Help(
@@ -98,7 +98,11 @@ class Help(
     }
 
     companion object Extension : TwitckExtension<Configuration, Help> {
-        override fun install(pipeline: Pipeline, extensionProvider: ExtensionProvider, configure: Configuration.() -> Unit): Help {
+        override fun install(
+            pipeline: Pipeline,
+            extensionProvider: ExtensionProvider,
+            configure: Configuration.() -> Unit
+        ): Help {
             return Configuration()
                 .apply(configure)
                 .build()

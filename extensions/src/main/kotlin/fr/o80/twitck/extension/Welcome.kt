@@ -1,9 +1,9 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bot.TwitckBot
+import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 import java.util.*
 import java.util.concurrent.TimeUnit

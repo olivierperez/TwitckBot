@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
+import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 
 class Presence(

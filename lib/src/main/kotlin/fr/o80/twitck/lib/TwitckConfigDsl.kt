@@ -3,6 +3,7 @@ package fr.o80.twitck.lib
 import fr.o80.twitck.lib.bean.TwitckConfiguration
 import fr.o80.twitck.lib.bot.TwitckBot
 import fr.o80.twitck.lib.bot.TwitckBotImpl
+import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 
 @DslMarker
@@ -46,10 +47,4 @@ class TwitckConfigurator {
         )
     }
 
-}
-
-// TODO Sortir ailleurs
-// TODO Provider plusieurs extensions à partir d'une interface passée en params (+ créer un module qui liste les interfaces disponibles ? pour le cas où quelqu'un veuille développer sa propre extension Help)
-interface ExtensionProvider {
-    fun <T> provide(extensionClass: Class<T>): T?
 }

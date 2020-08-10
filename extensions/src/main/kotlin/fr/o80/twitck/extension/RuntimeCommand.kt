@@ -1,12 +1,12 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.extension.help.Help
-import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
 import fr.o80.twitck.lib.bean.Badge
 import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
+import fr.o80.twitck.lib.extension.ExtensionProvider
 import fr.o80.twitck.lib.extension.TwitckExtension
 
 class RuntimeCommand(
