@@ -4,9 +4,9 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-orange.svg?style=flat-square)](http://makeapullrequest.com)
 [![Last release](https://jitpack.io/v/olivierperez/TwitckBot.svg?style=flat-square)](https://jitpack.io/#olivierperez/TwitckBot)
 
-Every streamers need a bot, and it's not that easy to find the perfect bot that matches what you really want.
+Every streamers need a bot, and it's not that easy to find the perfect bot matching what you really want.
 
-TwitckBot provides a good foundation to build your own bot, and allows you to extend it with whatever you're ready to develop.
+TwitckBot provides a good foundation to build your own Twitch bot, and allows you to extend it with whatever you're ready to develop.
 
 # Installation 👣
 
