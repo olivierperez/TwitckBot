@@ -25,10 +25,10 @@ class TwitckConfigurator {
 
     private val serviceLocator: ServiceLocator = ServiceLocator(
         extensionProvider = object : ExtensionProvider {
-            override fun <T> provide(extensionClass: Class<T>): T? =
+            override fun <T> provide(extensionInterface: Class<T>): List<T> =
                 extensions
-                    .firstOrNull { extension -> extensionClass.isAssignableFrom(extension::class.java) }
-                    ?.let { extension -> extensionClass.cast(extension) }
+                    .filter { extension -> extensionInterface.isAssignableFrom(extension::class.java) }
+                    .map { extension -> extensionInterface.cast(extension) }
         }
     )
 

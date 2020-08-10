@@ -56,10 +56,17 @@ class RuntimeCommand(
     private fun addCommand(options: List<String>): String {
         val newCommand = options[0].addPrefix().toLowerCase(Locale.FRENCH)
         val message = options.subList(1, options.size).joinToString(" ")
-        runtimeCommands[newCommand] = message
-        extensionProvider.provide(HelperExtension::class.java)
-            ?.registerCommand(newCommand)
+        registerRuntimeCommand(newCommand, message)
+        registerToHelper(newCommand)
         return newCommand
+    }
+
+    private fun registerRuntimeCommand(newCommand: String, message: String) {
+        runtimeCommands[newCommand] = message
+    }
+
+    private fun registerToHelper(newCommand: String) {
+        extensionProvider.provide(HelperExtension::class.java).map { helper -> helper.registerCommand(newCommand) }
     }
 
     class Configuration {
