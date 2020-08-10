@@ -97,8 +97,8 @@ class RuntimeCommand(
             return RuntimeCommand(
                 channelName,
                 theBadges,
-                serviceLocator.provideExtensionProvider(),
-                serviceLocator.provideCommandParser()
+                serviceLocator.extensionProvider,
+                serviceLocator.commandParser
             )
         }
     }

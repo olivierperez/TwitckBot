@@ -82,7 +82,7 @@ class Help(
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Help::class.simpleName}")
 
-            return Help(channelName, registeredCommands, serviceLocator.provideCommandParser())
+            return Help(channelName, registeredCommands, serviceLocator.commandParser)
         }
     }
 

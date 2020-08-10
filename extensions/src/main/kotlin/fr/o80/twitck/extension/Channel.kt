@@ -85,7 +85,7 @@ class Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
                 commandCallbacks = commandCallbacks,
-                commandParser = serviceLocator.provideCommandParser()
+                commandParser = serviceLocator.commandParser
             )
         }
     }
