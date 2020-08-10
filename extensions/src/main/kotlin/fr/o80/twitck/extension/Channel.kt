@@ -2,6 +2,7 @@ package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.ExtensionProvider
 import fr.o80.twitck.lib.Pipeline
+import fr.o80.twitck.lib.bean.Command
 import fr.o80.twitck.lib.bean.JoinEvent
 import fr.o80.twitck.lib.bean.MessageEvent
 import fr.o80.twitck.lib.bot.TwitckBot
@@ -50,12 +51,17 @@ class Channel(
         return messageEvent
     }
 
+    // TODO OPZ Ca c'est du gros C/C
     private fun parseCommand(messageEvent: MessageEvent): Command {
         val split = messageEvent.message.split(" ")
         return if (split.size == 1) {
-            Command(split[0])
+            Command(messageEvent.badges, split[0])
         } else {
-            Command(split[0], split.subList(1, split.size))
+            Command(
+                messageEvent.badges,
+                split[0],
+                split.subList(1, split.size)
+            )
         }
     }
 
@@ -108,11 +114,6 @@ class Channel(
         }
     }
 }
-
-class Command(
-    val tag: String,
-    val options: List<String> = emptyList()
-)
 
 typealias CommandCallback = (
     bot: TwitckBot,
