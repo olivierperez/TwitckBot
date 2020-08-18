@@ -72,6 +72,7 @@ There's some extension you may want to use:
 - `Help`: Responds to `!help` from the users
 - `Presence`: Your bot will also connect (but won't operate) on a channel of your friend
 - `RuntimeCommand`: You can add command at runtime thanks (eg: `!addcmd language Kotlin <3`)
+- `ViewerPromotion`: Promote the viewer channel when he/she starts talking
 - `Welcome`: Welcomes everyone
 - `Whisper`: React to whispering
 
