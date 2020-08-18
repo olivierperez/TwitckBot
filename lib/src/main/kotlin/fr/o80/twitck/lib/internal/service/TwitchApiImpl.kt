@@ -1,7 +1,8 @@
 package fr.o80.twitck.lib.internal.service
 
 import com.google.gson.GsonBuilder
-import fr.o80.twitck.lib.api.bean.Follow
+import fr.o80.twitck.lib.api.bean.Follower
+import fr.o80.twitck.lib.api.bean.User
 import fr.o80.twitck.lib.api.service.TwitchApi
 import java.net.URI
 import java.net.http.HttpClient
@@ -15,23 +16,39 @@ class TwitchApiImpl(
     private val gson = GsonBuilder().create()
     private val client = HttpClient.newHttpClient()
 
-    // gnucc -> "124210976"
-    override fun getFollowers(streamId: String): List<Follow> {
+    override fun getFollowers(streamId: String): List<Follower> {
+        val url = "https://api.twitch.tv/kraken/channels/$streamId/follows"
+        val answer = doRequest(url).parse<FollowAnswer>()
+        return answer.follows
+    }
+
+    override fun getUser(userName: String): User {
+        val url = "https://api.twitch.tv/kraken/users?login=$userName"
+        val answer = doRequest(url).parse<UserAnswer>()
+        return answer.users[0]
+    }
+
+    private fun doRequest(url: String): String {
         val request = HttpRequest.newBuilder()
-            .uri(URI.create("https://api.twitch.tv/kraken/channels/$streamId/follows"))
+            .uri(URI.create(url))
             .header("Client-ID", clientId)
             //.header("Authorization", "Bearer $oauthToken")
             .header("Accept", "application/vnd.twitchtv.v5+json")
             .build()
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        val body = response.body()
+        return response.body()
+    }
 
-
-        val getFollowAnswer = gson.fromJson(body, FollowAnswer::class.java)
-        return getFollowAnswer.follows
+    private inline fun <reified T> String.parse(): T {
+        return gson.fromJson(this, T::class.java)
     }
 }
 
+
 class FollowAnswer(
-    val follows: List<Follow>
+    val follows: List<Follower>
+)
+
+class UserAnswer(
+    val users: List<User>
 )

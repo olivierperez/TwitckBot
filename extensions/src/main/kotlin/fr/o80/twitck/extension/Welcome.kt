@@ -1,21 +1,29 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.Follower
+import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.api.service.TwitchApi
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class Welcome(
     private val channel: String,
+    private val messagesForFollowers: Collection<String>,
     private val messages: Collection<String>,
-    private val hostName: String?,
-    private val hostMessage: String?
+    private val hostName: String,
+    private val hostMessage: String?,
+    private val twitchApi: TwitchApi
 ) {
     private val welcomedUsers = mutableSetOf<Welcomed>()
     private val millisBeforeReWelcome = TimeUnit.HOURS.toMillis(1)
+    private val followers : List<Follower> by lazy {
+        val user = twitchApi.getUser(hostName)
+        twitchApi.getFollowers(user.id)
+    }
 
     fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
         if (channel != joinEvent.channel)
@@ -44,7 +52,7 @@ class Welcome(
     }
 
     private fun welcomeViewer(joinEvent: JoinEvent, bot: TwitckBot) {
-        val randomMessage = formatRandomMessageFor(joinEvent.login)
+        val randomMessage = pickMessage(joinEvent)
         bot.send(joinEvent.channel, randomMessage)
 
         welcomedUsers.add(Welcomed(joinEvent.login))
@@ -56,8 +64,24 @@ class Welcome(
             ?: true
     }
 
-    private fun formatRandomMessageFor(login: String): String =
-        messages.random().replace("#USER#", login)
+    private fun pickMessage(joinEvent: JoinEvent): String {
+        val follower = joinEvent.login.getFollowerOrNull()
+        return if (follower != null) {
+            messagesForFollowers.random().formatFollower(follower)
+        } else {
+            messages.random().formatViewer(joinEvent.login)
+        }
+    }
+
+    private fun String.getFollowerOrNull(): Follower? {
+        return followers.firstOrNull { follower -> follower.user.name == this }
+    }
+
+    private fun String.formatViewer(login: String): String =
+        this.replace("#USER#", login)
+
+    private fun String.formatFollower(follower: Follower): String =
+        this.replace("#USER#", follower.user.displayName)
 
     class Configuration {
 
@@ -67,6 +91,7 @@ class Welcome(
         private var channel: String? = null
 
         private val messages: MutableList<String> = mutableListOf()
+        private val messagesForFollowers: MutableList<String> = mutableListOf()
 
         private var hostName: String? = null
         private var hostMessage: String? = null
@@ -82,20 +107,29 @@ class Welcome(
         }
 
         @WelcomeDsl
+        fun welcomeFollower(message: String) {
+            messagesForFollowers += message
+        }
+
+        @WelcomeDsl
         fun host(hostName: String, welcomeMessage: String) {
             this.hostName = hostName
             this.hostMessage = welcomeMessage
         }
 
-        fun build(): Welcome {
+        fun build(serviceLocator: ServiceLocator): Welcome {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Welcome::class.simpleName}")
+            val hostName = hostName
+                ?: throw IllegalStateException("Host name must be set for the extension ${Welcome::class.simpleName}")
 
             return Welcome(
                 channel = channelName,
                 messages = messages,
+                messagesForFollowers = messagesForFollowers,
                 hostName = hostName,
-                hostMessage = hostMessage
+                hostMessage = hostMessage,
+                twitchApi = serviceLocator.twitchApi
             )
         }
     }
@@ -108,7 +142,7 @@ class Welcome(
         ): Welcome {
             return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { welcome ->
                     pipeline.interceptJoinEvent { bot, joinEvent -> welcome.interceptJoinEvent(bot, joinEvent) }
                     pipeline.requestChannel(welcome.channel)

@@ -59,12 +59,18 @@ class Main : CliktCommand() {
             install(Welcome) {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
-                addMessage("Compilation de #USER# impossible, il est plein de bugs.")
+                addMessage("Compilation de #USER# impossible, trop de bugs.")
                 addMessage("Décompilation de #USER# en cours...")
-                addMessage("#USER# télécharge les internets mondiaux, il arrive dans 1 ou 2 seconds.")
-                addMessage("#USER# croit profondément au retour du Pascal, ne lui dites pas la vérité.")
-                addMessage("#USER# vient de finir de lire les internets mondiaux.")
+                addMessage("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
+                addMessage("#USER# croit profondément au retour du Pascal...")
+                addMessage("#USER# vient de finir sa lecture des internets mondiaux.")
                 addMessage("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
+                welcomeFollower("Yo #USER# t'es le meilleur des internets mondiaux!")
+                welcomeFollower("Prière d'accueillir #USER# comme il se doit.")
+                welcomeFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")
+                welcomeFollower("#USER# !! Mon préféré !")
+                welcomeFollower("Faites place au prince #USER# !")
+                // ignore("lurxx", "anotherviewer")
             }
             install(Help) {
                 channel(hostChannel)
