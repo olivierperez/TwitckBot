@@ -14,8 +14,7 @@ import fr.o80.twitck.lib.internal.service.line.WhisperLineHandler
 import org.jibble.pircbot.PircBot
 
 internal class TwitckBotImpl(
-    private val oauthToken: String,
-    configuration: TwitckConfiguration
+    private val configuration: TwitckConfiguration
 ) : PircBot(), TwitckBot {
 
     private val initializer = TwitckInitializer()
@@ -33,7 +32,7 @@ internal class TwitckBotImpl(
     override  fun connectToServer() {
         println("Attempting to connect to irc.twitch.tv...")
 
-        connect(HOST, PORT, "oauth:$oauthToken")
+        connect(HOST, PORT, "oauth:${configuration.oauthToken}")
 
         println("Requesting twitch membership capability for NAMES/JOIN/PART/MODE messages...")
         sendRawLine(SERVER_MEMREQ)
