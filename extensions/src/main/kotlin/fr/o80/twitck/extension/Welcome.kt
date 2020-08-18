@@ -109,12 +109,12 @@ class Welcome(
         }
 
         @WelcomeDsl
-        fun addMessage(message: String) {
+        fun messageForViewer(message: String) {
             messages += message
         }
 
         @WelcomeDsl
-        fun welcomeFollower(message: String) {
+        fun messageForFollower(message: String) {
             messagesForFollowers += message
         }
 

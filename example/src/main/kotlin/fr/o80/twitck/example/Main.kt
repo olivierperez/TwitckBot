@@ -7,6 +7,7 @@ import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.Presence
 import fr.o80.twitck.extension.RuntimeCommand
+import fr.o80.twitck.extension.ViewerPromotion
 import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
@@ -59,18 +60,24 @@ class Main : CliktCommand() {
             install(Welcome) {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
-                ignore("lurxx", "anotherttvviewer")
-                addMessage("Compilation de #USER# impossible, trop de bugs.")
-                addMessage("Décompilation de #USER# en cours...")
-                addMessage("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
-                addMessage("#USER# croit profondément au retour du Pascal...")
-                addMessage("#USER# vient de finir sa lecture des internets mondiaux.")
-                addMessage("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
-                welcomeFollower("Yo #USER# t'es le meilleur des internets mondiaux!")
-                welcomeFollower("Prière d'accueillir #USER# comme il se doit.")
-                welcomeFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")
-                welcomeFollower("#USER# !! Mon préféré !")
-                welcomeFollower("Faites place au prince #USER# !")
+                ignore(botName, "lurxx", "anotherttvviewer")
+                messageForViewer("Compilation de #USER# impossible, trop de bugs.")
+                messageForViewer("Décompilation de #USER# en cours...")
+                messageForViewer("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
+                messageForViewer("#USER# croit profondément au retour du Pascal...")
+                messageForViewer("#USER# vient de finir sa lecture des internets mondiaux.")
+                messageForViewer("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
+                messageForFollower("Yo #USER# t'es le meilleur des internets mondiaux!")
+                messageForFollower("Prière d'accueillir #USER# comme il se doit.")
+                messageForFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")
+                messageForFollower("#USER# !! Mon préféré !")
+                messageForFollower("Faites place au prince #USER# !")
+            }
+            install(ViewerPromotion) {
+                channel(hostChannel)
+                ignore("gnucc", "lurxx", "anotherttvviewer")
+                addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
+                addMessage("Envie de [#GAME#] ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
             install(Help) {
                 channel(hostChannel)
