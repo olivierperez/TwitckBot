@@ -16,7 +16,8 @@ class Welcome(
     private val messages: Collection<String>,
     private val hostName: String,
     private val hostMessage: String?,
-    private val twitchApi: TwitchApi
+    private val twitchApi: TwitchApi,
+    private val ignoredLogins: MutableList<String>
 ) {
     private val welcomedUsers = mutableSetOf<Welcomed>()
     private val millisBeforeReWelcome = TimeUnit.HOURS.toMillis(1)
@@ -28,6 +29,10 @@ class Welcome(
     fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
         if (channel != joinEvent.channel)
             return joinEvent
+
+        if (joinEvent.login in ignoredLogins) {
+            return joinEvent
+        }
 
         when {
             isHost(joinEvent.login) -> {
@@ -96,6 +101,8 @@ class Welcome(
         private var hostName: String? = null
         private var hostMessage: String? = null
 
+        private var ignoredLogins: MutableList<String> = mutableListOf()
+
         @WelcomeDsl
         fun channel(channel: String) {
             this.channel = channel
@@ -117,6 +124,11 @@ class Welcome(
             this.hostMessage = welcomeMessage
         }
 
+        @WelcomeDsl
+        fun ignore(vararg logins: String) {
+            ignoredLogins.addAll(logins)
+        }
+
         fun build(serviceLocator: ServiceLocator): Welcome {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Welcome::class.simpleName}")
@@ -129,7 +141,8 @@ class Welcome(
                 messagesForFollowers = messagesForFollowers,
                 hostName = hostName,
                 hostMessage = hostMessage,
-                twitchApi = serviceLocator.twitchApi
+                twitchApi = serviceLocator.twitchApi,
+                ignoredLogins = ignoredLogins
             )
         }
     }

@@ -59,6 +59,7 @@ class Main : CliktCommand() {
             install(Welcome) {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
+                ignore("lurxx", "anotherttvviewer")
                 addMessage("Compilation de #USER# impossible, trop de bugs.")
                 addMessage("Décompilation de #USER# en cours...")
                 addMessage("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
@@ -70,7 +71,6 @@ class Main : CliktCommand() {
                 welcomeFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")
                 welcomeFollower("#USER# !! Mon préféré !")
                 welcomeFollower("Faites place au prince #USER# !")
-                // ignore("lurxx", "anotherviewer")
             }
             install(Help) {
                 channel(hostChannel)
