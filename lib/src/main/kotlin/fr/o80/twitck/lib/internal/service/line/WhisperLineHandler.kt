@@ -20,6 +20,7 @@ internal class WhisperLineHandler(
             val msg = matchResult.groupValues[4]
 
             var badges = listOf<Badge>()
+            var userId = ""
             var color = ""
             var displayName = ""
 
@@ -27,6 +28,7 @@ internal class WhisperLineHandler(
                 val (key, value) = it.split("=")
                 when (key) {
                     "badges" -> badges = parseBadges(value)
+                    "user-id" -> userId = value
                     "color" -> color = value
                     "display-name" -> displayName = value
                 }
@@ -36,6 +38,7 @@ internal class WhisperLineHandler(
                 WhisperEvent(
                     destination = destination,
                     login = user,
+                    userId = userId,
                     message = msg
                 )
             )

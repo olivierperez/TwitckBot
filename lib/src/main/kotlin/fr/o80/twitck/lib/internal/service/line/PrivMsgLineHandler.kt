@@ -20,6 +20,7 @@ internal class PrivMsgLineHandler(
             val msg = matchResult.groupValues[4]
 
             var badges = listOf<Badge>()
+            var userId = ""
             var color = ""
             var displayName = ""
             var bits = 0
@@ -28,6 +29,7 @@ internal class PrivMsgLineHandler(
                 val (key, value) = it.split("=")
                 when (key) {
                     "badges" -> badges = parseBadges(value)
+                    "user-id" -> userId = value
                     "color" -> color = value
                     "bits" -> bits = value.toInt()
                     "display-name" -> displayName = value
@@ -39,6 +41,7 @@ internal class PrivMsgLineHandler(
                     bot = bot,
                     channel = channel,
                     login = user,
+                    userId = userId,
                     badges = badges,
                     message = msg
                 )

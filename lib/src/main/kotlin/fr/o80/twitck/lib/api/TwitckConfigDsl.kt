@@ -35,7 +35,7 @@ class TwitckConfigurator(
                     .filter { extension -> extensionInterface.isAssignableFrom(extension::class.java) }
                     .map { extension -> extensionInterface.cast(extension) }
         },
-        twitchApi = TwitchApiImpl(clientId)
+        twitchApi = TwitchApiImpl(clientId, oauthToken)
     )
 
     @TwitckConfigDsl

@@ -1,6 +1,7 @@
 package fr.o80.twitck.lib.internal.service
 
 import com.google.gson.GsonBuilder
+import fr.o80.twitck.lib.api.bean.Channel
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.User
 import fr.o80.twitck.lib.api.service.TwitchApi
@@ -10,7 +11,8 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 class TwitchApiImpl(
-    private val clientId: String
+    private val clientId: String,
+    private val oauthToken: String
 ) : TwitchApi {
 
     private val gson = GsonBuilder().create()
@@ -28,13 +30,19 @@ class TwitchApiImpl(
         return answer.users[0]
     }
 
+    override fun getChannel(channelId: String): Channel {
+        val url = "https://api.twitch.tv/kraken/channels/$channelId"
+        return doRequest(url).parse<Channel>().also { println("  <<==>>  channel: $it") }
+    }
+
     private fun doRequest(url: String): String {
         val request = HttpRequest.newBuilder()
             .uri(URI.create(url))
             .header("Client-ID", clientId)
-            //.header("Authorization", "Bearer $oauthToken")
+            .header("Authorization", "OAuth $oauthToken")
             .header("Accept", "application/vnd.twitchtv.v5+json")
             .build()
+
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
         return response.body()
     }
