@@ -1,10 +1,10 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.Pipeline
-import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.TwitckExtension
-import fr.o80.twitck.lib.handler.WhisperEvent
-import fr.o80.twitck.lib.service.ServiceLocator
+import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.service.ServiceLocator
 
 /**
  * This extension provides a way to react to whispers to the bot.

@@ -1,10 +1,10 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.Pipeline
-import fr.o80.twitck.lib.bean.JoinEvent
-import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.TwitckExtension
-import fr.o80.twitck.lib.service.ServiceLocator
+import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.ServiceLocator
 import java.util.Date
 import java.util.concurrent.TimeUnit
 

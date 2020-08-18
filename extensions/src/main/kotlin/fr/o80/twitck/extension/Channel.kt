@@ -1,13 +1,13 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.Pipeline
-import fr.o80.twitck.lib.bean.Command
-import fr.o80.twitck.lib.bean.JoinEvent
-import fr.o80.twitck.lib.bean.MessageEvent
-import fr.o80.twitck.lib.bot.TwitckBot
-import fr.o80.twitck.lib.extension.TwitckExtension
-import fr.o80.twitck.lib.service.CommandParser
-import fr.o80.twitck.lib.service.ServiceLocator
+import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.Command
+import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.CommandParser
+import fr.o80.twitck.lib.api.service.ServiceLocator
 
 /**
  * This extension provides basic configuration for a given channel.

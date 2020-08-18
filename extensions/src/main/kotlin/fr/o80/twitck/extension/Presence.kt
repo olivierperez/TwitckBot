@@ -1,8 +1,8 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.Pipeline
-import fr.o80.twitck.lib.extension.TwitckExtension
-import fr.o80.twitck.lib.service.ServiceLocator
+import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Presence(
     private val channel: String
