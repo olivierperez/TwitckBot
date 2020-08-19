@@ -40,11 +40,11 @@ class Channel(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        val command = commandParser.parse(messageEvent)
-
-        commandCallbacks.forEach { (commandTag, callback) ->
-            if (commandTag == command.tag) {
-                callback(bot, command)
+        commandParser.parse(messageEvent)?.let { command ->
+            commandCallbacks.forEach { (commandTag, callback) ->
+                if (commandTag == command.tag) {
+                    callback(bot, command)
+                }
             }
         }
 

@@ -25,8 +25,9 @@ class RuntimeCommand(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        val command = commandParser.parse(messageEvent)
-        reactToCommand(command, bot, messageEvent)
+        commandParser.parse(messageEvent)?.let { command ->
+            reactToCommand(command, bot, messageEvent)
+        }
 
         return messageEvent
     }
