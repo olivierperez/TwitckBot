@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
+import fr.o80.twitck.extension.Points
 import fr.o80.twitck.extension.Presence
 import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.ViewerPromotion
@@ -57,6 +58,10 @@ class Main : CliktCommand() {
     ): TwitckBot {
         println("Start...")
         return twitckBot(oauthToken, clientId) {
+            install(Points) {
+                channel(hostChannel)
+                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
+            }
             install(Welcome) {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")

@@ -25,8 +25,6 @@ class RuntimeCommand(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
-
         val command = commandParser.parse(messageEvent)
         reactToCommand(command, bot, messageEvent)
 
@@ -66,7 +64,7 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.provide(HelperExtension::class.java).map { helper -> helper.registerCommand(newCommand) }
+        extensionProvider.provide(HelperExtension::class.java).forEach { helper -> helper.registerCommand(newCommand) }
     }
 
     class Configuration {

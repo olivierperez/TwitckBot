@@ -40,8 +40,6 @@ class Channel(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
-
         val command = commandParser.parse(messageEvent)
 
         commandCallbacks.forEach { (commandTag, callback) ->

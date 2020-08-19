@@ -19,8 +19,6 @@ class Help(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        println("> I've just seen a message event: ${messageEvent.channel} > ${messageEvent.message}")
-
         val command = commandParser.parse(messageEvent)
         reactToCommand(command, bot, messageEvent)
 

@@ -28,6 +28,8 @@ class ViewerPromotion(
         }
 
         when {
+            // TODO Vérifier si "status" != null && game != ||
+            // TODO Vérifier de quand date la dernière vidéo (trop vieux == ne pas faire de pub ?)
             needToPromote(messageEvent.login) -> {
                 promoteViewer(messageEvent, bot)
             }
