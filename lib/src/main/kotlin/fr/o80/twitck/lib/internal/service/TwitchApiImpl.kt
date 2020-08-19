@@ -32,7 +32,7 @@ class TwitchApiImpl(
 
     override fun getChannel(channelId: String): Channel {
         val url = "https://api.twitch.tv/kraken/channels/$channelId"
-        return doRequest(url).parse<Channel>().also { println("  <<==>>  channel: $it") }
+        return doRequest(url).parse()
     }
 
     private fun doRequest(url: String): String {

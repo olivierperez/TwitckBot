@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.MessageEvent
@@ -36,23 +37,23 @@ class Points(
         }
     }
 
-    private fun interceptMessage(messageEvent: MessageEvent): MessageEvent {
+    private fun interceptMessage(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
             return messageEvent
 
         commandParser.parse(messageEvent)?.let { command ->
-            reactToCommand(command, messageEvent)
+            reactToCommand(bot, command, messageEvent)
         }
 
         return messageEvent
     }
 
-    private fun reactToCommand(command: Command, messageEvent: MessageEvent) {
+    private fun reactToCommand(bot: TwitckBot, command: Command, messageEvent: MessageEvent) {
         when (command.tag) {
             // !points_add Pipiks_ 13000
             "!points_add" -> handleAddCommand(command)
             // !points_transfer idontwantgiftsub 152
-            "!points_transfer" -> handleTransferCommand(command, messageEvent)
+            "!points_transfer" -> handleTransferCommand(bot, command, messageEvent)
             // TODO !points_info
         }
     }
@@ -70,14 +71,20 @@ class Points(
         }
     }
 
-    private fun handleTransferCommand(command: Command, messageEvent: MessageEvent) {
+    private fun handleTransferCommand(bot: TwitckBot, command: Command, messageEvent: MessageEvent) {
         if (command.options.size == 2) {
-            val login = command.options[0].toLowerCase()
+            val toLogin = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
 
             points?.let {
-                // TODO Dire si ça a fonctionné, sinon "Les huissiers sont en route"
-                innerTransferPoints(messageEvent.login, login, points)
+                // TODO Vérifier que les 2 logins sont différents
+                val transferSucceeded = innerTransferPoints(messageEvent.login, toLogin, points)
+                if (transferSucceeded) {
+                    // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
+                    bot.send(channel, "Points transferés de ${messageEvent.login} à $toLogin")
+                } else {
+                    bot.send(channel, "Les huissiers sont en route vers ${messageEvent.login}")
+                }
             }
         }
     }
@@ -88,12 +95,15 @@ class Points(
         }
     }
 
-    private fun innerTransferPoints(fromLogin: String, toLogin: String, points: Int) {
+    private fun innerTransferPoints(fromLogin: String, toLogin: String, points: Int): Boolean {
         synchronized(bank) {
-            if (canConsume(fromLogin, points)) {
-                bank.computeIfPresent(fromLogin) { _, balance -> balance - points }
-                innerAddPoints(toLogin, points)
+            if (!canConsume(fromLogin, points)) {
+                return false
             }
+
+            bank.computeIfPresent(fromLogin) { _, balance -> balance - points }
+            innerAddPoints(toLogin, points)
+            return true
         }
     }
 
@@ -144,7 +154,7 @@ class Points(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { points ->
-                    pipeline.interceptMessageEvent { _, messageEvent -> points.interceptMessage(messageEvent) }
+                    pipeline.interceptMessageEvent { bot, messageEvent -> points.interceptMessage(bot, messageEvent) }
                     pipeline.requestChannel(points.channel)
                 }
         }
