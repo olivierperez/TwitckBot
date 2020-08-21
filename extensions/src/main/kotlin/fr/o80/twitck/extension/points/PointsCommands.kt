@@ -42,8 +42,9 @@ class PointsCommands(
             val toLogin = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
 
+            if (toLogin == messageEvent.login) return
+
             points?.let {
-                // TODO Vérifier que les 2 logins sont différents
                 val transferSucceeded = bank.transferPoints(messageEvent.login, toLogin, points)
                 if (transferSucceeded) {
                     // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
