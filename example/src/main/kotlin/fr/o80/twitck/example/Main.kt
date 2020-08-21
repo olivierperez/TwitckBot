@@ -65,7 +65,7 @@ class Main : CliktCommand() {
             install(Welcome) {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
-                ignore(botName, "lurxx", "anotherttvviewer")
+                ignore(botName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
                 messageForViewer("Compilation de #USER# impossible, trop de bugs.")
                 messageForViewer("Décompilation de #USER# en cours...")
                 messageForViewer("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
@@ -80,9 +80,9 @@ class Main : CliktCommand() {
             }
             install(ViewerPromotion) {
                 channel(hostChannel)
-                ignore("gnucc", "lurxx", "anotherttvviewer")
+                ignore("gnucc", "lurxx", "anotherttvviewer", "letsdothis_streamers")
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
-                addMessage("Envie de [#GAME#] ? n'hésitez pas à aller voir #USER# -> #URL#")
+                addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
             install(Help) {
                 channel(hostChannel)
