@@ -2,8 +2,8 @@ package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.Channel
 import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
@@ -28,8 +28,6 @@ class ViewerPromotion(
         }
 
         when {
-            // TODO Vérifier si "status" != null && game != ||
-            // TODO Vérifier de quand date la dernière vidéo (trop vieux == ne pas faire de pub ?)
             needToPromote(messageEvent.login) -> {
                 promoteViewer(messageEvent, bot)
             }
@@ -48,17 +46,21 @@ class ViewerPromotion(
     }
 
     private fun promoteViewer(messageEvent: MessageEvent, bot: TwitckBot) {
-        val viewerChannel = twitchApi.getChannel(messageEvent.userId)
-        val randomMessage = messages.random().formatViewer(viewerChannel)
+        val lastVideo = twitchApi.getVideos(messageEvent.userId, 1)
+            .takeIf { it.isNotEmpty() }
+            ?.first()
+            ?: return
+
+        val randomMessage = messages.random().formatViewer(messageEvent, lastVideo)
         bot.send(messageEvent.channel, randomMessage)
 
         promotedUsers.add(Promoted(messageEvent.login))
     }
 
-    private fun String.formatViewer(viewerChannel: Channel): String =
-        this.replace("#USER#", viewerChannel.displayName)
-            .replace("#URL#", viewerChannel.url)
-            .replace("#GAME#", viewerChannel.game)
+    private fun String.formatViewer(messageEvent: MessageEvent, video: Video): String =
+        this.replace("#USER#", messageEvent.login)
+            .replace("#URL#", video.url)
+            .replace("#GAME#", video.game)
 
     class Configuration {
 
