@@ -48,13 +48,15 @@ class Points(
         return messageEvent
     }
 
+    // TODO OPZ Bouger les fonctions qui réagissent aux commandes dans un classe à part
     private fun reactToCommand(bot: TwitckBot, command: Command, messageEvent: MessageEvent) {
         when (command.tag) {
             // !points_add Pipiks_ 13000
             "!points_add" -> handleAddCommand(command)
             // !points_transfer idontwantgiftsub 152
             "!points_transfer" -> handleTransferCommand(bot, command, messageEvent)
-            // TODO !points_info
+            // !points
+            "!points_info" -> handleInfoCommand(bot, messageEvent)
         }
     }
 
@@ -86,6 +88,15 @@ class Points(
                     bot.send(channel, "Les huissiers sont en route vers ${messageEvent.login}")
                 }
             }
+        }
+    }
+
+    private fun handleInfoCommand(bot: TwitckBot, messageEvent: MessageEvent) {
+        val points = bank[messageEvent.login] ?: 0
+        if (points == 0) {
+            bot.send(channel, "${messageEvent.login} n'a pas de points")
+        } else {
+            bot.send(channel, "${messageEvent.login} a $points point(s)")
         }
     }
 
