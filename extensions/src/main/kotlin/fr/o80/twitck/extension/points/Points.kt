@@ -47,6 +47,8 @@ class Points(
         private var channel: String? = null
         private var badges: Array<out Badge>? = null
 
+        private var messages : Messages? = null
+
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
@@ -60,13 +62,30 @@ class Points(
             this.badges = badges
         }
 
+        @Dsl
+        fun messages(
+            pointsTransferred: String,
+            noPointsEnough: String,
+            viewHasNoPoints: String,
+            viewHasPoints: String
+        ) {
+            messages = Messages(pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints)
+        }
+
         fun build(serviceLocator: ServiceLocator): Points {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
             val privilegedBadges = badges
                 ?: arrayOf(Badge.BROADCASTER)
             val bank = PointsBank()
-            return Points(channelName, serviceLocator.commandParser, PointsCommands(channelName, privilegedBadges, bank), bank)
+            val theMessages = messages
+                ?: throw IllegalStateException("Messages must be set for the extension ${Points::class.simpleName}")
+            return Points(
+                channelName,
+                serviceLocator.commandParser,
+                PointsCommands(channelName, privilegedBadges, bank, theMessages),
+                bank
+            )
         }
     }
 

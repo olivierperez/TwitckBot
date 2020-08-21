@@ -9,14 +9,18 @@ import fr.o80.twitck.lib.utils.tryToInt
 class PointsCommands(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
-    private val bank: PointsBank
+    private val bank: PointsBank,
+    private val message: Messages
 ) {
 
     fun reactTo(command: Command, messageEvent: MessageEvent, bot: TwitckBot) {
         when (command.tag) {
-            "!points_add" -> handleAddCommand(command) // !points_add Pipiks_ 13000
-            "!points_transfer" -> handleTransferCommand(command, messageEvent, bot) // !points_transfer idontwantgiftsub 152
-            "!points_info" -> handleInfoCommand(messageEvent, bot) // !points_info
+            // !points_add Pipiks_ 13000
+            "!points_add" -> handleAddCommand(command)
+            // !points_transfer idontwantgiftsub 152
+            "!points_transfer" -> handleTransferCommand(command, messageEvent, bot)
+            // !points_info
+            "!points_info" -> handleInfoCommand(messageEvent, bot)
         }
     }
 
@@ -46,22 +50,32 @@ class PointsCommands(
 
             points?.let {
                 val transferSucceeded = bank.transferPoints(messageEvent.login, toLogin, points)
-                if (transferSucceeded) {
+                val msg = if (transferSucceeded) {
                     // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
-                    bot.send(channel, "Points transferés de ${messageEvent.login} à $toLogin")
+                    message.pointsTransferred
+                        .replace("#FROM#", messageEvent.login)
+                        .replace("#TO#", toLogin)
                 } else {
-                    bot.send(channel, "Les huissiers sont en route vers ${messageEvent.login}")
+                    message.notEnoughPoints
+                        .replace("#FROM#", messageEvent.login)
+                        .replace("#TO#", toLogin)
                 }
+                bot.send(channel, msg)
             }
         }
     }
 
     private fun handleInfoCommand(messageEvent: MessageEvent, bot: TwitckBot) {
         val points = bank.getPoints(messageEvent.login)
-        if (points == 0) {
-            bot.send(channel, "${messageEvent.login} n'a pas de point")
+        val msg = if (points == 0) {
+            message.viewerHasNoPoints
+                .replace("#USER#", messageEvent.login)
+                .replace("#POINTS#", points.toString())
         } else {
-            bot.send(channel, "${messageEvent.login} a $points point(s)")
+            message.viewerHasPoints
+                .replace("#USER#", messageEvent.login)
+                .replace("#POINTS#", points.toString())
         }
+        bot.send(channel, msg)
     }
 }

@@ -61,6 +61,12 @@ class Main : CliktCommand() {
             install(Points) {
                 channel(hostChannel)
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
+                messages(
+                    pointsTransferred = "Codes transferés de #FROM# à #TO#",
+                    noPointsEnough = "Les huissiers sont en route vers #FROM#",
+                    viewHasNoPoints = "#USER# n'a pas de code",
+                    viewHasPoints = "#USER# a #POINTS# code(s)"
+                )
             }
             install(Welcome) {
                 channel(hostChannel)
