@@ -7,6 +7,7 @@ import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.extension.Presence
+import fr.o80.twitck.extension.Rewards
 import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.ViewerPromotion
 import fr.o80.twitck.extension.Welcome
@@ -58,6 +59,9 @@ class Main : CliktCommand() {
     ): TwitckBot {
         println("Start...")
         return twitckBot(oauthToken, clientId) {
+            install(Rewards) {
+                channel(hostChannel)
+            }
             install(Points) {
                 channel(hostChannel)
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
@@ -86,7 +90,7 @@ class Main : CliktCommand() {
             }
             install(ViewerPromotion) {
                 channel(hostChannel)
-                ignore("lurxx", "anotherttvviewer", "letsdothis_streamers")
+                ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
