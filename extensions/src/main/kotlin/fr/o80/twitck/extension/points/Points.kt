@@ -33,7 +33,7 @@ class Points(
             return messageEvent
 
         commandParser.parse(messageEvent)?.let { command ->
-            commands.reactTo(command, messageEvent, bot)
+            commands.reactTo(command, bot)
         }
 
         return messageEvent
@@ -80,10 +80,13 @@ class Points(
             val bank = PointsBank()
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Points::class.simpleName}")
+
+            val logger = serviceLocator.loggerFactory.getLogger(Points::class)
+
             return Points(
                 channelName,
                 serviceLocator.commandParser,
-                PointsCommands(channelName, privilegedBadges, bank, theMessages),
+                PointsCommands(channelName, privilegedBadges, bank, theMessages, logger),
                 bank
             )
         }

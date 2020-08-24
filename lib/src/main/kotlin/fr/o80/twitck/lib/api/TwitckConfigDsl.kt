@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl
@@ -27,6 +28,7 @@ class TwitckConfigurator(
 ) {
     private val extensions: MutableList<Any> = mutableListOf()
     private val pipeline = PipelineImpl()
+    private val loggerFactory = Slf4jLoggerFactory()
 
     private val serviceLocator: ServiceLocator = ServiceLocator(
         extensionProvider = object : ExtensionProvider {
@@ -35,6 +37,7 @@ class TwitckConfigurator(
                     .filter { extension -> extensionInterface.isAssignableFrom(extension::class.java) }
                     .map { extension -> extensionInterface.cast(extension) }
         },
+        loggerFactory = loggerFactory,
         twitchApi = TwitchApiImpl(clientId, oauthToken)
     )
 
@@ -53,7 +56,8 @@ class TwitckConfigurator(
             requestedChannels = pipeline.requestedChannels,
             joinHandlers = pipeline.joinHandlers,
             messageHandlers = pipeline.messageHandlers,
-            whisperHandlers = pipeline.whisperHandlers
+            whisperHandlers = pipeline.whisperHandlers,
+            loggerFactory = loggerFactory
         )
     }
 

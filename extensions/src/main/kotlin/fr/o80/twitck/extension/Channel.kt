@@ -8,6 +8,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.api.service.log.Logger
 
 /**
  * This extension provides basic configuration for a given channel.
@@ -19,14 +20,15 @@ class Channel(
     private val channel: String,
     private val joinCallbacks: Iterable<JoinCallback>,
     private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
-    private val commandParser: CommandParser
+    private val commandParser: CommandParser,
+    private val logger: Logger
 ) {
 
     fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
         if (channel != joinEvent.channel)
             return joinEvent
 
-        println("> I've just seen a join event: ${joinEvent.channel} > ${joinEvent.login}")
+        logger.debug("I've just seen a join event: ${joinEvent.channel} > ${joinEvent.login}")
 
         joinCallbacks.forEach { callback ->
             callback(bot, joinEvent)
@@ -83,7 +85,8 @@ class Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
                 commandCallbacks = commandCallbacks,
-                commandParser = serviceLocator.commandParser
+                commandParser = serviceLocator.commandParser,
+                logger = serviceLocator.loggerFactory.getLogger(Channel::class)
             )
         }
     }
