@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.bean.Command
 
 interface Logger {
     fun command(command: Command, message: String)
-    fun info(message: String)
+    fun trace(message: String)
     fun debug(message: String)
+    fun info(message: String)
 }

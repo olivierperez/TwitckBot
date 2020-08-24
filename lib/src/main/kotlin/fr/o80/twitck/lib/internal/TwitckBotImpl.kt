@@ -60,8 +60,7 @@ internal class TwitckBotImpl(
     }
 
     override fun handleLine(line: String?) {
-        // TODO OPZ Verbose ?
-        logger.debug("Handle line: $line")
+        logger.trace("Handle line: $line")
         super.handleLine(line)
         line ?: return
 

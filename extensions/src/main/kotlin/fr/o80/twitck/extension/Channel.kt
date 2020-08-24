@@ -28,7 +28,7 @@ class Channel(
         if (channel != joinEvent.channel)
             return joinEvent
 
-        logger.debug("I've just seen a join event: ${joinEvent.channel} > ${joinEvent.login}")
+        logger.trace("I've just seen a join event: ${joinEvent.channel} > ${joinEvent.login}")
 
         joinCallbacks.forEach { callback ->
             callback(bot, joinEvent)

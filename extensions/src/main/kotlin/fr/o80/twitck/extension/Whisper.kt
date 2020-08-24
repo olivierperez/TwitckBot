@@ -16,7 +16,7 @@ class Whisper(
 ) {
 
     fun interceptWhisperEvent(bot: TwitckBot, whisperEvent: WhisperEvent) {
-        logger.debug("I've just seen a whisper event: ${whisperEvent.destination} > ${whisperEvent.message}")
+        logger.trace("I've just seen a whisper event: ${whisperEvent.destination} > ${whisperEvent.message}")
 
         whisperCallbacks.forEach { callback ->
             callback(bot, whisperEvent)

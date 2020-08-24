@@ -22,6 +22,10 @@ private class Slf4jLoggerAdapter(name: String) : Logger {
         slf4jLogger.debug("[Command:${command.tag}] $message")
     }
 
+    override fun trace(message: String) {
+        slf4jLogger.trace(message)
+    }
+
     override fun info(message: String) {
         slf4jLogger.info(message)
     }
