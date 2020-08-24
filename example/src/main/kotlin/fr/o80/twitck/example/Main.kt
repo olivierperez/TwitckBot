@@ -86,7 +86,7 @@ class Main : CliktCommand() {
             }
             install(ViewerPromotion) {
                 channel(hostChannel)
-                ignore("gnucc", "lurxx", "anotherttvviewer", "letsdothis_streamers")
+                ignore("lurxx", "anotherttvviewer", "letsdothis_streamers")
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }

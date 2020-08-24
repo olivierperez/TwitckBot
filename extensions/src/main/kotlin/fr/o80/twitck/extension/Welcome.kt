@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
+import fr.o80.twitck.lib.api.service.log.Logger
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -17,7 +18,8 @@ class Welcome(
     private val hostName: String,
     private val hostMessage: String?,
     private val twitchApi: TwitchApi,
-    private val ignoredLogins: MutableList<String>
+    private val ignoredLogins: MutableList<String>,
+    private val logger: Logger
 ) {
     private val welcomedUsers = mutableSetOf<Welcomed>()
     private val millisBeforeReWelcome = TimeUnit.HOURS.toMillis(1)
@@ -42,7 +44,7 @@ class Welcome(
                 welcomeViewer(joinEvent, bot)
             }
             else -> {
-                println("> No need to re-welcome ${joinEvent.login} yet.")
+                logger.debug("No need to re-welcome ${joinEvent.login} yet.")
             }
         }
 
@@ -142,7 +144,8 @@ class Welcome(
                 hostName = hostName,
                 hostMessage = hostMessage,
                 twitchApi = serviceLocator.twitchApi,
-                ignoredLogins = ignoredLogins
+                ignoredLogins = ignoredLogins,
+                logger = serviceLocator.loggerFactory.getLogger(Welcome::class)
             )
         }
     }

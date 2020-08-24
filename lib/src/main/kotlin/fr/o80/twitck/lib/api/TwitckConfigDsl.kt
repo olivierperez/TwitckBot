@@ -38,7 +38,7 @@ class TwitckConfigurator(
                     .map { extension -> extensionInterface.cast(extension) }
         },
         loggerFactory = loggerFactory,
-        twitchApi = TwitchApiImpl(clientId, oauthToken)
+        twitchApi = TwitchApiImpl(clientId, oauthToken, loggerFactory)
     )
 
     @TwitckConfigDsl

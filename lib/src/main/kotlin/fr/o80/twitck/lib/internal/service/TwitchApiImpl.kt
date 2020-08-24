@@ -7,6 +7,8 @@ import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.User
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.service.TwitchApi
+import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -14,8 +16,11 @@ import java.net.http.HttpResponse
 
 class TwitchApiImpl(
     private val clientId: String,
-    private val oauthToken: String
+    private val oauthToken: String,
+    loggerFactory: LoggerFactory
 ) : TwitchApi {
+
+    private val logger = loggerFactory.getLogger("NETWORK")
 
     private val gson: Gson = GsonBuilder().create()
     private val client: HttpClient = HttpClient.newHttpClient()
@@ -35,7 +40,7 @@ class TwitchApiImpl(
 
     override fun getChannel(channelId: String): Channel {
         val url = "/channels/$channelId"
-        return doRequest(url).also { println(">><<\n$it") }.parse()
+        return doRequest(url).parse()
     }
 
     override fun getVideos(channelId: String, limit: Int): List<Video> {
@@ -53,7 +58,9 @@ class TwitchApiImpl(
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        return response.body().also {
+            logger.debug("Response: $response")
+        }
     }
 
     private inline fun <reified T> String.parse(): T {

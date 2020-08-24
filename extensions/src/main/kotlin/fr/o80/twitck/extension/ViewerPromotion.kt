@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
+import fr.o80.twitck.lib.api.service.log.Logger
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -14,7 +15,8 @@ class ViewerPromotion(
     private val channel: String,
     private val messages: Collection<String>,
     private val twitchApi: TwitchApi,
-    private val ignoredLogins: MutableList<String>
+    private val ignoredLogins: MutableList<String>,
+    private val logger: Logger
 ) {
     private val promotedUsers = mutableSetOf<Promoted>()
     private val millisBeforeRePromote = TimeUnit.HOURS.toMillis(1)
@@ -32,7 +34,7 @@ class ViewerPromotion(
                 promoteViewer(messageEvent, bot)
             }
             else -> {
-                println("> No need to re-promote ${messageEvent.login} yet.") // TODO Utiliser un meilleur système de logging
+                logger.debug("No need to re-promote ${messageEvent.login} yet.")
             }
         }
 
@@ -96,7 +98,8 @@ class ViewerPromotion(
                 channel = channelName,
                 messages = messages,
                 twitchApi = serviceLocator.twitchApi,
-                ignoredLogins = ignoredLogins
+                ignoredLogins = ignoredLogins,
+                logger = serviceLocator.loggerFactory.getLogger(ViewerPromotion::class)
             )
         }
     }
