@@ -2,7 +2,7 @@ package fr.o80.twitck.lib.api.bean
 
 import fr.o80.twitck.lib.api.TwitckBot
 
-class MessageEvent(
+data class MessageEvent(
     val bot: TwitckBot,
     val channel: String,
     val login: String,
