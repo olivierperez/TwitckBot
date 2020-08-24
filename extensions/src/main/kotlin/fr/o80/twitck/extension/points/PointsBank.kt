@@ -8,8 +8,10 @@ class PointsBank {
         balances.getOrDefault(login, 0)
 
     fun addPoints(login: String, points: Int) {
-        balances.compute(login) { _, balance ->
-            (balance ?: 0) + points
+        synchronized(balances) {
+            balances.compute(login) { _, balance ->
+                (balance ?: 0) + points
+            }
         }
     }
 
