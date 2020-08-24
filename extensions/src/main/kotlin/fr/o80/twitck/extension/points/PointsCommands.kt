@@ -5,6 +5,8 @@ import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.utils.tryToInt
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class PointsCommands(
     private val channel: String,
@@ -12,6 +14,8 @@ class PointsCommands(
     private val bank: PointsBank,
     private val message: Messages
 ) {
+
+    private val logger: Logger = LoggerFactory.getLogger(PointsCommands::class.java)
 
     fun reactTo(command: Command, messageEvent: MessageEvent, bot: TwitckBot) {
         when (command.tag) {
@@ -30,6 +34,7 @@ class PointsCommands(
         if (command.options.size == 2) {
             val login = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
+            logger.debug("[Command:AddPoints] ${command.login} try to add $points to $login")
 
             points?.let {
                 bank.addPoints(login, points)
@@ -45,7 +50,9 @@ class PointsCommands(
         if (command.options.size == 2) {
             val toLogin = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
+            logger.debug("[Command:AddPoints] ${command.login} try to transfer $points to $toLogin")
 
+            // TODO OPZ Remplacer messageEvent par command
             if (toLogin == messageEvent.login) return
 
             points?.let {
@@ -65,8 +72,10 @@ class PointsCommands(
         }
     }
 
+    // TODO OPZ Remplacer messageEvent par command
     private fun handleInfoCommand(messageEvent: MessageEvent, bot: TwitckBot) {
         val points = bank.getPoints(messageEvent.login)
+        logger.debug("[Command:AddPoints] ${messageEvent.login} requested points info ($points)")
         val msg = if (points == 0) {
             message.viewerHasNoPoints
                 .replace("#USER#", messageEvent.login)

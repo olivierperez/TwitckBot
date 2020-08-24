@@ -64,8 +64,8 @@ class Main : CliktCommand() {
                 messages(
                     pointsTransferred = "Codes transferés de #FROM# à #TO#",
                     noPointsEnough = "Les huissiers sont en route vers #FROM#",
-                    viewHasNoPoints = "#USER# n'a pas de code",
-                    viewHasPoints = "#USER# a #POINTS# code(s)"
+                    viewHasNoPoints = "#USER# possède 0 code",
+                    viewHasPoints = "#USER# possède #POINTS# code(s)"
                 )
             }
             install(Welcome) {
