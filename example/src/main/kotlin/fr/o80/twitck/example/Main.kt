@@ -9,12 +9,14 @@ import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.extension.Presence
 import fr.o80.twitck.extension.Rewards
 import fr.o80.twitck.extension.RuntimeCommand
+import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.extension.ViewerPromotion
 import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.twitckBot
+import java.io.File
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -59,6 +61,9 @@ class Main : CliktCommand() {
     ): TwitckBot {
         println("Start...")
         return twitckBot(oauthToken, clientId) {
+            install(Storage) {
+                output(File(".storage/"))
+            }
             install(Rewards) {
                 channel(hostChannel)
             }

@@ -24,7 +24,7 @@ class Points(
         bank.addPoints(login, points)
     }
 
-    override fun removePoints(login: String, points: Int): Boolean {
+    override fun consumePoints(login: String, points: Int): Boolean {
         return bank.removePoints(login, points)
     }
 
@@ -77,7 +77,7 @@ class Points(
                 ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
             val privilegedBadges = badges
                 ?: arrayOf(Badge.BROADCASTER)
-            val bank = PointsBank()
+            val bank = PointsBank(serviceLocator.extensionProvider)
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Points::class.simpleName}")
 

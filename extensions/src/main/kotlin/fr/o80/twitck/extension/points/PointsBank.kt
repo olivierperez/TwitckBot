@@ -1,24 +1,38 @@
 package fr.o80.twitck.extension.points
 
-class PointsBank {
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.StorageExtension
+import fr.o80.twitck.lib.utils.tryToInt
 
-    private val balances: MutableMap<String, Int> = mutableMapOf()
+class PointsBank(
+    private val extensionProvider: ExtensionProvider
+) {
+
+    private val storage: StorageExtension by lazy {
+        extensionProvider.provide(StorageExtension::class.java).first()
+    }
+
+    private val namespace: String = Points::class.java.name
+
+    private val lock = Any()
 
     fun getPoints(login: String): Int =
-        balances.getOrDefault(login, 0)
+        storage.getPoints(login)
 
     fun addPoints(login: String, points: Int) {
-        synchronized(balances) {
-            balances.compute(login) { _, balance ->
-                (balance ?: 0) + points
-            }
+        synchronized(lock) {
+            val currentPoints = storage.getPoints(login)
+            val newPoints = currentPoints + points
+            storage.putPoints(login, newPoints)
         }
     }
 
     fun removePoints(login: String, points: Int): Boolean =
-        synchronized(balances) {
+        synchronized(lock) {
             if (canConsume(login, points)) {
-                balances.computeIfPresent(login) { _, balance -> balance - points }
+                val currentPoints = storage.getPoints(login)
+                val newPoints = currentPoints - points
+                storage.putPoints(login, newPoints)
                 true
             } else {
                 false
@@ -26,9 +40,9 @@ class PointsBank {
         }
 
     fun transferPoints(fromLogin: String, toLogin: String, points: Int): Boolean =
-        synchronized(balances) {
+        synchronized(lock) {
             if (canConsume(fromLogin, points)) {
-                balances.computeIfPresent(fromLogin) { _, balance -> balance - points }
+                removePoints(fromLogin, points)
                 addPoints(toLogin, points)
                 true
             } else {
@@ -37,5 +51,11 @@ class PointsBank {
         }
 
     private fun canConsume(login: String, points: Int): Boolean =
-        balances.getOrDefault(login, 0) >= points
+        storage.getPoints(login) >= points
+
+    private fun StorageExtension.getPoints(login: String) =
+        getUserInfo(login, namespace, "balance").tryToInt() ?: 0
+
+    private fun StorageExtension.putPoints(login: String, points: Int) =
+        putUserInfo(login, namespace, "balance", points.toString())
 }
