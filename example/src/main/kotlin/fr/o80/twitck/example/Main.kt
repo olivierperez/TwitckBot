@@ -17,6 +17,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.twitckBot
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 
 fun main(args: Array<String>) = Main().main(args)
@@ -66,6 +67,7 @@ class Main : CliktCommand() {
             }
             install(Rewards) {
                 channel(hostChannel)
+                claim(points = 50, time = 1, unit = TimeUnit.HOURS)
             }
             install(Points) {
                 channel(hostChannel)

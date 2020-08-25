@@ -18,6 +18,7 @@ class ViewerPromotion(
     private val ignoredLogins: MutableList<String>,
     private val logger: Logger
 ) {
+    // TODO OPZ Stocker en fichier
     private val promotedUsers = mutableSetOf<Promoted>()
     private val millisBeforeRePromote = TimeUnit.HOURS.toMillis(1)
 

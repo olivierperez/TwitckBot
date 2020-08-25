@@ -19,6 +19,7 @@ class RuntimeCommand(
     private val commandParser: CommandParser
 ) {
 
+    // TODO OPZ Stocker en fichier ?
     private val runtimeCommands = mutableMapOf<String, String?>()
 
     fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
