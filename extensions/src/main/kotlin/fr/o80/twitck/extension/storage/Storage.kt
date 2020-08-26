@@ -28,19 +28,56 @@ class Storage(
     }
 
     override fun putUserInfo(login: String, namespace: String, key: String, value: String) {
-        logger.debug("Putting info into $login [$namespace//$key => $value]")
-        with(getOrCreate(login)) {
+        logger.debug("Putting user info into $login [$namespace//$key] => $value")
+        with(getOrCreateUser(login)) {
             putExtra("$namespace//$key", value)
             save(this)
         }
     }
 
     override fun getUserInfo(login: String, namespace: String, key: String): String? {
-        logger.debug("Getting info of $login [$namespace//$key]")
-        return getOrCreate(login).getExtra("$namespace//$key")
+        logger.debug("Getting user info of $login [$namespace//$key]")
+        return getOrCreateUser(login).getExtra("$namespace//$key")
     }
 
-    private fun getOrCreate(login: String): User {
+    override fun putGlobalInfo(namespace: String, key: String, value: String) {
+        logger.debug("Putting info into [$namespace//$key] => $value")
+        with(getOrCreateGlobal()) {
+            putExtra(namespace, key, value)
+            save(this)
+        }
+    }
+
+    override fun getGlobalInfo(namespace: String): List<Pair<String, String>> {
+        logger.debug("Getting all info [$namespace]")
+        return getOrCreateGlobal().getExtras(namespace)
+    }
+
+    private fun getOrCreateGlobal(): Global {
+        val globalFile = getGlobalFile()
+        return if (globalFile.isFile) {
+            globalFile.reader().use { reader ->
+                gson.fromJson(reader, Global::class.java)
+            }
+        } else {
+            logger.trace("There's no global file")
+            Global()
+        }
+    }
+
+    private fun save(global: Global) {
+        logger.debug("Saving global...")
+        synchronized(lock) {
+            val globalFile = getGlobalFile()
+            val globalJson = gson.toJson(global)
+            globalFile.writer().use {
+                it.write(globalJson)
+            }
+            logger.trace("Global saved")
+        }
+    }
+
+    private fun getOrCreateUser(login: String): User {
         val userFile = getUserFile(login)
         return if (userFile.isFile) {
             logger.trace("User $login already has a file !")
@@ -65,8 +102,11 @@ class Storage(
         }
     }
 
+    private fun getGlobalFile() =
+        File(outputDirectory, "global.json")
+
     private fun getUserFile(login: String) =
-        File(outputDirectory, "${sanitizer(login)}.json")
+        File(outputDirectory, "users/${sanitizer(login)}.json")
 
     class Configuration {
 

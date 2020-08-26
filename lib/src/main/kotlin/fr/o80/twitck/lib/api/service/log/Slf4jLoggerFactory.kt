@@ -26,11 +26,15 @@ private class Slf4jLoggerAdapter(name: String) : Logger {
         slf4jLogger.trace(message)
     }
 
+    override fun debug(message: String) {
+        slf4jLogger.debug(message)
+    }
+
     override fun info(message: String) {
         slf4jLogger.info(message)
     }
 
-    override fun debug(message: String) {
-        slf4jLogger.debug(message)
+    override fun error(message: String) {
+        slf4jLogger.error(message)
     }
 }

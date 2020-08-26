@@ -1,28 +1,39 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.api.service.log.Logger
 import java.util.Locale
+
+private const val SCOPE_STREAM = "stream"
+private const val SCOPE_PERMANENT = "permanent"
 
 class RuntimeCommand(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
     private val extensionProvider: ExtensionProvider,
-    private val commandParser: CommandParser
+    private val commandParser: CommandParser,
+    private val logger: Logger
 ) {
 
-    // TODO OPZ Stocker en fichier ?
+    private val storage: StorageExtension by lazy {
+        extensionProvider.provide(StorageExtension::class.java).first()
+    }
+
+    private val namespace: String = RuntimeCommand::class.java.name
+
     private val runtimeCommands = mutableMapOf<String, String?>()
 
-    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
+    private fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
             return messageEvent
 
@@ -33,36 +44,64 @@ class RuntimeCommand(
         return messageEvent
     }
 
+    private fun onInstallationFinished() {
+        storage.getGlobalInfo(namespace)
+            .filter { it.first.startsWith("Command//") }
+            .forEach { runtimeCommands[it.first.substring("Command//".length)] = it.second }
+    }
+
     private fun reactToCommand(
         command: Command,
         bot: TwitckBot,
         messageEvent: MessageEvent
     ) {
+        // !cmd stream !exo Aujourd'hui on développe des trucs funs
+        // !cmd permanent !twitter Retrouvez-moi sur https://twitter.com/olivierperez
         when (command.tag) {
-            "!addcmd" -> {
-                if (command.badges.any { it in privilegedBadges }) {
-                    val addedCommand = addCommand(command.options)
-                    bot.send(messageEvent.channel, "Commande $addedCommand ajoutée")
-                }
-            }
-            in runtimeCommands.keys -> {
-                runtimeCommands[command.tag]?.let { message ->
-                    bot.send(messageEvent.channel, message)
-                }
-            }
+            "!cmd" -> handleAddCommand(command, messageEvent, bot)
+            in runtimeCommands.keys -> handleRegisteredCommand(command, bot, messageEvent)
         }
     }
 
-    private fun addCommand(options: List<String>): String {
-        val newCommand = options[0].addPrefix().toLowerCase(Locale.FRENCH)
-        val message = options.subList(1, options.size).joinToString(" ")
-        registerRuntimeCommand(newCommand, message)
+    private fun handleAddCommand(command: Command, messageEvent: MessageEvent, bot: TwitckBot) {
+        if (privilegedBadges.intersect(command.badges).isEmpty()) {
+            return
+        }
+
+        val scope: String = command.options[0]
+        val newCommand: String = command.options[1].toLowerCase(Locale.FRENCH)
+        val message: String = command.options.subList(2, command.options.size).joinToString(" ")
+
+        if (scope !in arrayOf(SCOPE_STREAM, SCOPE_PERMANENT)) {
+            logger.error("Scope \"$scope\" non autorisé")
+            return
+        }
+        if (!newCommand.startsWith("!")) {
+            logger.error("Préfixe manquant pour $newCommand")
+            return
+        }
+
+        registerRuntimeCommand(newCommand, scope, message)
         registerToHelper(newCommand)
-        return newCommand
+        bot.send(messageEvent.channel, "Commande $newCommand ajoutée")
     }
 
-    private fun registerRuntimeCommand(newCommand: String, message: String) {
+    private fun handleRegisteredCommand(
+        command: Command,
+        bot: TwitckBot,
+        messageEvent: MessageEvent
+    ) {
+        runtimeCommands[command.tag]?.let { message ->
+            bot.send(messageEvent.channel, message)
+        }
+    }
+
+    private fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
         runtimeCommands[newCommand] = message
+
+        if (scope == SCOPE_PERMANENT) {
+            storage.putGlobalInfo(namespace, "Command//$newCommand", message)
+        }
     }
 
     private fun registerToHelper(newCommand: String) {
@@ -98,7 +137,8 @@ class RuntimeCommand(
                 channelName,
                 theBadges,
                 serviceLocator.extensionProvider,
-                serviceLocator.commandParser
+                serviceLocator.commandParser,
+                serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
             )
         }
     }
@@ -115,11 +155,8 @@ class RuntimeCommand(
                 .also { runtimeCommand ->
                     pipeline.requestChannel(runtimeCommand.channel)
                     pipeline.interceptMessageEvent(runtimeCommand::interceptMessageEvent)
+                    runtimeCommand.onInstallationFinished()
                 }
         }
     }
-}
-
-private fun String.addPrefix(): String {
-    return if (this[0] == '!') this else "!$this"
 }
