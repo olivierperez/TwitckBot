@@ -4,10 +4,13 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.bean.Video
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.utils.tryToLong
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
@@ -16,11 +19,16 @@ class ViewerPromotion(
     private val messages: Collection<String>,
     private val twitchApi: TwitchApi,
     private val ignoredLogins: MutableList<String>,
-    private val logger: Logger
+    private val logger: Logger,
+    private val extensionProvider: ExtensionProvider
 ) {
-    // TODO OPZ Stocker en fichier
-    private val promotedUsers = mutableSetOf<Promoted>()
     private val millisBeforeRePromote = TimeUnit.HOURS.toMillis(1)
+
+    private val storage: StorageExtension by lazy {
+        extensionProvider.provide(StorageExtension::class.java).first()
+    }
+
+    private val namespace: String = ViewerPromotion::class.java.name
 
     fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
@@ -43,9 +51,8 @@ class ViewerPromotion(
     }
 
     private fun needToPromote(login: String): Boolean {
-        return promotedUsers.firstOrNull { it.login == login }
-            ?.let { promotedUser -> promotedUser.date.time + millisBeforeRePromote < System.currentTimeMillis() }
-            ?: true
+        val lastPromotionAt = storage.getUserInfo(login, namespace, "lastPromotionAt").tryToLong() ?: 0
+        return lastPromotionAt + millisBeforeRePromote < System.currentTimeMillis()
     }
 
     private fun promoteViewer(messageEvent: MessageEvent, bot: TwitckBot) {
@@ -57,7 +64,7 @@ class ViewerPromotion(
         val randomMessage = messages.random().formatViewer(messageEvent, lastVideo)
         bot.send(messageEvent.channel, randomMessage)
 
-        promotedUsers.add(Promoted(messageEvent.login))
+        storage.putUserInfo(messageEvent.login, namespace, "lastPromotionAt", System.currentTimeMillis().toString())
     }
 
     private fun String.formatViewer(messageEvent: MessageEvent, video: Video): String =
@@ -100,7 +107,8 @@ class ViewerPromotion(
                 messages = messages,
                 twitchApi = serviceLocator.twitchApi,
                 ignoredLogins = ignoredLogins,
-                logger = serviceLocator.loggerFactory.getLogger(ViewerPromotion::class)
+                logger = serviceLocator.loggerFactory.getLogger(ViewerPromotion::class),
+                extensionProvider = serviceLocator.extensionProvider
             )
         }
     }
@@ -121,8 +129,3 @@ class ViewerPromotion(
         }
     }
 }
-
-private data class Promoted(
-    val login: String,
-    val date: Date = Date()
-)
