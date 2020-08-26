@@ -11,18 +11,17 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.tryToLong
-import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class ViewerPromotion(
     private val channel: String,
     private val messages: Collection<String>,
-    private val twitchApi: TwitchApi,
     private val ignoredLogins: MutableList<String>,
+    private val intervalBetweenTwoPromotions: Long,
+    private val twitchApi: TwitchApi,
     private val logger: Logger,
     private val extensionProvider: ExtensionProvider
 ) {
-    private val millisBeforeRePromote = TimeUnit.HOURS.toMillis(1)
 
     private val storage: StorageExtension by lazy {
         extensionProvider.provide(StorageExtension::class.java).first()
@@ -52,7 +51,7 @@ class ViewerPromotion(
 
     private fun needToPromote(login: String): Boolean {
         val lastPromotionAt = storage.getUserInfo(login, namespace, "lastPromotionAt").tryToLong() ?: 0
-        return lastPromotionAt + millisBeforeRePromote < System.currentTimeMillis()
+        return lastPromotionAt + intervalBetweenTwoPromotions < System.currentTimeMillis()
     }
 
     private fun promoteViewer(messageEvent: MessageEvent, bot: TwitckBot) {
@@ -83,6 +82,8 @@ class ViewerPromotion(
 
         private var ignoredLogins: MutableList<String> = mutableListOf()
 
+        private var intervalBetweenTwoPromotions: Long = TimeUnit.HOURS.toMillis(12)
+
         @ViewerPromotionDsl
         fun channel(channel: String) {
             this.channel = channel
@@ -98,6 +99,11 @@ class ViewerPromotion(
             ignoredLogins.addAll(logins)
         }
 
+        @ViewerPromotionDsl
+        fun promotionInterval(time: Long, unit: TimeUnit) {
+            intervalBetweenTwoPromotions = unit.toMillis(time)
+        }
+
         fun build(serviceLocator: ServiceLocator): ViewerPromotion {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
@@ -105,8 +111,9 @@ class ViewerPromotion(
             return ViewerPromotion(
                 channel = channelName,
                 messages = messages,
-                twitchApi = serviceLocator.twitchApi,
                 ignoredLogins = ignoredLogins,
+                intervalBetweenTwoPromotions = intervalBetweenTwoPromotions,
+                twitchApi = serviceLocator.twitchApi,
                 logger = serviceLocator.loggerFactory.getLogger(ViewerPromotion::class),
                 extensionProvider = serviceLocator.extensionProvider
             )

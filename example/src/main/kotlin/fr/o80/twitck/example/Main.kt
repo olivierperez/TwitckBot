@@ -98,6 +98,7 @@ class Main : CliktCommand() {
             install(ViewerPromotion) {
                 channel(hostChannel)
                 ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
+                promotionInterval(1, TimeUnit.HOURS)
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
