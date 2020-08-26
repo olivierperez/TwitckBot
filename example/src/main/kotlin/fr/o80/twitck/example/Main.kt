@@ -83,6 +83,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
                 ignore(botName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
+                welcomeInterval(2, TimeUnit.HOURS)
                 messageForViewer("Compilation de #USER# impossible, trop de bugs.")
                 messageForViewer("Décompilation de #USER# en cours...")
                 messageForViewer("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")

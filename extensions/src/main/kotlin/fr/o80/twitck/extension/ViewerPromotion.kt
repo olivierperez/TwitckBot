@@ -74,7 +74,7 @@ class ViewerPromotion(
     class Configuration {
 
         @DslMarker
-        annotation class ViewerPromotionDsl
+        private annotation class ViewerPromotionDsl
 
         private var channel: String? = null
 

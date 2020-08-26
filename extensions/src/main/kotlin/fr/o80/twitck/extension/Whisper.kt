@@ -26,7 +26,7 @@ class Whisper(
     class Configuration {
 
         @DslMarker
-        annotation class ChannelDsl
+        private annotation class ChannelDsl
 
         private val whisperCallbacks: MutableList<WhisperCallback> = mutableListOf()
 

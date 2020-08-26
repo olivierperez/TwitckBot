@@ -10,7 +10,7 @@ import fr.o80.twitck.lib.internal.TwitckBotImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl
 
 @DslMarker
-annotation class TwitckConfigDsl
+private annotation class TwitckConfigDsl
 
 @TwitckConfigDsl
 fun twitckBot(

@@ -10,7 +10,7 @@ class Presence(
     class Configuration {
 
         @DslMarker
-        annotation class PresenceDsl
+        private annotation class PresenceDsl
 
         private var channel: String? = null
 

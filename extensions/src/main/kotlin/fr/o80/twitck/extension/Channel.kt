@@ -56,7 +56,7 @@ class Channel(
     class Configuration {
 
         @DslMarker
-        annotation class ChannelDsl
+        private annotation class ChannelDsl
 
         private var channel: String? = null
 
