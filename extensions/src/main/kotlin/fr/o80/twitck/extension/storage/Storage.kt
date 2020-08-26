@@ -11,7 +11,8 @@ import java.io.File
 
 class Storage(
     private val outputDirectory: File,
-    private val logger: Logger
+    private val logger: Logger,
+    private val sanitizer: FileNameSanitizer = FileNameSanitizer()
 ) : StorageExtension {
 
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -55,7 +56,6 @@ class Storage(
     private fun save(user: User) {
         logger.debug("Saving user ${user.login}...")
         synchronized(lock) {
-            // TODO OPZ Clean fileName to avoid injection
             val userFile = getUserFile(user.login)
             val userJson = gson.toJson(user)
             userFile.writer().use {
@@ -66,7 +66,7 @@ class Storage(
     }
 
     private fun getUserFile(login: String) =
-        File(outputDirectory, "$login.json")
+        File(outputDirectory, "${sanitizer(login)}.json")
 
     class Configuration {
 
