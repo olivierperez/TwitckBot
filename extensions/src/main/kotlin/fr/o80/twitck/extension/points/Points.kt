@@ -90,7 +90,6 @@ class Points(
                 privilegedBadges,
                 bank,
                 theMessages,
-                serviceLocator.extensionProvider,
                 logger
             )
             return Points(
@@ -113,7 +112,7 @@ class Points(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { points ->
-                    pipeline.interceptCommandEvent { _, commandEvent -> points.commands.interceptCommandEvent(commandEvent) }
+                    pipeline.interceptCommandEvent(points.commands::interceptCommandEvent)
                     pipeline.requestChannel(points.channel)
                     points.onInstallationFinished()
                 }

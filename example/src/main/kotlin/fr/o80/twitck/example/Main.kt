@@ -131,6 +131,7 @@ class Main : CliktCommand() {
                 messageForViewer("#USER# croit profondément au retour du Pascal...")
                 messageForViewer("#USER# vient de finir sa lecture des internets mondiaux.")
                 messageForViewer("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
+                messageForViewer("#USER# a presque DL tout Wikipedia")
                 messageForFollower("Yo #USER# t'es le meilleur des internets mondiaux!")
                 messageForFollower("Prière d'accueillir #USER# comme il se doit.")
                 messageForFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")

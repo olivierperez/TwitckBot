@@ -4,4 +4,5 @@ import fr.o80.twitck.lib.api.bean.SendMessage
 
 interface Messenger {
     fun send(message: SendMessage)
+    fun sendLine(line: String)
 }

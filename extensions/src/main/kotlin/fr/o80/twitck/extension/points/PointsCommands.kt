@@ -2,23 +2,21 @@ package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.Overlay
+import fr.o80.twitck.lib.api.bean.SendMessage
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.sanitizeLogin
 import fr.o80.twitck.lib.utils.tryToInt
-import java.time.Duration
 
 class PointsCommands(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
     private val bank: PointsBank,
     private val message: Messages,
-    private val extensionProvider: ExtensionProvider,
     private val logger: Logger
 ) {
 
-    fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
 
@@ -26,9 +24,9 @@ class PointsCommands(
             // !points_add Pipiks_ 13000
             "!points_add" -> handleAddCommand(commandEvent)
             // !points_give idontwantgiftsub 152
-            "!points_give" -> handleGiveCommand(commandEvent)
+            "!points_give" -> handleGiveCommand(messenger, commandEvent)
             // !points_info
-            "!points_info" -> handleInfoCommand(commandEvent)
+            "!points_info" -> handleInfoCommand(messenger, commandEvent)
         }
 
         return commandEvent
@@ -50,7 +48,7 @@ class PointsCommands(
     }
 
     // TODO OPZ Vérifier si le viewer de destination existe (toto VS toot)
-    private fun handleGiveCommand(commandEvent: CommandEvent) {
+    private fun handleGiveCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {
             val fromLogin = commandEvent.login
@@ -63,7 +61,6 @@ class PointsCommands(
 
             val transferSucceeded = bank.transferPoints(fromLogin, toLogin, points)
             val msg = if (transferSucceeded) {
-                // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
                 message.pointsTransferred
                     .replace("#FROM#", fromLogin)
                     .replace("#TO#", toLogin)
@@ -73,11 +70,11 @@ class PointsCommands(
                     .replace("#TO#", toLogin)
             }
 
-            extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
+            messenger.send(SendMessage.whisper(commandEvent.channel, commandEvent.login, msg))
         }
     }
 
-    private fun handleInfoCommand(commandEvent: CommandEvent) {
+    private fun handleInfoCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         val login = commandEvent.login
         val points = bank.getPoints(login)
@@ -94,12 +91,6 @@ class PointsCommands(
                 .replace("#POINTS#", points.toString())
         }
 
-        extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
-    }
-}
-
-private fun ExtensionProvider.alertOverlay(msg: String, duration: Duration) {
-    this.forEach(Overlay::class) { overlay ->
-        overlay.alert(msg, duration)
+        messenger.send(SendMessage.whisper(commandEvent.channel, login, msg))
     }
 }

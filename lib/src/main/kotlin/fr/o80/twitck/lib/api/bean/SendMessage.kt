@@ -2,12 +2,22 @@ package fr.o80.twitck.lib.api.bean
 
 import java.time.Duration
 
-class SendMessage (
+class SendMessage(
     val channel: String,
     val content: String,
     val deadline: Deadline,
     val coolDown: CoolDown? = null
-)
+) {
+    companion object {
+        fun whisper(channel: String, recipient: String, message: String): SendMessage =
+            SendMessage(
+                channel = channel,
+                content = "/w $recipient $message",
+                deadline = Deadline.Immediate,
+                coolDown = null
+            )
+    }
+}
 
 sealed class Deadline {
     object Immediate : Deadline()

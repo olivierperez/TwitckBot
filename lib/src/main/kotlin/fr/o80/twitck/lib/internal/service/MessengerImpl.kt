@@ -40,6 +40,10 @@ class MessengerImpl(
         }
     }
 
+    override fun sendLine(line: String) {
+        bot.sendLine(line)
+    }
+
     fun interrupt() {
         interrupted = true
     }

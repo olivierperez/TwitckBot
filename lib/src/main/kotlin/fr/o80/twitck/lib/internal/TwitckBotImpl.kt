@@ -62,6 +62,12 @@ internal class TwitckBotImpl(
             if (!initializer.initialized) logger.debug("Not yet initialized")
         }
 
+        val recipient = "gnu_coding_cafe"
+        val sender = "bothusky"
+        // :gnu_coding_cafe !gnu_coding_cafe @gnu_coding_cafe .tmi.twitch.tv WHISPER bothusky :eee
+        // :idontwantgiftsub!idontwantgiftsub@idontwantgiftsub.tmi.twitch.tv WHISPER bothusky :cc
+        sendLine(":$sender!$sender@$sender.tmi.twitch.tv WHISPER $recipient :T'as vu ?")
+
         autoJoiner.join()
     }
 
