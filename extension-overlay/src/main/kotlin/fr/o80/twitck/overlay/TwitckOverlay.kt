@@ -20,7 +20,8 @@ class TwitckOverlay(
 
     private var interrupted = false
 
-    private val renderQueue: Queue<Renderer> = ConcurrentLinkedDeque()
+    private val renderersToInit: Queue<Renderer> = ConcurrentLinkedDeque()
+    private val renderers: MutableList<Renderer> = mutableListOf()
 
     override fun run() {
         configure()
@@ -101,7 +102,8 @@ class TwitckOverlay(
             }
 
             GL46.glClear(GL46.GL_COLOR_BUFFER_BIT or GL46.GL_DEPTH_BUFFER_BIT)
-            registerRender()
+            initRenderers()
+            executeRenders()
             GLFW.glfwPollEvents()
             GLFW.glfwSwapBuffers(window)
             frames++
@@ -116,8 +118,16 @@ class TwitckOverlay(
         }
     }
 
-    private fun registerRender() {
-        renderQueue.forEach { it.render() }
+    private fun initRenderers() {
+        var elem = renderersToInit.poll()
+        while (elem != null) {
+            elem.init()
+            elem = renderersToInit.poll()
+        }
+    }
+
+    private fun executeRenders() {
+        renderers.forEach { it.render() }
     }
 
     fun kill() {
@@ -125,7 +135,8 @@ class TwitckOverlay(
     }
 
     fun registerRender(renderer: Renderer) {
-        renderQueue.offer(renderer)
+        renderers.add(renderer)
+        renderersToInit.offer(renderer)
     }
 
 }

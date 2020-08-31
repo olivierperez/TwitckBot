@@ -1,5 +1,6 @@
 package fr.o80.twitck.overlay
 
-fun interface Renderer {
+interface Renderer {
+    fun init()
     fun render()
 }
