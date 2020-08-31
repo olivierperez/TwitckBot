@@ -1,6 +1,7 @@
-package fr.o80.twitck.overlay
+package fr.o80.twitck.overlay.graphics
 
-import fr.o80.twitck.overlay.IOUtil.ioResourceToByteBuffer
+import fr.o80.twitck.overlay.graphics.IOUtil.ioResourceToByteBuffer
+import fr.o80.twitck.overlay.graphics.ext.draw
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL11.GL_ALPHA
 import org.lwjgl.opengl.GL11.GL_BLEND
@@ -45,20 +46,14 @@ import java.nio.ByteBuffer
 import java.nio.IntBuffer
 import kotlin.math.round
 
-
-class DemoRenderer(
+// TODO OPZ Rename
+// TODO OPZ Split in some classes
+class InformationRenderer(
     private val width: Int,
     private val height: Int
 ) : Renderer {
 
-    private val texts = listOf(
-        "Vous connaissez la commande !claim ?",
-        "Ou !points_info ?",
-        "Et !discord ? et !github ? ou !help"
-    )
-
-    private val text get() =
-        texts.joinToString("\n")
+    private var texts: List<String> = emptyList()
 
     private val margin: Float = 10f
     private val fontHeight: Float = 25f
@@ -118,6 +113,10 @@ class DemoRenderer(
         }
     }
 
+    fun updateTexts(texts: List<String>) {
+        this.texts = texts
+    }
+
     private fun initFont() {
         bitmapWidth = round(512 * getContentScaleX()).toInt()
         bitmapHeight = round(512 * getContentScaleY()).toInt()
@@ -145,6 +144,7 @@ class DemoRenderer(
     private fun getContentScaleY(): Float = 1.0f
 
     private fun renderText() {
+        val text = texts.joinToString("\n")
         val scale = stbtt_ScaleForPixelHeight(fontInfo, fontHeight)
 
         stackPush().use { stack ->
@@ -165,7 +165,7 @@ class DemoRenderer(
                 if (codePoint == '\n'.toInt()) {
                     if (drawBoxBorder) {
                         glEnd()
-                        renderLineBB(lineStart, i - 1, y[0], scale)
+                        renderLineBB(lineStart, i - 1, y[0], scale, text)
                         glBegin(GL_QUADS)
                     }
                     y.put(0, y[0] + (ascent - descent + lineGap) * scale.also { lineY = it })
@@ -197,7 +197,7 @@ class DemoRenderer(
             }
             glEnd()
             if (drawBoxBorder) {
-                renderLineBB(lineStart, text.length, lineY, scale)
+                renderLineBB(lineStart, text.length, lineY, scale, text)
             }
         }
     }
@@ -206,7 +206,7 @@ class DemoRenderer(
         return (offset - center) * factor + center
     }
 
-    private fun renderLineBB(from: Int, to: Int, y: Float, scale: Float) {
+    private fun renderLineBB(from: Int, to: Int, y: Float, scale: Float, text: String) {
         val info = fontInfo ?: throw IllegalStateException("This class is not initialized")
         val adjustedY = y - descent * scale
         glDisable(GL_TEXTURE_2D)

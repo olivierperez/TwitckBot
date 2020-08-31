@@ -5,6 +5,8 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -32,6 +34,16 @@ class Rewards(
             handleCommand(command)
         }
         return messageEvent
+    }
+
+    private fun afterInstallation() {
+        extensionProvider.provide(Overlay::class.java).forEach { overlay ->
+            // TODO Remplacer POINTS par un message passé en config
+            overlay.provideInformation(namespace, listOf("Vous pouvez !claim des POINTS de temps en temps."))
+        }
+        extensionProvider.provide(HelperExtension::class.java).forEach { help ->
+            help.registerCommand("!claim")
+        }
     }
 
     private fun handleCommand(command: Command) {
@@ -110,6 +122,7 @@ class Rewards(
                 .also { rewards ->
                     pipeline.interceptMessageEvent(rewards::interceptMessage)
                     pipeline.requestChannel(rewards.channel)
+                    rewards.afterInstallation()
                 }
         }
 

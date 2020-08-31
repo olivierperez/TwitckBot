@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay
+package fr.o80.twitck.overlay.graphics.ext
 
 import kotlin.math.PI
 import kotlin.math.max

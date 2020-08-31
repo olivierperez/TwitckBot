@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay
+package fr.o80.twitck.overlay.graphics.ext
 
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL46

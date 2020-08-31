@@ -1,5 +1,6 @@
-package fr.o80.twitck.overlay
+package fr.o80.twitck.overlay.graphics
 
+import fr.o80.twitck.lib.api.service.log.Logger
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
@@ -9,11 +10,12 @@ import org.lwjgl.system.MemoryUtil
 import java.util.Queue
 import java.util.concurrent.ConcurrentLinkedDeque
 
-class TwitckOverlay(
+class OverlayWindow(
     private val title: String,
     private val width: Int,
     private val height: Int,
-    private val updatesPerSecond: Int = 55
+    private val updatesPerSecond: Int,
+    private val logger: Logger
 ) : Runnable {
 
     private var window: Long = 0
@@ -29,7 +31,7 @@ class TwitckOverlay(
     }
 
     private fun configure() {
-        println("configure on ${Thread.currentThread().name}")
+        logger.debug("Overlay configured on ${Thread.currentThread().name}")
         GLFWErrorCallback.createPrint(System.err).set()
 
         if (!GLFW.glfwInit()) {
@@ -110,8 +112,8 @@ class TwitckOverlay(
 
             if (GLFW.glfwGetTime() - timer > 1) {
                 timer++
-                println("FPS: $frames Updates: $updates")
-                println("on ${Thread.currentThread().name}")
+                logger.trace("FPS: $frames Updates: $updates")
+                logger.trace("on ${Thread.currentThread().name}")
                 frames = 0
                 updates = 0
             }
