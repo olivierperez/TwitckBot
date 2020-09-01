@@ -5,19 +5,23 @@ import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.overlay.graphics.InformationRenderer
 import fr.o80.twitck.overlay.graphics.OverlayWindow
+import fr.o80.twitck.overlay.graphics.ext.Vertex3f
+import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
 
 class StandardOverlay(
     windowName: String,
     logger: Logger
-): Overlay {
+) : Overlay {
 
     private val width = 512
     private val height = 110
+    private val bgColor = Vertex3f(0.8f, 0.8f, 0.8f)
+    private val borderColor = Vertex3f(0.5f, 0.5f, 0.5f)
+    private val textColor = Vertex3f(0.1f, 0.1f, 0.1f)
 
     private val overlay = OverlayWindow(windowName, width, height, 55, logger)
-    private val renderer = InformationRenderer(width, height)
+    private val renderer = InformationRenderer(width, height, bgColor, borderColor, textColor)
 
     private val texts = mutableMapOf<String, List<String>>()
 

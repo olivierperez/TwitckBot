@@ -1,6 +1,7 @@
 package fr.o80.twitck.overlay.graphics
 
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.overlay.graphics.renderer.Renderer
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL

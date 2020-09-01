@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay.graphics
+package fr.o80.twitck.overlay.graphics.renderer
 
 interface Renderer {
     fun init()

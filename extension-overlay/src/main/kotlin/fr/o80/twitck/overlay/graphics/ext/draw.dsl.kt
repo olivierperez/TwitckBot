@@ -12,11 +12,11 @@ annotation class Drawer
 
 @Drawer
 fun draw(block: Draw.() -> Unit) {
-    Draw().apply(block)
+    Draw.apply(block)
 }
 
 @Drawer
-class Draw {
+object Draw {
 
     @Drawer
     fun clear(red: Float, green: Float, blue: Float, alpha: Float = 1f) {
