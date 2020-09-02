@@ -17,6 +17,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
+import fr.o80.twitck.poll.Poll
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -115,6 +116,10 @@ class Main : CliktCommand() {
                 promotionInterval(1, TimeUnit.HOURS)
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
+            }
+            install(Poll) {
+                channel(hostChannel)
+                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
             }
             install(RuntimeCommand) {
                 channel(hostChannel)
