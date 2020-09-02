@@ -2,6 +2,8 @@ package fr.o80.twitck.overlay.graphics.renderer
 
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
+import java.time.Duration
+import java.time.Instant
 
 class InformationRenderer(
     private val width: Int,
@@ -14,8 +16,16 @@ class InformationRenderer(
 
     private var texts: List<String> = emptyList()
 
+    private var alert: Alert? = null
+
     override fun init() {
         textRenderer.init()
+    }
+
+    override fun tick() {
+        if (alert?.endAt?.isBefore(Instant.now()) == true) {
+            alert = null
+        }
     }
 
     override fun render() {
@@ -28,7 +38,13 @@ class InformationRenderer(
 
             color(textColor.x, textColor.y, textColor.z)
 
-            textRenderer.render(texts.joinToString("\n"))
+            with(alert) {
+                if (this != null) {
+                    textRenderer.render(this.text)
+                } else {
+                    textRenderer.render(texts.joinToString("\n"))
+                }
+            }
         }
     }
 
@@ -36,4 +52,13 @@ class InformationRenderer(
         this.texts = texts
     }
 
+    fun popAlert(text: String, duration: Duration) {
+        this.alert = Alert(text, Instant.now() + duration)
+    }
+
 }
+
+data class Alert(
+    val text: String,
+    val endAt: Instant
+)

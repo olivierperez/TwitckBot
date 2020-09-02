@@ -8,6 +8,7 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
+import java.time.Duration
 
 class StandardOverlay(
     windowName: String,
@@ -23,13 +24,17 @@ class StandardOverlay(
     private val overlay = OverlayWindow(windowName, width, height, 55, logger)
     private val renderer = InformationRenderer(width, height, bgColor, borderColor, textColor)
 
-    private val texts = mutableMapOf<String, List<String>>()
+    private val informationTexts = mutableMapOf<String, List<String>>()
 
     // TODO OPZ Est-ce que ça a du sens de donner une priorité à certains textes ?
     // TODO OPZ Faire changer le text toutes les X minutes ?
     override fun provideInformation(namespace: String, texts: List<String>) {
-        this.texts[namespace] = texts
-        renderer.updateTexts(this.texts.entries.flatMap { (_, value) -> value })
+        informationTexts[namespace] = texts
+        renderer.updateTexts(informationTexts.entries.flatMap { (_, value) -> value })
+    }
+
+    override fun alert(text: String, duration: Duration) {
+        renderer.popAlert(text, duration)
     }
 
     private fun start() {

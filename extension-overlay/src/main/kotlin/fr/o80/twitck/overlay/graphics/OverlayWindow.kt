@@ -99,7 +99,7 @@ class OverlayWindow(
             lastTime = now
 
             while (delta > 1.0) {
-                //TODO extension?.tick()
+                tickRenderers()
                 updates++
                 delta--
             }
@@ -119,6 +119,10 @@ class OverlayWindow(
                 updates = 0
             }
         }
+    }
+
+    private fun tickRenderers() {
+        renderers.forEach { it.tick() }
     }
 
     private fun initRenderers() {

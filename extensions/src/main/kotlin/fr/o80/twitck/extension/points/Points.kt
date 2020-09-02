@@ -40,7 +40,7 @@ class Points(
             return messageEvent
 
         commandParser.parse(messageEvent)?.let { command ->
-            commands.reactTo(command, bot)
+            commands.reactTo(command)
         }
 
         return messageEvent
@@ -100,11 +100,18 @@ class Points(
 
             val logger = serviceLocator.loggerFactory.getLogger(Points::class)
 
+            val pointsCommands = PointsCommands(
+                privilegedBadges,
+                bank,
+                theMessages,
+                serviceLocator.extensionProvider,
+                logger
+            )
             return Points(
                 channelName,
                 serviceLocator.commandParser,
                 serviceLocator.extensionProvider,
-                PointsCommands(channelName, privilegedBadges, bank, theMessages, logger),
+                pointsCommands,
                 bank,
                 theMessages
             )
