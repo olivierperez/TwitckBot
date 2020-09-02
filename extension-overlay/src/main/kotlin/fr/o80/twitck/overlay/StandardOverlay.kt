@@ -26,8 +26,7 @@ class StandardOverlay(
 
     private val informationTexts = mutableMapOf<String, List<String>>()
 
-    // TODO OPZ Est-ce que ça a du sens de donner une priorité à certains textes ?
-    // TODO OPZ Faire changer le text toutes les X minutes ?
+    // TODO OPZ Donner une durée de vie à certains textes
     override fun provideInformation(namespace: String, texts: List<String>) {
         informationTexts[namespace] = texts
         renderer.updateTexts(informationTexts.entries.flatMap { (_, value) -> value })
