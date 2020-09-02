@@ -17,7 +17,7 @@ import kotlin.math.round
 class TextRenderer(
     private val fontPath: String,
     private val margin: Float = 10f,
-    private val fontHeight: Float = 25f
+    private val fontHeight: Float = 20f
 ) {
 
     private val kerningEnabled = true

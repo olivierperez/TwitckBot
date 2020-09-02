@@ -1,5 +1,6 @@
-package fr.o80.twitck.extension
+package fr.o80.twitck.extension.rewards
 
+import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Command
@@ -20,7 +21,8 @@ class Rewards(
     private val commandParser: CommandParser,
     private val extensionProvider: ExtensionProvider,
     private val intervalBetweenTwoClaims: Long,
-    private val claimedPoints: Int
+    private val claimedPoints: Int,
+    private val messages: Messages
 ) {
 
     private val storage: StorageExtension by lazy {
@@ -38,8 +40,7 @@ class Rewards(
 
     private fun afterInstallation() {
         extensionProvider.provide(Overlay::class).forEach { overlay ->
-            // TODO Remplacer POINTS par un message passé en config
-            overlay.provideInformation(namespace, listOf("Vous pouvez !claim des POINTS de temps en temps."))
+            overlay.provideInformation(namespace, listOf("Vous pouvez !claim des ${messages.points} de temps en temps."))
         }
         extensionProvider.provide(HelperExtension::class).forEach { help ->
             help.registerCommand("!claim")
@@ -85,6 +86,8 @@ class Rewards(
         private var intervalBetweenTwoClaims: Long = TimeUnit.HOURS.toMillis(12)
         private var claimedPoints: Int = 10
 
+        private var messages : Messages? = null
+
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
@@ -96,16 +99,28 @@ class Rewards(
             intervalBetweenTwoClaims = unit.toMillis(time)
         }
 
+        @Dsl
+        fun messages(
+            points: String,
+        ) {
+            messages = Messages(
+                points
+            )
+        }
+
         fun build(serviceLocator: ServiceLocator): Rewards {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Rewards::class.simpleName}")
+            val theMessages = messages
+                ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
 
             return Rewards(
                 channel = channelName,
                 commandParser = serviceLocator.commandParser,
                 extensionProvider = serviceLocator.extensionProvider,
+                intervalBetweenTwoClaims = intervalBetweenTwoClaims,
                 claimedPoints = claimedPoints,
-                intervalBetweenTwoClaims = intervalBetweenTwoClaims
+                messages = theMessages
             )
         }
     }

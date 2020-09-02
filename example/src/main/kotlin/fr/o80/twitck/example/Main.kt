@@ -7,7 +7,7 @@ import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.extension.Presence
-import fr.o80.twitck.extension.Rewards
+import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.extension.ViewerPromotion
@@ -78,16 +78,19 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
                 messages(
-                    pointsTransferred = "Codes transferés de #FROM# à #TO#",
+                    pointsTransferred = "Codes source transferés de #FROM# à #TO#",
                     noPointsEnough = "Les huissiers sont en route vers #FROM#",
-                    viewHasNoPoints = "#USER# possède 0 code",
-                    viewHasPoints = "#USER# possède #POINTS# code(s)",
-                    points = "codes"
+                    viewHasNoPoints = "#USER# possède 0 code source",
+                    viewHasPoints = "#USER# possède #POINTS# codes source",
+                    points = "codes source"
                 )
             }
             install(Rewards) {
                 channel(hostChannel)
                 claim(points = 50, time = 1, unit = TimeUnit.HOURS)
+                messages(
+                    points = "codes source"
+                )
             }
             install(Welcome) {
                 channel(hostChannel)
