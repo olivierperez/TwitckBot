@@ -1,27 +1,29 @@
 package fr.o80.twitck.extension.points
 
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.tryToInt
+import java.time.Duration
 
 class PointsCommands(
-    private val channel: String,
     private val privilegedBadges: Array<out Badge>,
     private val bank: PointsBank,
     private val message: Messages,
+    private val extensionProvider: ExtensionProvider,
     private val logger: Logger
 ) {
 
-    fun reactTo(command: Command, bot: TwitckBot) {
+    fun reactTo(command: Command) {
         when (command.tag) {
             // !points_add Pipiks_ 13000
             "!points_add" -> handleAddCommand(command)
             // !points_transfer idontwantgiftsub 152
-            "!points_transfer" -> handleTransferCommand(command, bot)
+            "!points_transfer" -> handleTransferCommand(command)
             // !points_info
-            "!points_info" -> handleInfoCommand(command, bot)
+            "!points_info" -> handleInfoCommand(command)
         }
     }
 
@@ -40,8 +42,7 @@ class PointsCommands(
     }
 
     private fun handleTransferCommand(
-        command: Command,
-        bot: TwitckBot
+        command: Command
     ) {
         if (command.options.size == 2) {
             val fromLogin = command.login
@@ -63,12 +64,13 @@ class PointsCommands(
                         .replace("#FROM#", fromLogin)
                         .replace("#TO#", toLogin)
                 }
-                bot.send(channel, msg)
+
+                extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
             }
         }
     }
 
-    private fun handleInfoCommand(command: Command, bot: TwitckBot) {
+    private fun handleInfoCommand(command: Command) {
         val login = command.login
         val points = bank.getPoints(login)
         logger.command(command, "$login requested points info ($points)")
@@ -83,6 +85,12 @@ class PointsCommands(
                 .replace("#POINTS#", points.toString())
         }
 
-        bot.send(channel, msg)
+        extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
+    }
+}
+
+private fun ExtensionProvider.alertOverlay(msg: String, duration: Duration) {
+    this.provide(Overlay::class).forEach { overlay ->
+        overlay.alert(msg, duration)
     }
 }

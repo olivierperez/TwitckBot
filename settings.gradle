@@ -1,3 +1,4 @@
 rootProject.name = 'TwitckBot'
 
 include ':lib', ':extensions', ':example'
+include ':extension-overlay'

@@ -27,7 +27,7 @@ class Welcome(
 ) {
 
     private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class.java).first()
+        extensionProvider.provide(StorageExtension::class).first()
     }
 
     private val namespace: String = Welcome::class.java.name

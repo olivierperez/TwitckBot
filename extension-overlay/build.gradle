@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+group 'fr.o80.twitck.overlay'
+version '0.0.2'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation project(':lib')
+
+    implementation 'org.lwjgl:lwjgl:3.2.1'
+    implementation 'org.lwjgl.osgi:org.lwjgl.glfw:3.2.1.2'
+    implementation 'org.lwjgl.osgi:org.lwjgl.opengl:3.2.1.2'
+    implementation 'org.lwjgl.osgi:org.lwjgl.stb:3.2.1.2'
+}

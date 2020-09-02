@@ -8,6 +8,8 @@ import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl
+import kotlin.reflect.KClass
+import kotlin.reflect.cast
 
 @DslMarker
 private annotation class TwitckConfigDsl
@@ -32,9 +34,9 @@ class TwitckConfigurator(
 
     private val serviceLocator: ServiceLocator = ServiceLocator(
         extensionProvider = object : ExtensionProvider {
-            override fun <T> provide(extensionInterface: Class<T>): List<T> =
+            override fun <T : Any> provide(extensionInterface: KClass<T>): List<T> =
                 extensions
-                    .filter { extension -> extensionInterface.isAssignableFrom(extension::class.java) }
+                    .filter { extension -> extensionInterface.isInstance(extension) }
                     .map { extension -> extensionInterface.cast(extension) }
         },
         loggerFactory = loggerFactory,

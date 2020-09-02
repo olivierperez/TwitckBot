@@ -16,6 +16,7 @@ import fr.o80.twitck.extension.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.twitckBot
+import fr.o80.twitck.overlay.StandardOverlay
 import java.io.File
 import java.util.concurrent.TimeUnit
 
@@ -62,12 +63,16 @@ class Main : CliktCommand() {
     ): TwitckBot {
         println("Start...")
         return twitckBot(oauthToken, clientId) {
+            install(StandardOverlay) {
+            }
             install(Storage) {
                 output(File(".storage/"))
             }
-            install(Rewards) {
+            install(Help) {
                 channel(hostChannel)
-                claim(points = 50, time = 1, unit = TimeUnit.HOURS)
+                registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
+                registerCommand("!language", "Ici on fait du Kotlin, best language ever")
+                registerCommand("!none")
             }
             install(Points) {
                 channel(hostChannel)
@@ -76,8 +81,13 @@ class Main : CliktCommand() {
                     pointsTransferred = "Codes transferés de #FROM# à #TO#",
                     noPointsEnough = "Les huissiers sont en route vers #FROM#",
                     viewHasNoPoints = "#USER# possède 0 code",
-                    viewHasPoints = "#USER# possède #POINTS# code(s)"
+                    viewHasPoints = "#USER# possède #POINTS# code(s)",
+                    points = "codes"
                 )
+            }
+            install(Rewards) {
+                channel(hostChannel)
+                claim(points = 50, time = 1, unit = TimeUnit.HOURS)
             }
             install(Welcome) {
                 channel(hostChannel)
@@ -102,12 +112,6 @@ class Main : CliktCommand() {
                 promotionInterval(1, TimeUnit.HOURS)
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
-            }
-            install(Help) {
-                channel(hostChannel)
-                registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
-                registerCommand("!language", "Ici on fait du Kotlin, best language ever")
-                registerCommand("!none")
             }
             install(RuntimeCommand) {
                 channel(hostChannel)

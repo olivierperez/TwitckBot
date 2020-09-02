@@ -4,6 +4,9 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.CommandParser
@@ -12,9 +15,13 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 class Points(
     override val channel: String,
     private val commandParser: CommandParser,
+    private val extensionProvider: ExtensionProvider,
     private val commands: PointsCommands,
-    private val bank: PointsBank
+    private val bank: PointsBank,
+    private val messages: Messages
 ) : PointsManager {
+
+    private val namespace: String = Points::class.java.name
 
     override fun getPoints(login: String): Int {
         return bank.getPoints(login)
@@ -33,10 +40,19 @@ class Points(
             return messageEvent
 
         commandParser.parse(messageEvent)?.let { command ->
-            commands.reactTo(command, bot)
+            commands.reactTo(command)
         }
 
         return messageEvent
+    }
+
+    private fun afterInstallation() {
+        extensionProvider.provide(Overlay::class).forEach { overlay ->
+            overlay.provideInformation(namespace, listOf("Vous avez combien de ${messages.points} ? !points_info"))
+        }
+        extensionProvider.provide(HelperExtension::class).forEach { help ->
+            help.registerCommand("!points_info")
+        }
     }
 
     class Configuration {
@@ -67,9 +83,10 @@ class Points(
             pointsTransferred: String,
             noPointsEnough: String,
             viewHasNoPoints: String,
-            viewHasPoints: String
+            viewHasPoints: String,
+            points: String,
         ) {
-            messages = Messages(pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints)
+            messages = Messages(pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints, points)
         }
 
         fun build(serviceLocator: ServiceLocator): Points {
@@ -83,11 +100,20 @@ class Points(
 
             val logger = serviceLocator.loggerFactory.getLogger(Points::class)
 
+            val pointsCommands = PointsCommands(
+                privilegedBadges,
+                bank,
+                theMessages,
+                serviceLocator.extensionProvider,
+                logger
+            )
             return Points(
                 channelName,
                 serviceLocator.commandParser,
-                PointsCommands(channelName, privilegedBadges, bank, theMessages, logger),
-                bank
+                serviceLocator.extensionProvider,
+                pointsCommands,
+                bank,
+                theMessages
             )
         }
     }
@@ -104,6 +130,7 @@ class Points(
                 .also { points ->
                     pipeline.interceptMessageEvent { bot, messageEvent -> points.interceptMessage(bot, messageEvent) }
                     pipeline.requestChannel(points.channel)
+                    points.afterInstallation()
                 }
         }
 
