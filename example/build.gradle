@@ -15,9 +15,9 @@ dependencies {
     implementation project(':lib')
     implementation project(':extensions')
     implementation project(':extension-overlay')
-    // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.2'
-    // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.2'
-    // implementation 'com.github.olivierperez.TwitckBot:extensions-overlay:0.0.2'
+    // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
+    // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
+    // implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'
 
     implementation 'com.github.ajalt:clikt:2.6.0'
     implementation 'ch.qos.logback:logback-classic:1.0.13'

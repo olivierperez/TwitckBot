@@ -19,7 +19,7 @@ repositories {
 }
 
 dependecies {
-    implementation 'com.github.olivierperez.TwitckBot:lib:0.0.2'
+    implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
 }
 ```
 
@@ -79,13 +79,15 @@ There's some extension you may want to use:
 ```groovy
 // For Gradle
 dependecies {
-    implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.2'
+    implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
+    implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'
 }
 ```
 
 ## Make your own extension 🎨
 
-TODO
+TODO Explain how to create a custom extension
+TODO remember to talk about Storage and Overlay
 
 # Example
 
