@@ -24,7 +24,7 @@ class ViewerPromotion(
 ) {
 
     private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class.java).first()
+        extensionProvider.provide(StorageExtension::class).first()
     }
 
     private val namespace: String = ViewerPromotion::class.java.name

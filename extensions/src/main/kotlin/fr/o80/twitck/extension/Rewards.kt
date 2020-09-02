@@ -24,7 +24,7 @@ class Rewards(
 ) {
 
     private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class.java).first()
+        extensionProvider.provide(StorageExtension::class).first()
     }
 
     private val namespace: String = Rewards::class.java.name
@@ -37,11 +37,11 @@ class Rewards(
     }
 
     private fun afterInstallation() {
-        extensionProvider.provide(Overlay::class.java).forEach { overlay ->
+        extensionProvider.provide(Overlay::class).forEach { overlay ->
             // TODO Remplacer POINTS par un message passé en config
             overlay.provideInformation(namespace, listOf("Vous pouvez !claim des POINTS de temps en temps."))
         }
-        extensionProvider.provide(HelperExtension::class.java).forEach { help ->
+        extensionProvider.provide(HelperExtension::class).forEach { help ->
             help.registerCommand("!claim")
         }
     }
@@ -59,7 +59,7 @@ class Rewards(
 
         rememberLastClaimIsNow(login)
 
-        extensionProvider.provide(PointsManager::class.java)
+        extensionProvider.provide(PointsManager::class)
             .filter { it.channel == channel }
             .forEach { pointsManager ->
                 pointsManager.addPoints(login, claimedPoints)

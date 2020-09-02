@@ -26,7 +26,7 @@ class RuntimeCommand(
 ) {
 
     private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class.java).first()
+        extensionProvider.provide(StorageExtension::class).first()
     }
 
     private val namespace: String = RuntimeCommand::class.java.name
@@ -105,7 +105,7 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.provide(HelperExtension::class.java).forEach { helper -> helper.registerCommand(newCommand) }
+        extensionProvider.provide(HelperExtension::class).forEach { helper -> helper.registerCommand(newCommand) }
     }
 
     class Configuration {
