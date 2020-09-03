@@ -15,6 +15,7 @@ import java.util.Locale
 private const val SCOPE_STREAM = "stream"
 private const val SCOPE_PERMANENT = "permanent"
 
+// TODO OPZ Extraire la partie gestion des commandes
 class RuntimeCommand(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,

@@ -12,6 +12,7 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.utils.tryToLong
 import java.util.concurrent.TimeUnit
 
+// TODO OPZ Extraire la partie gestion des commandes
 class Rewards(
     private val channel: String,
     private val extensionProvider: ExtensionProvider,
