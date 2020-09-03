@@ -120,7 +120,7 @@ class Main : CliktCommand() {
             install(Poll) {
                 channel(hostChannel)
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
-                // TODO OPZ pointsToEarn(15)
+                pointsToEarn(15)
                 messages(
                     errorCreationPollUsage = "Pour créer un sondage : \"!poll <durée> <question>\"",
                     errorDurationIsMissing = "Il faut choisir la durée du sondage !",

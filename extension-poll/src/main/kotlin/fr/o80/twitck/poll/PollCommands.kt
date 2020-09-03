@@ -3,6 +3,8 @@ package fr.o80.twitck.poll
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.utils.tryToLong
 import java.util.Timer
 import kotlin.concurrent.schedule
@@ -10,7 +12,9 @@ import kotlin.concurrent.schedule
 class PollCommands(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
-    private val messages: Messages
+    private val messages: Messages,
+    private val pointsForEachVote: Int,
+    private val extensionProvider: ExtensionProvider
 ) {
 
     private var currentPoll: CurrentPoll? = null
@@ -36,8 +40,13 @@ class PollCommands(
 
     private fun handleVote(command: Command) {
         val vote = command.options.joinToString(" ").toLowerCase()
-        currentPoll?.addVote(command.login, vote)
-        // TODO OPZ Notifier Points qu'on gagne un certain nombre de points (configurable dans l'extension)
+        val voteResult = currentPoll?.addVote(command.login, vote)
+
+        if (voteResult == Vote.NEW_VOTE && pointsForEachVote > 0) {
+            extensionProvider.provide(PointsManager::class).forEach { pointsManager ->
+                pointsManager.addPoints(command.login, pointsForEachVote)
+            }
+        }
     }
 
     private fun startPoll(bot: TwitckBot, command: Command) {
@@ -105,7 +114,18 @@ class CurrentPoll(
             ?.let { Pair(it.key, it.value.size) }
             ?: Pair("", 0)
 
-    fun addVote(login: String, vote: String) {
-        votes[login] = vote
+    fun addVote(login: String, vote: String): Vote {
+        return if (votes.containsKey(login)) {
+            votes[login] = vote
+            Vote.VOTE_CHANGED
+        } else {
+            votes[login] = vote
+            Vote.NEW_VOTE
+        }
     }
+}
+
+enum class Vote {
+    NEW_VOTE,
+    VOTE_CHANGED
 }

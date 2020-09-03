@@ -34,6 +34,7 @@ class Poll(
         private var channel: String? = null
         private var badges: Array<out Badge>? = null
 
+        private var points: Int = 0
         private var messages: Messages? = null
 
         @Dsl
@@ -47,6 +48,11 @@ class Poll(
                 throw IllegalArgumentException("Impossible to set an empty list of privileged badges.")
             }
             this.badges = badges
+        }
+
+        @Dsl
+        fun pointsToEarn(points: Int) {
+            this.points = points
         }
 
         @Dsl
@@ -81,7 +87,9 @@ class Poll(
                 PollCommands(
                     channel = channelName,
                     privilegedBadges = privilegedBadges,
-                    messages = theMessages
+                    messages = theMessages,
+                    pointsForEachVote = points,
+                    extensionProvider = serviceLocator.extensionProvider
                 ),
                 commandParser = serviceLocator.commandParser
             )
