@@ -34,6 +34,8 @@ class Poll(
         private var channel: String? = null
         private var badges: Array<out Badge>? = null
 
+        private var messages: Messages? = null
+
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
@@ -47,17 +49,39 @@ class Poll(
             this.badges = badges
         }
 
+        @Dsl
+        fun messages(
+            errorCreationPollUsage: String = "To create a poll: \"!poll <duration> <question>\"",
+            errorDurationIsMissing: String = "You have to enter a duration for the poll!",
+            newPoll: String = "New poll: #TITLE#",
+            pollHasJustFinished: String = "Poll has just finished, to the question #TITLE# You've answered #BEST# #COUNT times",
+            currentPollResult: String = "Poll is still running, the question is #TITLE# For now you've answered #BEST# #COUNT times",
+            pollHasNoVotes: String = "No one has answered to the question #TITLE#"
+        ) {
+            messages = Messages(
+                errorCreationPollUsage,
+                errorDurationIsMissing,
+                newPoll,
+                pollHasJustFinished,
+                currentPollResult,
+                pollHasNoVotes
+            )
+        }
+
         fun build(serviceLocator: ServiceLocator): Poll {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Poll::class.simpleName}")
             val privilegedBadges = badges
                 ?: arrayOf(Badge.BROADCASTER)
+            val theMessages = messages
+                ?: throw IllegalStateException("The messages must be set for the extension ${Poll::class.simpleName}")
 
             return Poll(
                 channelName,
                 PollCommands(
                     channel = channelName,
-                    privilegedBadges = privilegedBadges
+                    privilegedBadges = privilegedBadges,
+                    messages = theMessages
                 ),
                 commandParser = serviceLocator.commandParser
             )

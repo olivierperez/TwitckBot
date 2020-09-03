@@ -9,7 +9,8 @@ import kotlin.concurrent.schedule
 
 class PollCommands(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>
+    private val privilegedBadges: Array<out Badge>,
+    private val messages: Messages
 ) {
 
     private var currentPoll: CurrentPoll? = null
@@ -36,12 +37,12 @@ class PollCommands(
     private fun handleVote(command: Command) {
         val vote = command.options.joinToString(" ").toLowerCase()
         currentPoll?.addVote(command.login, vote)
+        // TODO OPZ Notifier Points qu'on gagne un certain nombre de points (configurable dans l'extension)
     }
 
     private fun startPoll(bot: TwitckBot, command: Command) {
         if (command.options.size < 2) {
-            // TODO OPZ Message
-            bot.send(channel, "Pour créer un sondage il te faut une durée et un titre !")
+            bot.send(channel, messages.errorCreationPollUsage)
             return
         }
 
@@ -50,17 +51,26 @@ class PollCommands(
         val title = command.options.subList(1, command.options.size).joinToString(" ")
 
         if (seconds == null) {
-            // TODO OPZ Message
-            bot.send(channel, "Il faut choisir la durée du sondage !")
+            bot.send(channel, messages.errorDurationIsMissing)
             return
         }
 
         currentPoll = CurrentPoll(title)
-        bot.send(channel, "Nouveau sondage : $title")
+        bot.send(channel, messages.newPoll.replace("#TITLE#", title))
 
-        Timer().schedule(seconds) {
+        Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
-                bot.send(channel, "Le sondage est fini !! ${poll.result}")
+                val best = poll.best
+
+                if (best.second >= 1) {
+                    val resultMsg = messages.pollHasJustFinished
+                        .replace("#TITLE#", poll.title)
+                        .replace("#BEST#", best.first)
+                        .replace("#COUNT#", best.second.toString())
+                    bot.send(channel, resultMsg)
+                } else {
+                    bot.send(channel, messages.pollHasNoVotes.replace("#TITLE#", poll.title))
+                }
                 currentPoll = null
             }
         }
@@ -68,23 +78,32 @@ class PollCommands(
 
     private fun showResult(bot: TwitckBot) {
         currentPoll?.let { poll ->
-            bot.send(channel, "Sondage en cours... ${poll.result}")
+            val best = poll.best
+            if (best.second >= 1) {
+                val resultMsg = messages.currentPollResult
+                    .replace("#TITLE#", poll.title)
+                    .replace("#BEST#", best.first)
+                    .replace("#COUNT#", best.second.toString())
+                bot.send(channel, resultMsg)
+            } else {
+                bot.send(channel, messages.pollHasNoVotes.replace("#TITLE#", poll.title))
+            }
         }
     }
 
 }
 
 class CurrentPoll(
-    private val title: String
+    val title: String
 ) {
+
     private val votes: MutableMap<String, String> = mutableMapOf()
 
-    val result: String
+    val best: Pair<String, Int>
         get() = votes.values.groupBy { it }
             .maxByOrNull { it.value.size }
-            // TODO OPZ Sortir ça vers la classe PollCommands : message.endedPoll.replace("#TITLE#", title).replace("#BEST#", best.key).replace("#COUNT#", best.value)
-            ?.let { "à la question $title Vous avez répondu \"${it.key}\" avec ${it.value.size} résultats" }
-            ?: "Pas de résultat"
+            ?.let { Pair(it.key, it.value.size) }
+            ?: Pair("", 0)
 
     fun addVote(login: String, vote: String) {
         votes[login] = vote
