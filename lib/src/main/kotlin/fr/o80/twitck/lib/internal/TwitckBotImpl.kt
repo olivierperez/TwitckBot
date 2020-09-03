@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
+import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
@@ -22,7 +23,12 @@ internal class TwitckBotImpl(
 
     private val ping = Ping(this)
 
-    private val privMsgLineHandler = PrivMsgLineHandler(this, MessageDispatcher(this, configuration.messageHandlers))
+    private val privMsgLineHandler = PrivMsgLineHandler(
+        this,
+        configuration.commandParser,
+        MessageDispatcher(this, configuration.messageHandlers),
+        CommandDispatcher(this, configuration.commandHandlers)
+    )
     private val joinLineHandler = JoinLineHandler(this, JoinDispatcher(this, configuration.joinHandlers))
     private val whisperLineHandler = WhisperLineHandler(this, WhisperDispatcher(this, configuration.whisperHandlers))
 

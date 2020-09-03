@@ -1,50 +1,40 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Command
-import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Help(
     private val channel: String,
-    private val registeredCommands: MutableMap<String, String?>,
-    private val commandParser: CommandParser
+    private val registeredCommands: MutableMap<String, String?>
 ) : HelperExtension {
-
-    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
-        if (channel != messageEvent.channel)
-            return messageEvent
-
-        commandParser.parse(messageEvent)?.let { command ->
-            reactToCommand(command, bot, messageEvent)
-        }
-
-        return messageEvent
-    }
 
     override fun registerCommand(command: String) {
         registeredCommands[command] = null
     }
 
-    private fun reactToCommand(
-        command: Command,
+    private fun interceptCommandEvent(
         bot: TwitckBot,
-        messageEvent: MessageEvent
-    ) {
-        when (command.tag) {
+        commandEvent: CommandEvent
+    ): CommandEvent {
+        if (channel != commandEvent.channel)
+            return commandEvent
+
+        when (commandEvent.command.tag) {
             "!help" -> {
-                bot.sendHelp(messageEvent.channel, registeredCommands.keys)
+                bot.sendHelp(commandEvent.channel, registeredCommands.keys)
             }
             in registeredCommands.keys -> {
-                registeredCommands[command.tag]?.let { message ->
-                    bot.send(messageEvent.channel, message)
+                registeredCommands[commandEvent.command.tag]?.let { message ->
+                    bot.send(commandEvent.channel, message)
                 }
             }
         }
+
+        return commandEvent
     }
 
     private fun TwitckBot.sendHelp(
@@ -81,7 +71,7 @@ class Help(
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Help::class.simpleName}")
 
-            return Help(channelName, registeredCommands, serviceLocator.commandParser)
+            return Help(channelName, registeredCommands)
         }
     }
 
@@ -95,7 +85,7 @@ class Help(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { localHelp ->
-                    pipeline.interceptMessageEvent(localHelp::interceptMessageEvent)
+                    pipeline.interceptCommandEvent(localHelp::interceptCommandEvent)
                 }
         }
     }

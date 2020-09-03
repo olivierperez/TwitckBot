@@ -1,20 +1,16 @@
 package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Points(
     override val channel: String,
-    private val commandParser: CommandParser,
     private val extensionProvider: ExtensionProvider,
     private val commands: PointsCommands,
     private val bank: PointsBank,
@@ -35,17 +31,6 @@ class Points(
         return bank.removePoints(login, points)
     }
 
-    private fun interceptMessage(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
-        if (channel != messageEvent.channel)
-            return messageEvent
-
-        commandParser.parse(messageEvent)?.let { command ->
-            commands.reactTo(command)
-        }
-
-        return messageEvent
-    }
-
     private fun afterInstallation() {
         extensionProvider.provide(Overlay::class).forEach { overlay ->
             overlay.provideInformation(namespace, listOf("Vous avez combien de ${messages.points} ? !points_info"))
@@ -63,7 +48,7 @@ class Points(
         private var channel: String? = null
         private var badges: Array<out Badge>? = null
 
-        private var messages : Messages? = null
+        private var messages: Messages? = null
 
         @Dsl
         fun channel(channel: String) {
@@ -101,6 +86,7 @@ class Points(
             val logger = serviceLocator.loggerFactory.getLogger(Points::class)
 
             val pointsCommands = PointsCommands(
+                channelName,
                 privilegedBadges,
                 bank,
                 theMessages,
@@ -109,7 +95,6 @@ class Points(
             )
             return Points(
                 channelName,
-                serviceLocator.commandParser,
                 serviceLocator.extensionProvider,
                 pointsCommands,
                 bank,
@@ -128,7 +113,7 @@ class Points(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { points ->
-                    pipeline.interceptMessageEvent { bot, messageEvent -> points.interceptMessage(bot, messageEvent) }
+                    pipeline.interceptCommandEvent { _, commandEvent -> points.commands.interceptCommandEvent(commandEvent) }
                     pipeline.requestChannel(points.channel)
                     points.afterInstallation()
                 }

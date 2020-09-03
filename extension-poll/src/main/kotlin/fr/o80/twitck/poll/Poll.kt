@@ -1,30 +1,13 @@
 package fr.o80.twitck.poll
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Poll(
-    private val channel: String,
-    private val commands: PollCommands,
-    private val commandParser: CommandParser
+    private val commands: PollCommands
 ) {
-
-    private fun interceptMessage(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
-        if (channel != messageEvent.channel)
-            return messageEvent
-
-        // TODO Ajouter au Pipeline, une méthode interceptCommand(Bot, Command)
-        commandParser.parse(messageEvent)?.let { command ->
-            commands.reactTo(bot, command)
-        }
-
-        return messageEvent
-    }
 
     class Configuration {
 
@@ -83,15 +66,13 @@ class Poll(
                 ?: throw IllegalStateException("The messages must be set for the extension ${Poll::class.simpleName}")
 
             return Poll(
-                channelName,
                 PollCommands(
                     channel = channelName,
                     privilegedBadges = privilegedBadges,
                     messages = theMessages,
                     pointsForEachVote = points,
                     extensionProvider = serviceLocator.extensionProvider
-                ),
-                commandParser = serviceLocator.commandParser
+                )
             )
         }
     }
@@ -106,7 +87,7 @@ class Poll(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { poll ->
-                    pipeline.interceptMessageEvent(poll::interceptMessage)
+                    pipeline.interceptCommandEvent(poll.commands::interceptCommandEvent)
                 }
         }
 

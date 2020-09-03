@@ -1,12 +1,10 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Command
-import fr.o80.twitck.lib.api.bean.JoinEvent
-import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 
@@ -20,7 +18,6 @@ class Channel(
     private val channel: String,
     private val joinCallbacks: Iterable<JoinCallback>,
     private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
-    private val commandParser: CommandParser,
     private val logger: Logger
 ) {
 
@@ -38,19 +35,17 @@ class Channel(
         return joinEvent
     }
 
-    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
-        if (channel != messageEvent.channel)
-            return messageEvent
+    fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
+        if (channel != commandEvent.channel)
+            return commandEvent
 
-        commandParser.parse(messageEvent)?.let { command ->
-            commandCallbacks.forEach { (commandTag, callback) ->
-                if (commandTag == command.tag) {
-                    callback(bot, command)
-                }
+        commandCallbacks.forEach { (commandTag, callback) ->
+            if (commandTag == commandEvent.command.tag) {
+                callback(bot, commandEvent)
             }
         }
 
-        return messageEvent
+        return commandEvent
     }
 
     class Configuration {
@@ -85,7 +80,6 @@ class Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
                 commandCallbacks = commandCallbacks,
-                commandParser = serviceLocator.commandParser,
                 logger = serviceLocator.loggerFactory.getLogger(Channel::class)
             )
         }
@@ -102,7 +96,7 @@ class Channel(
                 .build(serviceLocator)
                 .also { channel ->
                     pipeline.interceptJoinEvent(channel::interceptJoinEvent)
-                    pipeline.interceptMessageEvent(channel::interceptMessageEvent)
+                    pipeline.interceptCommandEvent(channel::interceptCommandEvent)
                     pipeline.requestChannel(channel.channel)
                 }
         }
@@ -111,7 +105,7 @@ class Channel(
 
 typealias CommandCallback = (
     bot: TwitckBot,
-    command: Command
+    commandEvent: CommandEvent
 ) -> Unit
 
 typealias JoinCallback = (

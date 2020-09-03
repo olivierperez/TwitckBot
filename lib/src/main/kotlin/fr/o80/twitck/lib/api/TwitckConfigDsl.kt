@@ -58,8 +58,10 @@ class TwitckConfigurator(
             requestedChannels = pipeline.requestedChannels,
             joinHandlers = pipeline.joinHandlers,
             messageHandlers = pipeline.messageHandlers,
+            commandHandlers = pipeline.commandHandlers,
             whisperHandlers = pipeline.whisperHandlers,
-            loggerFactory = loggerFactory
+            loggerFactory = loggerFactory,
+            commandParser = serviceLocator.commandParser
         )
     }
 

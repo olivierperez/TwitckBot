@@ -1,24 +1,19 @@
 package fr.o80.twitck.extension.rewards
 
-import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.Command
-import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.utils.tryToLong
 import java.util.concurrent.TimeUnit
 
 class Rewards(
     private val channel: String,
-    private val commandParser: CommandParser,
     private val extensionProvider: ExtensionProvider,
     private val intervalBetweenTwoClaims: Long,
     private val claimedPoints: Int,
@@ -31,26 +26,27 @@ class Rewards(
 
     private val namespace: String = Rewards::class.java.name
 
-    private fun interceptMessage(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
-        commandParser.parse(messageEvent)?.let { command ->
-            handleCommand(command)
-        }
-        return messageEvent
-    }
-
-    private fun afterInstallation() {
+    private fun onInstallationFinished() {
         extensionProvider.provide(Overlay::class).forEach { overlay ->
-            overlay.provideInformation(namespace, listOf("Vous pouvez !claim des ${messages.points} de temps en temps."))
+            overlay.provideInformation(
+                namespace,
+                listOf("Vous pouvez !claim des ${messages.points} de temps en temps.")
+            )
         }
         extensionProvider.provide(HelperExtension::class).forEach { help ->
             help.registerCommand("!claim")
         }
     }
 
-    private fun handleCommand(command: Command) {
-        when (command.tag) {
-            "!claim" -> claim(command.login)
+    private fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
+        if (channel != commandEvent.channel)
+            return commandEvent
+
+        when (commandEvent.command.tag) {
+            "!claim" -> claim(commandEvent.login)
         }
+
+        return commandEvent
     }
 
     private fun claim(login: String) {
@@ -86,7 +82,7 @@ class Rewards(
         private var intervalBetweenTwoClaims: Long = TimeUnit.HOURS.toMillis(12)
         private var claimedPoints: Int = 10
 
-        private var messages : Messages? = null
+        private var messages: Messages? = null
 
         @Dsl
         fun channel(channel: String) {
@@ -116,7 +112,6 @@ class Rewards(
 
             return Rewards(
                 channel = channelName,
-                commandParser = serviceLocator.commandParser,
                 extensionProvider = serviceLocator.extensionProvider,
                 intervalBetweenTwoClaims = intervalBetweenTwoClaims,
                 claimedPoints = claimedPoints,
@@ -135,9 +130,9 @@ class Rewards(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { rewards ->
-                    pipeline.interceptMessageEvent(rewards::interceptMessage)
+                    pipeline.interceptCommandEvent { _, commandEvent -> rewards.interceptCommandEvent(commandEvent) }
                     pipeline.requestChannel(rewards.channel)
-                    rewards.afterInstallation()
+                    rewards.onInstallationFinished()
                 }
         }
 

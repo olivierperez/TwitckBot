@@ -1,13 +1,18 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.service.CommandParser
+import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 
 internal class PrivMsgLineHandler(
     private val bot: TwitckBot,
-    private val dispatcher: MessageDispatcher
+    private val commandParser: CommandParser,
+    private val messageDispatcher: MessageDispatcher,
+    private val commandDispatcher: CommandDispatcher
 ) : LineHandler {
 
     private val regex = Regex("^@([^ ]+) :([^!]+)![^@]+@[^.]+\\.tmi\\.twitch\\.tv PRIVMSG (#[^ ]+) :(.+)$")
@@ -36,16 +41,12 @@ internal class PrivMsgLineHandler(
                 }
             }
 
-            dispatcher.dispatch(
-                MessageEvent(
-                    bot = bot,
-                    channel = channel,
-                    login = user,
-                    userId = userId,
-                    badges = badges,
-                    message = msg
-                )
-            )
+            val command = commandParser.parse(msg)
+            if (command != null) {
+                commandDispatcher.dispatch(CommandEvent(bot, channel, user, userId, badges, command))
+            } else {
+                messageDispatcher.dispatch(MessageEvent(bot, channel, user, userId, badges, msg))
+            }
         }
     }
 

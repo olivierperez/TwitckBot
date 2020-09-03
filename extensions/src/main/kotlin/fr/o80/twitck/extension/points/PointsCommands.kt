@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.Command
+import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -9,6 +9,7 @@ import fr.o80.twitck.lib.utils.tryToInt
 import java.time.Duration
 
 class PointsCommands(
+    private val channel: String,
     private val privilegedBadges: Array<out Badge>,
     private val bank: PointsBank,
     private val message: Messages,
@@ -16,24 +17,30 @@ class PointsCommands(
     private val logger: Logger
 ) {
 
-    fun reactTo(command: Command) {
-        when (command.tag) {
+    fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
+        if (channel != commandEvent.channel)
+            return commandEvent
+
+        when (commandEvent.command.tag) {
             // !points_add Pipiks_ 13000
-            "!points_add" -> handleAddCommand(command)
+            "!points_add" -> handleAddCommand(commandEvent)
             // !points_transfer idontwantgiftsub 152
-            "!points_transfer" -> handleTransferCommand(command)
+            "!points_transfer" -> handleTransferCommand(commandEvent)
             // !points_info
-            "!points_info" -> handleInfoCommand(command)
+            "!points_info" -> handleInfoCommand(commandEvent)
         }
+
+        return commandEvent
     }
 
-    private fun handleAddCommand(command: Command) {
-        if (command.badges.none { badge -> badge in privilegedBadges }) return
+    private fun handleAddCommand(commandEvent: CommandEvent) {
+        if (commandEvent.badges.none { badge -> badge in privilegedBadges }) return
 
+        val command = commandEvent.command
         if (command.options.size == 2) {
             val login = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${command.login} try to add $points to $login")
+            logger.command(command, "${commandEvent.login} try to add $points to $login")
 
             points?.let {
                 bank.addPoints(login, points)
@@ -41,14 +48,13 @@ class PointsCommands(
         }
     }
 
-    private fun handleTransferCommand(
-        command: Command
-    ) {
+    private fun handleTransferCommand(commandEvent: CommandEvent) {
+        val command = commandEvent.command
         if (command.options.size == 2) {
-            val fromLogin = command.login
+            val fromLogin = commandEvent.login
             val toLogin = command.options[0].toLowerCase()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${command.login} try to transfer $points to $toLogin")
+            logger.command(command, "${commandEvent.login} try to transfer $points to $toLogin")
 
             if (toLogin == fromLogin) return
 
@@ -70,9 +76,11 @@ class PointsCommands(
         }
     }
 
-    private fun handleInfoCommand(command: Command) {
-        val login = command.login
+    private fun handleInfoCommand(commandEvent: CommandEvent) {
+        val command = commandEvent.command
+        val login = commandEvent.login
         val points = bank.getPoints(login)
+
         logger.command(command, "$login requested points info ($points)")
 
         val msg = if (points == 0) {

@@ -2,7 +2,7 @@ package fr.o80.twitck.poll
 
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.Command
+import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.utils.tryToLong
@@ -19,37 +19,43 @@ class PollCommands(
 
     private var currentPoll: CurrentPoll? = null
 
-    fun reactTo(bot: TwitckBot, command: Command) {
-        when (command.tag) {
+    fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
+        if (channel != commandEvent.channel)
+            return commandEvent
+
+        when (commandEvent.command.tag) {
             // !poll 120 Est-ce que je dois changer de langage ?
-            "!poll" -> handlePoll(bot, command)
+            "!poll" -> handlePoll(bot, commandEvent)
             // !vote Non
-            "!vote" -> handleVote(command)
+            "!vote" -> handleVote(commandEvent)
         }
+
+        return commandEvent
     }
 
-    private fun handlePoll(bot: TwitckBot, command: Command) {
-        if (command.badges.none { badge -> badge in privilegedBadges }) return
+    private fun handlePoll(bot: TwitckBot, commandEvent: CommandEvent) {
+        if (commandEvent.badges.none { badge -> badge in privilegedBadges }) return
 
-        if (command.options.isNotEmpty()) {
-            startPoll(bot, command)
+        if (commandEvent.command.options.isNotEmpty()) {
+            startPoll(bot, commandEvent)
         } else {
             showResult(bot)
         }
     }
 
-    private fun handleVote(command: Command) {
-        val vote = command.options.joinToString(" ").toLowerCase()
-        val voteResult = currentPoll?.addVote(command.login, vote)
+    private fun handleVote(commandEvent: CommandEvent) {
+        val vote = commandEvent.command.options.joinToString(" ").toLowerCase()
+        val voteResult = currentPoll?.addVote(commandEvent.login, vote)
 
         if (voteResult == Vote.NEW_VOTE && pointsForEachVote > 0) {
             extensionProvider.provide(PointsManager::class).forEach { pointsManager ->
-                pointsManager.addPoints(command.login, pointsForEachVote)
+                pointsManager.addPoints(commandEvent.login, pointsForEachVote)
             }
         }
     }
 
-    private fun startPoll(bot: TwitckBot, command: Command) {
+    private fun startPoll(bot: TwitckBot, commandEvent: CommandEvent) {
+        val command = commandEvent.command
         if (command.options.size < 2) {
             bot.send(channel, messages.errorCreationPollUsage)
             return
