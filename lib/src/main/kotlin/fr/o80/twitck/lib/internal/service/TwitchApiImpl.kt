@@ -1,18 +1,20 @@
 package fr.o80.twitck.lib.internal.service
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.bean.Channel
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.User
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.util.Date
 
 class TwitchApiImpl(
     private val clientId: String,
@@ -22,7 +24,11 @@ class TwitchApiImpl(
 
     private val logger = loggerFactory.getLogger("NETWORK")
 
-    private val gson: Gson = GsonBuilder().create()
+    private val moshi = Moshi.Builder()
+        .add(KotlinJsonAdapterFactory())
+        .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+        .build()
+
     private val client: HttpClient = HttpClient.newHttpClient()
     private val baseUrl: String = "https://api.twitch.tv/kraken"
 
@@ -64,18 +70,21 @@ class TwitchApiImpl(
     }
 
     private inline fun <reified T> String.parse(): T {
-        return gson.fromJson(this, T::class.java)
+        return moshi.adapter(T::class.java).fromJson(this)!!
     }
 }
 
+@JsonClass(generateAdapter = true)
 class FollowAnswer(
     val follows: List<Follower>
 )
 
+@JsonClass(generateAdapter = true)
 class UserAnswer(
     val users: List<User>
 )
 
+@JsonClass(generateAdapter = true)
 class VideoAnswer(
     val videos: List<Video>
 )

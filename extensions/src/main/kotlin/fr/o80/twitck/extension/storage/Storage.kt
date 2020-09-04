@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.storage
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -15,7 +15,7 @@ class Storage(
     private val sanitizer: FileNameSanitizer = FileNameSanitizer()
 ) : StorageExtension {
 
-    private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+    private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
     private val lock = Any()
 
@@ -57,7 +57,7 @@ class Storage(
         val globalFile = getGlobalFile()
         return if (globalFile.isFile) {
             globalFile.reader().use { reader ->
-                gson.fromJson(reader, Global::class.java)
+                moshi.adapter(Global::class.java).fromJson(reader.readText())!!
             }
         } else {
             logger.trace("There's no global file")
@@ -69,7 +69,7 @@ class Storage(
         logger.debug("Saving global...")
         synchronized(lock) {
             val globalFile = getGlobalFile()
-            val globalJson = gson.toJson(global)
+            val globalJson = moshi.adapter(Global::class.java).indent("  ").toJson(global)
             globalFile.writer().use {
                 it.write(globalJson)
             }
@@ -82,7 +82,7 @@ class Storage(
         return if (userFile.isFile) {
             logger.trace("User $login already has a file !")
             userFile.reader().use { reader ->
-                gson.fromJson(reader, User::class.java)
+                moshi.adapter(User::class.java).fromJson(reader.readText())!!
             }
         } else {
             logger.trace("User $login has no files")
@@ -94,7 +94,7 @@ class Storage(
         logger.debug("Saving user ${user.login}...")
         synchronized(lock) {
             val userFile = getUserFile(user.login)
-            val userJson = gson.toJson(user)
+            val userJson = moshi.adapter(User::class.java).indent("  ").toJson(user)
             userFile.writer().use {
                 it.write(userJson)
             }

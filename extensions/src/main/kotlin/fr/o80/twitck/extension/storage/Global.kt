@@ -1,7 +1,10 @@
 package fr.o80.twitck.extension.storage
 
+import com.squareup.moshi.JsonClass
+
+@JsonClass(generateAdapter = true)
 data class Global(
-    private val namespaces: MutableMap<String, Extras> = mutableMapOf()
+    val namespaces: MutableMap<String, Extras> = mutableMapOf()
 ) {
 
     fun putExtra(namespace: String, key: String, value: String) {
@@ -17,8 +20,9 @@ data class Global(
     }
 }
 
+@JsonClass(generateAdapter = true)
 class Extras(
-    private val extras: MutableMap<String, String> = mutableMapOf()
+    val extras: MutableMap<String, String> = mutableMapOf()
 ) {
     fun put(key: String, value: String) {
         extras[key] = value
