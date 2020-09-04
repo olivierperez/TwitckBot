@@ -32,10 +32,10 @@ class Points(
     }
 
     private fun afterInstallation() {
-        extensionProvider.provide(Overlay::class).forEach { overlay ->
+        extensionProvider.forEach(Overlay::class) { overlay ->
             overlay.provideInformation(namespace, listOf("Vous avez combien de ${messages.points} ? !points_info"))
         }
-        extensionProvider.provide(HelperExtension::class).forEach { help ->
+        extensionProvider.forEach(HelperExtension::class) { help ->
             help.registerCommand("!points_info")
         }
     }

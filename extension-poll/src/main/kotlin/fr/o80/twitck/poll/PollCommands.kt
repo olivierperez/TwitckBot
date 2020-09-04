@@ -49,7 +49,7 @@ class PollCommands(
         val voteResult = currentPoll?.addVote(commandEvent.login, vote)
 
         if (voteResult == Vote.NEW_VOTE && pointsForEachVote > 0) {
-            extensionProvider.provide(PointsManager::class).forEach { pointsManager ->
+            extensionProvider.forEach(PointsManager::class) { pointsManager ->
                 pointsManager.addPoints(commandEvent.login, pointsForEachVote)
             }
         }

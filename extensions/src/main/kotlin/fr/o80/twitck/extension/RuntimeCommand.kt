@@ -99,7 +99,7 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.provide(HelperExtension::class).forEach { helper -> helper.registerCommand(newCommand) }
+        extensionProvider.forEach(HelperExtension::class) { helper -> helper.registerCommand(newCommand) }
     }
 
     class Configuration {

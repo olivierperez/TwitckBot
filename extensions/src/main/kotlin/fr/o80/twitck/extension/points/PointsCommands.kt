@@ -98,7 +98,7 @@ class PointsCommands(
 }
 
 private fun ExtensionProvider.alertOverlay(msg: String, duration: Duration) {
-    this.provide(Overlay::class).forEach { overlay ->
+    this.forEach(Overlay::class) { overlay ->
         overlay.alert(msg, duration)
     }
 }

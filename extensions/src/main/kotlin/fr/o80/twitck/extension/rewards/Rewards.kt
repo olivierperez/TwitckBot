@@ -28,13 +28,13 @@ class Rewards(
     private val namespace: String = Rewards::class.java.name
 
     private fun onInstallationFinished() {
-        extensionProvider.provide(Overlay::class).forEach { overlay ->
+        extensionProvider.forEach(Overlay::class) { overlay ->
             overlay.provideInformation(
                 namespace,
                 listOf("Vous pouvez !claim des ${messages.points} de temps en temps.")
             )
         }
-        extensionProvider.provide(HelperExtension::class).forEach { help ->
+        extensionProvider.forEach(HelperExtension::class) { help ->
             help.registerCommand("!claim")
         }
     }

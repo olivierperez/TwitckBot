@@ -38,6 +38,11 @@ class TwitckConfigurator(
                 extensions
                     .filter { extension -> extensionInterface.isInstance(extension) }
                     .map { extension -> extensionInterface.cast(extension) }
+
+            override fun <T : Any> forEach(extensionInterface: KClass<T>, block: (extension: T) -> Unit) {
+                provide(extensionInterface)
+                    .forEach(block)
+            }
         },
         loggerFactory = loggerFactory,
         twitchApi = TwitchApiImpl(clientId, oauthToken, loggerFactory)
