@@ -32,7 +32,7 @@ class Welcome(
 
     private val namespace: String = Welcome::class.java.name
 
-    private val followers : List<Follower> by lazy {
+    private val followers: List<Follower> by lazy {
         val user = twitchApi.getUser(hostName)
         twitchApi.getFollowers(user.id)
     }
@@ -41,7 +41,7 @@ class Welcome(
         if (channel != joinEvent.channel)
             return joinEvent
 
-        if (joinEvent.login in ignoredLogins) {
+        if (ignoredLogins.any { joinEvent.login.equals(it, true) }) {
             return joinEvent
         }
 

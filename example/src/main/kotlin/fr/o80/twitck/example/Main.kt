@@ -170,7 +170,7 @@ class Main : CliktCommand() {
                     bot.send(botChannel, "Il n'y a pas encore d'aide")
                 }
                 join { bot, join ->
-                    if (join.login != botName) {
+                    if (!join.login.equals(botName, true)) {
                         bot.send(join.channel, "Salut ${join.login} ! Que fais-tu ici ?")
                         bot.send(hostChannel, "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?")
                     }

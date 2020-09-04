@@ -5,7 +5,7 @@ import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.utils.tryToLong
+import fr.o80.twitck.lib.api.service.TimeParser
 import java.util.Timer
 import kotlin.concurrent.schedule
 
@@ -14,7 +14,8 @@ class PollCommands(
     private val privilegedBadges: Array<out Badge>,
     private val messages: Messages,
     private val pointsForEachVote: Int,
-    private val extensionProvider: ExtensionProvider
+    private val extensionProvider: ExtensionProvider,
+    private val timeParser: TimeParser = TimeParser()
 ) {
 
     private var currentPoll: CurrentPoll? = null
@@ -61,11 +62,10 @@ class PollCommands(
             return
         }
 
-        // TODO OPZ Voir comment pouvoir définir le sondage en minutes ou heures (1h, 35m ?)
-        val seconds = command.options[0].tryToLong()
+        val seconds = timeParser.parse(command.options[0])
         val title = command.options.subList(1, command.options.size).joinToString(" ")
 
-        if (seconds == null) {
+        if (seconds == -1L) {
             bot.send(channel, messages.errorDurationIsMissing)
             return
         }

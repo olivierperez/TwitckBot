@@ -1,6 +1,6 @@
 package fr.o80.twitck.extension.storage
 
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class FileNameSanitizerTest {

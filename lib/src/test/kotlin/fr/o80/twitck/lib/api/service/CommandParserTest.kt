@@ -1,5 +1,6 @@
+package fr.o80.twitck.lib.api.service
+
 import fr.o80.twitck.lib.api.bean.Command
-import fr.o80.twitck.lib.api.service.CommandParser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
