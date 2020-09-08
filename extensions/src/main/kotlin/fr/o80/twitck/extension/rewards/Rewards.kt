@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
@@ -39,29 +40,36 @@ class Rewards(
         }
     }
 
-    private fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
+    private fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
 
         when (commandEvent.command.tag) {
-            "!claim" -> claim(commandEvent.login)
+            "!claim" -> claim(bot, commandEvent.login)
         }
 
         return commandEvent
     }
 
-    private fun claim(login: String) {
+    private fun claim(bot: TwitckBot, login: String) {
         if (alreadyClaimed(login)) {
             return
         }
 
         rememberLastClaimIsNow(login)
 
-        extensionProvider.provide(PointsManager::class)
+        val ownedPoints = extensionProvider.provide(PointsManager::class)
             .filter { it.channel == channel }
-            .forEach { pointsManager ->
+            .onEach { pointsManager ->
                 pointsManager.addPoints(login, claimedPoints)
             }
+            .sumBy { pointsManager -> pointsManager.getPoints(login) }
+
+        val message = messages.viewerJustClaimed
+            .replace("#USER#", login)
+            .replace("#NEW_POINTS#", claimedPoints.toString())
+            .replace("#OWNED_POINTS#", ownedPoints.toString())
+        bot.send(channel, message)
     }
 
     private fun alreadyClaimed(login: String): Boolean {
@@ -99,9 +107,11 @@ class Rewards(
         @Dsl
         fun messages(
             points: String,
+            viewerJustClaimed: String,
         ) {
             messages = Messages(
-                points
+                points,
+                viewerJustClaimed
             )
         }
 
@@ -131,7 +141,7 @@ class Rewards(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { rewards ->
-                    pipeline.interceptCommandEvent { _, commandEvent -> rewards.interceptCommandEvent(commandEvent) }
+                    pipeline.interceptCommandEvent(rewards::interceptCommandEvent)
                     pipeline.requestChannel(rewards.channel)
                     rewards.onInstallationFinished()
                 }

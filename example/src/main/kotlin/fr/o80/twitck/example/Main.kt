@@ -89,7 +89,8 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 claim(points = 50, time = 1, unit = TimeUnit.HOURS)
                 messages(
-                    points = "codes source"
+                    points = "codes source",
+                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et possède donc #OWNED_POINTS#"
                 )
             }
             install(Welcome) {
