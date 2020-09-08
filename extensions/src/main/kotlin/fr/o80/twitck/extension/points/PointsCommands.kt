@@ -24,8 +24,8 @@ class PointsCommands(
         when (commandEvent.command.tag) {
             // !points_add Pipiks_ 13000
             "!points_add" -> handleAddCommand(commandEvent)
-            // !points_transfer idontwantgiftsub 152
-            "!points_transfer" -> handleTransferCommand(commandEvent)
+            // !points_give idontwantgiftsub 152
+            "!points_give" -> handleGiveCommand(commandEvent)
             // !points_info
             "!points_info" -> handleInfoCommand(commandEvent)
         }
@@ -48,7 +48,7 @@ class PointsCommands(
         }
     }
 
-    private fun handleTransferCommand(commandEvent: CommandEvent) {
+    private fun handleGiveCommand(commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {
             val fromLogin = commandEvent.login
