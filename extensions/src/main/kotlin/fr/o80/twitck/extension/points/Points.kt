@@ -31,7 +31,7 @@ class Points(
         return bank.removePoints(login, points)
     }
 
-    private fun afterInstallation() {
+    private fun onInstallationFinished() {
         extensionProvider.forEach(Overlay::class) { overlay ->
             overlay.provideInformation(namespace, listOf("Vous avez combien de ${messages.points} ? !points_info"))
         }
@@ -115,7 +115,7 @@ class Points(
                 .also { points ->
                     pipeline.interceptCommandEvent { _, commandEvent -> points.commands.interceptCommandEvent(commandEvent) }
                     pipeline.requestChannel(points.channel)
-                    points.afterInstallation()
+                    points.onInstallationFinished()
                 }
         }
 

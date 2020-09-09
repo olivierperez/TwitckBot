@@ -12,8 +12,8 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import java.util.Locale
 
-private const val SCOPE_STREAM = "stream"
-private const val SCOPE_PERMANENT = "permanent"
+const val SCOPE_STREAM = "stream"
+const val SCOPE_PERMANENT = "permanent"
 
 // TODO OPZ Extraire la partie gestion des commandes
 class RuntimeCommand(
@@ -90,7 +90,7 @@ class RuntimeCommand(
         }
     }
 
-    private fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
+    fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
         runtimeCommands[newCommand] = message
 
         if (scope == SCOPE_PERMANENT) {
