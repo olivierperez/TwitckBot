@@ -4,17 +4,31 @@ import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import java.util.Date
 
-class Product(
-    val name: String,
-    val price: Int,
-    val executePurchase: PurchaseExecution
-)
+interface Product {
+    val name: String
 
-typealias PurchaseExecution = (CommandEvent, Logger, StorageExtension, ServiceLocator) -> PurchaseResult
+    fun computePrice(
+        commandEvent: CommandEvent
+    ): Int?
+
+    fun execute(
+        commandEvent: CommandEvent,
+        logger: Logger,
+        storageExtension: StorageExtension,
+        serviceLocator: ServiceLocator
+    ): PurchaseResult
+}
 
 sealed class PurchaseResult {
     class Success(val message: String) : PurchaseResult()
     class Fail(val message: String) : PurchaseResult()
-    object WaitingValidation : PurchaseResult()
+    class WaitingValidation(
+        val login: String,
+        val code: String,
+        val message: String,
+        val price: Int,
+        val date: Date = Date()
+    ) : PurchaseResult()
 }

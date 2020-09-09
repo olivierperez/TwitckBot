@@ -3,6 +3,8 @@ package fr.o80.twitck.example
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import fr.o80.twitck.example.market.CodeReviewProduct
+import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.Presence
@@ -96,8 +98,9 @@ class Main : CliktCommand() {
             }
             install(Market) {
                 channel(hostChannel)
-                product("codereview", 1100, ::marketBuyCodeReview)
-                product("command", 200, ::marketBuyCommand)
+                product(CommandProduct)
+                product(CodeReviewProduct)
+                // TODO !buy kotlin Javascript => bot: Tout le monde préfère Kotlin à Javascript
             }
             install(Welcome) {
                 channel(hostChannel)

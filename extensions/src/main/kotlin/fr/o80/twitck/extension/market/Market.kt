@@ -34,8 +34,8 @@ class Market(
         }
 
         @Dsl
-        fun product(name: String, price: Int, purchaseExecution: PurchaseExecution) {
-            products.add(Product(name, price, purchaseExecution))
+        fun product(product: Product) {
+            products.add(product)
         }
 
         fun build(serviceLocator: ServiceLocator): Market {

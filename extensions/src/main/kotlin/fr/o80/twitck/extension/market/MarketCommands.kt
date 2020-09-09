@@ -1,5 +1,8 @@
 package fr.o80.twitck.extension.market
 
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
@@ -8,7 +11,9 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.Do
+import java.util.Date
 
+// TODO OPZ Messages
 class MarketCommands(
     private val channel: String,
     private val products: MutableList<Product>,
@@ -17,13 +22,23 @@ class MarketCommands(
     private val serviceLocator: ServiceLocator
 ) {
 
+    private val moshi =
+        Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
+            .build()
+
     private val storage: StorageExtension by lazy {
         extensionProvider.provide(StorageExtension::class).first()
     }
 
+    private val namespace: String = Market::class.java.name
+
     private val points: PointsManager by lazy {
         extensionProvider.provide(PointsManager::class).first()
     }
+
+    private val lockWaitingForValidation = Any()
 
     fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
@@ -48,23 +63,42 @@ class MarketCommands(
             return
         }
 
-        if (points.consumePoints(commandEvent.login, product.price)) {
-            logger.info("${commandEvent.login} just spend ${product.price} points for ${product.name}")
-
-            val purchaseResult = product.executePurchase(commandEvent, logger, storage, serviceLocator)
-            Do exhaustive when (purchaseResult) {
-                is PurchaseResult.Success -> onBuySucceeded(bot, purchaseResult, commandEvent, product)
-                is PurchaseResult.Fail -> onBuyFailed(bot, purchaseResult, commandEvent, product)
-                PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(bot, commandEvent, product)
-            }
+        val price = product.computePrice(commandEvent)
+        if (price == null) {
+            bot.send(channel, "Impossible de calculer le prix pour l'achat demandé !")
         } else {
-            bot.send(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !")
+            doBuy(bot, commandEvent, product, price)
         }
     }
 
     private fun handleMarketCommand(bot: TwitckBot) {
         val productNames = products.joinToString(", ") { it.name }
         bot.send(channel, "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames))
+    }
+
+    private fun doBuy(
+        bot: TwitckBot,
+        commandEvent: CommandEvent,
+        product: Product,
+        price: Int
+    ) {
+        if (points.consumePoints(commandEvent.login, price)) {
+            logger.info("${commandEvent.login} just spend $price points for ${product.name}")
+
+            val purchaseResult = product.execute(commandEvent, logger, storage, serviceLocator)
+            Do exhaustive when (purchaseResult) {
+                is PurchaseResult.Success -> onBuySucceeded(bot, purchaseResult, commandEvent, product)
+                is PurchaseResult.Fail -> onBuyFailed(bot, purchaseResult, commandEvent, product, price)
+                is PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(
+                    bot,
+                    purchaseResult,
+                    commandEvent,
+                    product
+                )
+            }
+        } else {
+            bot.send(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !")
+        }
     }
 
     private fun onBuySucceeded(
@@ -81,20 +115,48 @@ class MarketCommands(
         bot: TwitckBot,
         purchaseResult: PurchaseResult.Fail,
         commandEvent: CommandEvent,
-        product: Product
+        product: Product,
+        price: Int
     ) {
         logger.info("${commandEvent.login} failed to buy ${product.name}!")
         bot.send(channel, purchaseResult.message)
-        points.addPoints(commandEvent.login, product.price)
+        points.addPoints(commandEvent.login, price)
     }
 
     private fun onBuyIsWaitingForValidation(
         bot: TwitckBot,
+        purchaseResult: PurchaseResult.WaitingValidation,
         commandEvent: CommandEvent,
         product: Product
     ) {
-        logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
-        bot.send(channel, "Ton achat est en cours de validation")
+        synchronized(lockWaitingForValidation) {
+            val productsInValidation = storage.getOrCreateProductsInValidation()
+
+            productsInValidation.products += ProductInValidation(
+                login = purchaseResult.login,
+                code = purchaseResult.code,
+                message = purchaseResult.message,
+                price = purchaseResult.price,
+                date = purchaseResult.date
+            )
+
+            storage.putProductsInValidation(productsInValidation)
+
+            logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
+            bot.send(channel, "Ton achat est en attente de validation")
+        }
+    }
+
+    private fun StorageExtension.getOrCreateProductsInValidation(): ProductsInValidation {
+        return this.getGlobalInfo(namespace)
+            .firstOrNull { it.first == "waitingForValidation" }
+            ?.let { moshi.adapter(ProductsInValidation::class.java).fromJson(it.second) }
+            ?: ProductsInValidation()
+    }
+
+    private fun StorageExtension.putProductsInValidation(productsInValidation: ProductsInValidation) {
+        val json = moshi.adapter(ProductsInValidation::class.java).toJson(productsInValidation)
+        this.putGlobalInfo(namespace, "waitingForValidation", json)
     }
 
 }
