@@ -26,8 +26,9 @@ class MarketCommands(
     }
 
     fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
-        if (commandEvent.command.tag == "!buy") {
-            handleBuyCommand(bot, commandEvent)
+        when (commandEvent.command.tag) {
+            "!buy" -> handleBuyCommand(bot, commandEvent)
+            "!market" -> handleMarketCommand(bot)
         }
 
         return commandEvent
@@ -47,7 +48,6 @@ class MarketCommands(
             return
         }
 
-
         if (points.consumePoints(commandEvent.login, product.price)) {
             logger.info("${commandEvent.login} just spend ${product.price} points for ${product.name}")
 
@@ -55,11 +55,16 @@ class MarketCommands(
             Do exhaustive when (purchaseResult) {
                 is PurchaseResult.Success -> onBuySucceeded(bot, purchaseResult, commandEvent, product)
                 is PurchaseResult.Fail -> onBuyFailed(bot, purchaseResult, commandEvent, product)
-                PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(bot, purchaseResult, commandEvent, product)
+                PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(bot, commandEvent, product)
             }
         } else {
             bot.send(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !")
         }
+    }
+
+    private fun handleMarketCommand(bot: TwitckBot) {
+        val productNames = products.joinToString(", ") { it.name }
+        bot.send(channel, "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames))
     }
 
     private fun onBuySucceeded(
@@ -85,7 +90,6 @@ class MarketCommands(
 
     private fun onBuyIsWaitingForValidation(
         bot: TwitckBot,
-        purchaseResult: PurchaseResult,
         commandEvent: CommandEvent,
         product: Product
     ) {

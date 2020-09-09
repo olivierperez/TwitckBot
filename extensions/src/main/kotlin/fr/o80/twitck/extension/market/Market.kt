@@ -16,7 +16,7 @@ class Market(
     private fun onInstallationFinished() {
         extensionProvider.forEach(HelperExtension::class) { helper ->
             helper.registerCommand("!buy")
-            // TODO OPZ helper.registerCommand("!market")
+            helper.registerCommand("!market")
         }
     }
 
