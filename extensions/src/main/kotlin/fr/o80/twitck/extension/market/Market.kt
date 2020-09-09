@@ -2,15 +2,23 @@ package fr.o80.twitck.extension.market
 
 import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Market(
     private val channel: String,
-    private val commands: MarketCommands
+    private val commands: MarketCommands,
+    private val extensionProvider: ExtensionProvider
 ) {
 
-    // On installation finished => Helper + !buy
+    private fun onInstallationFinished() {
+        extensionProvider.forEach(HelperExtension::class) { helper ->
+            helper.registerCommand("!buy")
+            // TODO OPZ helper.registerCommand("!market")
+        }
+    }
 
     class Configuration {
 
@@ -45,7 +53,8 @@ class Market(
             )
             return Market(
                 channelName,
-                commands
+                commands,
+                serviceLocator.extensionProvider
             )
         }
     }
@@ -62,6 +71,7 @@ class Market(
                 .also { market ->
                     pipeline.interceptCommandEvent(market.commands::interceptCommandEvent)
                     pipeline.requestChannel(market.channel)
+                    market.onInstallationFinished()
                 }
         }
 
