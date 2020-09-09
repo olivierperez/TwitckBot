@@ -85,7 +85,7 @@ class MarketCommands(
         if (points.consumePoints(commandEvent.login, price)) {
             logger.info("${commandEvent.login} just spend $price points for ${product.name}")
 
-            val purchaseResult = product.execute(commandEvent, logger, storage, serviceLocator)
+            val purchaseResult = product.execute(bot, commandEvent, logger, storage, serviceLocator)
             Do exhaustive when (purchaseResult) {
                 is PurchaseResult.Success -> onBuySucceeded(bot, purchaseResult, commandEvent, product)
                 is PurchaseResult.Fail -> onBuyFailed(bot, purchaseResult, commandEvent, product, price)
@@ -108,7 +108,7 @@ class MarketCommands(
         product: Product
     ) {
         logger.info("${commandEvent.login} just bough a ${product.name}!")
-        bot.send(channel, purchaseResult.message)
+        purchaseResult.message?.let { bot.send(channel, it) }
     }
 
     private fun onBuyFailed(

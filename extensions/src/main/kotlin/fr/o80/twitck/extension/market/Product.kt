@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension.market
 
+import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -14,6 +15,7 @@ interface Product {
     ): Int?
 
     fun execute(
+        bot: TwitckBot,
         commandEvent: CommandEvent,
         logger: Logger,
         storageExtension: StorageExtension,
@@ -22,7 +24,7 @@ interface Product {
 }
 
 sealed class PurchaseResult {
-    class Success(val message: String) : PurchaseResult()
+    class Success(val message: String? = null) : PurchaseResult()
     class Fail(val message: String) : PurchaseResult()
     class WaitingValidation(
         val login: String,

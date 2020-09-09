@@ -2,6 +2,7 @@ package fr.o80.twitck.example.market
 
 import fr.o80.twitck.extension.market.Product
 import fr.o80.twitck.extension.market.PurchaseResult
+import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -18,6 +19,7 @@ object CodeReviewProduct : Product {
     }
 
     override fun execute(
+        bot: TwitckBot,
         commandEvent: CommandEvent,
         logger: Logger,
         storageExtension: StorageExtension,

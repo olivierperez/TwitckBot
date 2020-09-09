@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import fr.o80.twitck.example.market.CodeReviewProduct
 import fr.o80.twitck.example.market.CommandProduct
+import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.Presence
@@ -100,7 +101,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 product(CommandProduct)
                 product(CodeReviewProduct)
-                // TODO !buy kotlin Javascript => bot: Tout le monde préfère Kotlin à Javascript
+                product(KotlinProduct)
             }
             install(Welcome) {
                 channel(hostChannel)
