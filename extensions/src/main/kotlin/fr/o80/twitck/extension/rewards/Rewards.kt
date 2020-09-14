@@ -1,26 +1,22 @@
 package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.Overlay
-import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.utils.tryToLong
 import java.util.concurrent.TimeUnit
 
-// TODO OPZ Extraire la partie gestion des commandes
 class Rewards(
     private val channel: String,
+    private val commands: RewardsCommands,
     private val extensionProvider: ExtensionProvider,
-    private val intervalBetweenTwoClaims: Long,
-    private val claimedPoints: Int,
     private val messages: Messages
 ) {
+
+    // TODO OPZ !! Récompenser les gens qui parlent
 
     private val storage: StorageExtension by lazy {
         extensionProvider.provide(StorageExtension::class).first()
@@ -38,47 +34,6 @@ class Rewards(
         extensionProvider.forEach(HelperExtension::class) { help ->
             help.registerCommand("!claim")
         }
-    }
-
-    private fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
-        if (channel != commandEvent.channel)
-            return commandEvent
-
-        when (commandEvent.command.tag) {
-            "!claim" -> claim(bot, commandEvent.login)
-        }
-
-        return commandEvent
-    }
-
-    private fun claim(bot: TwitckBot, login: String) {
-        if (alreadyClaimed(login)) {
-            return
-        }
-
-        rememberLastClaimIsNow(login)
-
-        val ownedPoints = extensionProvider.provide(PointsManager::class)
-            .filter { it.channel == channel }
-            .onEach { pointsManager ->
-                pointsManager.addPoints(login, claimedPoints)
-            }
-            .sumBy { pointsManager -> pointsManager.getPoints(login) }
-
-        val message = messages.viewerJustClaimed
-            .replace("#USER#", login)
-            .replace("#NEW_POINTS#", claimedPoints.toString())
-            .replace("#OWNED_POINTS#", ownedPoints.toString())
-        bot.send(channel, message)
-    }
-
-    private fun alreadyClaimed(login: String): Boolean {
-        val lastClaimedAt = storage.getUserInfo(login, namespace, "lastClaimedAt").tryToLong()
-        return lastClaimedAt != null && lastClaimedAt + intervalBetweenTwoClaims > System.currentTimeMillis()
-    }
-
-    private fun rememberLastClaimIsNow(login: String) {
-        storage.putUserInfo(login, namespace, "lastClaimedAt", System.currentTimeMillis().toString())
     }
 
     class Configuration {
@@ -121,11 +76,17 @@ class Rewards(
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
 
-            return Rewards(
+            val commands = RewardsCommands(
                 channel = channelName,
                 extensionProvider = serviceLocator.extensionProvider,
                 intervalBetweenTwoClaims = intervalBetweenTwoClaims,
                 claimedPoints = claimedPoints,
+                messages = theMessages
+            )
+            return Rewards(
+                channel = channelName,
+                commands = commands,
+                extensionProvider = serviceLocator.extensionProvider,
                 messages = theMessages
             )
         }
@@ -141,7 +102,7 @@ class Rewards(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { rewards ->
-                    pipeline.interceptCommandEvent(rewards::interceptCommandEvent)
+                    pipeline.interceptCommandEvent(rewards.commands::interceptCommandEvent)
                     pipeline.requestChannel(rewards.channel)
                     rewards.onInstallationFinished()
                 }
