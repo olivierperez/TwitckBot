@@ -10,28 +10,22 @@ import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.utils.tryToLong
-import java.util.concurrent.TimeUnit
+import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
+import java.time.Duration
 
 class Rewards(
     private val channel: String,
     private val commands: RewardsCommands,
     private val extensionProvider: ExtensionProvider,
     private val messages: Messages,
-    private val intervalBetweenTwoTalkRewards: Long,
+    private val talkingTimeChecker: StorageFlagTimeChecker,
     private val rewardedPoints: Int
 ) {
-
-    private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class).first()
-    }
-
-    private val namespace: String = Rewards::class.java.name
 
     private fun onInstallationFinished() {
         extensionProvider.forEach(Overlay::class) { overlay ->
             overlay.provideInformation(
-                namespace,
+                Rewards::class.java.name,
                 listOf("Vous pouvez !claim des ${messages.points} de temps en temps.")
             )
         }
@@ -46,27 +40,11 @@ class Rewards(
     }
 
     private fun rewardTalkativeViewers(messageEvent: MessageEvent) {
-        if (alreadyRewarded(messageEvent.login)) {
-            return
+        talkingTimeChecker.executeIfNotCooldown(messageEvent.login) {
+            extensionProvider.forEach(PointsManager::class) { points ->
+                points.addPoints(messageEvent.login, rewardedPoints)
+            }
         }
-
-        giveRewardTo(messageEvent.login)
-        rememberLastRewardIsNow(messageEvent.login)
-    }
-
-    private fun alreadyRewarded(login: String): Boolean {
-        val lastTalkRewardedAt = storage.getUserInfo(login, namespace, "lastTalkRewardedAt").tryToLong()
-        return lastTalkRewardedAt != null && lastTalkRewardedAt + intervalBetweenTwoTalkRewards > System.currentTimeMillis()
-    }
-
-    private fun giveRewardTo(login: String) {
-        extensionProvider.forEach(PointsManager::class) { points ->
-            points.addPoints(login, rewardedPoints)
-        }
-    }
-
-    private fun rememberLastRewardIsNow(login: String) {
-        storage.putUserInfo(login, namespace, "lastTalkRewardedAt", System.currentTimeMillis().toString())
     }
 
     class Configuration {
@@ -76,10 +54,10 @@ class Rewards(
 
         private var channel: String? = null
 
-        private var intervalBetweenTwoClaims: Long = TimeUnit.HOURS.toMillis(12)
+        private var intervalBetweenTwoClaims: Duration = Duration.ofHours(12)
         private var claimedPoints: Int = 10
 
-        private var intervalBetweenTwoTalkRewards: Long = TimeUnit.MINUTES.toMillis(15)
+        private var intervalBetweenTwoTalkRewards: Duration = Duration.ofMinutes(15)
         private var rewardedPoints: Int = 10
 
         private var messages: Messages? = null
@@ -90,15 +68,15 @@ class Rewards(
         }
 
         @Dsl
-        fun claim(points: Int, time: Long, unit: TimeUnit) {
+        fun claim(points: Int, time: Duration) {
             claimedPoints = points
-            intervalBetweenTwoClaims = unit.toMillis(time)
+            intervalBetweenTwoClaims = time
         }
 
         @Dsl
-        fun rewardTalkativeViewers(points: Int, time: Long, unit: TimeUnit) {
+        fun rewardTalkativeViewers(points: Int, time: Duration) {
             rewardedPoints = points
-            intervalBetweenTwoTalkRewards = unit.toMillis(time)
+            intervalBetweenTwoTalkRewards = time
         }
 
         @Dsl
@@ -118,10 +96,22 @@ class Rewards(
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
 
+            val lastClaimChecker = StorageFlagTimeChecker(
+                storage = serviceLocator.extensionProvider.storage,
+                namespace = Rewards::class.java.name,
+                flag = "lastClaimedAt",
+                interval = intervalBetweenTwoClaims
+            )
+            val lastTalkChecker = StorageFlagTimeChecker(
+                storage = serviceLocator.extensionProvider.storage,
+                namespace = Rewards::class.java.name,
+                flag = "lastTalkRewardedAt",
+                interval = intervalBetweenTwoTalkRewards
+            )
             val commands = RewardsCommands(
                 channel = channelName,
                 extensionProvider = serviceLocator.extensionProvider,
-                intervalBetweenTwoClaims = intervalBetweenTwoClaims,
+                claimTimeChecker = lastClaimChecker,
                 claimedPoints = claimedPoints,
                 messages = theMessages
             )
@@ -130,7 +120,7 @@ class Rewards(
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
                 messages = theMessages,
-                intervalBetweenTwoTalkRewards = intervalBetweenTwoTalkRewards,
+                talkingTimeChecker = lastTalkChecker,
                 rewardedPoints = rewardedPoints
             )
         }
@@ -155,3 +145,7 @@ class Rewards(
 
     }
 }
+
+private val ExtensionProvider.storage: StorageExtension
+    get() = provide(StorageExtension::class).first()
+

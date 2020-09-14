@@ -23,6 +23,7 @@ import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
 import java.io.File
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 
@@ -91,9 +92,8 @@ class Main : CliktCommand() {
             }
             install(Rewards) {
                 channel(hostChannel)
-                claim(points = 10, time = 10, unit = TimeUnit.MINUTES)
-                rewardTalkativeViewers(points = 5, time = 10, unit = TimeUnit.MINUTES)
-                // TODO idée Delphes99 Passer des Durations : Duration.ofMinutes(10)
+                claim(points = 10, time = Duration.ofMinutes(10))
+                rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(10))
                 messages(
                     points = "codes source",
                     viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et possède donc #OWNED_POINTS#"
