@@ -73,6 +73,7 @@ class PollCommands(
         currentPoll = CurrentPoll(title)
         bot.send(channel, messages.newPoll.replace("#TITLE#", title))
 
+        // TODO idée Thermo74 Lister tous les résultats
         Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
                 val best = poll.best

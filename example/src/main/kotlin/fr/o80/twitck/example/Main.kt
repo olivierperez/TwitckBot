@@ -91,7 +91,9 @@ class Main : CliktCommand() {
             }
             install(Rewards) {
                 channel(hostChannel)
-                claim(points = 50, time = 1, unit = TimeUnit.HOURS)
+                claim(points = 10, time = 10, unit = TimeUnit.MINUTES)
+                rewardTalkativeViewers(points = 5, time = 10, unit = TimeUnit.MINUTES)
+                // TODO idée Delphes99 Passer des Durations : Duration.ofMinutes(10)
                 messages(
                     points = "codes source",
                     viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et possède donc #OWNED_POINTS#"
@@ -102,6 +104,7 @@ class Main : CliktCommand() {
                 product(CommandProduct)
                 product(CodeReviewProduct)
                 product(KotlinProduct)
+                // TODO idée Thermo74 !buy language php js (Tout le monde sait que PHP est préféré depuis toujours à js
             }
             install(Welcome) {
                 channel(hostChannel)

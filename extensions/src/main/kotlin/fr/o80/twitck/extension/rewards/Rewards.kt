@@ -1,22 +1,26 @@
 package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.Overlay
+import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.utils.tryToLong
 import java.util.concurrent.TimeUnit
 
 class Rewards(
     private val channel: String,
     private val commands: RewardsCommands,
     private val extensionProvider: ExtensionProvider,
-    private val messages: Messages
+    private val messages: Messages,
+    private val intervalBetweenTwoTalkRewards: Long,
+    private val rewardedPoints: Int
 ) {
-
-    // TODO OPZ !! Récompenser les gens qui parlent
 
     private val storage: StorageExtension by lazy {
         extensionProvider.provide(StorageExtension::class).first()
@@ -36,6 +40,35 @@ class Rewards(
         }
     }
 
+    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
+        rewardTalkativeViewers(messageEvent)
+        return messageEvent
+    }
+
+    private fun rewardTalkativeViewers(messageEvent: MessageEvent) {
+        if (alreadyRewarded(messageEvent.login)) {
+            return
+        }
+
+        giveRewardTo(messageEvent.login)
+        rememberLastRewardIsNow(messageEvent.login)
+    }
+
+    private fun alreadyRewarded(login: String): Boolean {
+        val lastTalkRewardedAt = storage.getUserInfo(login, namespace, "lastTalkRewardedAt").tryToLong()
+        return lastTalkRewardedAt != null && lastTalkRewardedAt + intervalBetweenTwoTalkRewards > System.currentTimeMillis()
+    }
+
+    private fun giveRewardTo(login: String) {
+        extensionProvider.forEach(PointsManager::class) { points ->
+            points.addPoints(login, rewardedPoints)
+        }
+    }
+
+    private fun rememberLastRewardIsNow(login: String) {
+        storage.putUserInfo(login, namespace, "lastTalkRewardedAt", System.currentTimeMillis().toString())
+    }
+
     class Configuration {
 
         @DslMarker
@@ -45,6 +78,9 @@ class Rewards(
 
         private var intervalBetweenTwoClaims: Long = TimeUnit.HOURS.toMillis(12)
         private var claimedPoints: Int = 10
+
+        private var intervalBetweenTwoTalkRewards: Long = TimeUnit.MINUTES.toMillis(15)
+        private var rewardedPoints: Int = 10
 
         private var messages: Messages? = null
 
@@ -57,6 +93,12 @@ class Rewards(
         fun claim(points: Int, time: Long, unit: TimeUnit) {
             claimedPoints = points
             intervalBetweenTwoClaims = unit.toMillis(time)
+        }
+
+        @Dsl
+        fun rewardTalkativeViewers(points: Int, time: Long, unit: TimeUnit) {
+            rewardedPoints = points
+            intervalBetweenTwoTalkRewards = unit.toMillis(time)
         }
 
         @Dsl
@@ -87,7 +129,9 @@ class Rewards(
                 channel = channelName,
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
-                messages = theMessages
+                messages = theMessages,
+                intervalBetweenTwoTalkRewards = intervalBetweenTwoTalkRewards,
+                rewardedPoints = rewardedPoints
             )
         }
     }
@@ -103,6 +147,7 @@ class Rewards(
                 .build(serviceLocator)
                 .also { rewards ->
                     pipeline.interceptCommandEvent(rewards.commands::interceptCommandEvent)
+                    pipeline.interceptMessageEvent(rewards::interceptMessageEvent)
                     pipeline.requestChannel(rewards.channel)
                     rewards.onInstallationFinished()
                 }
