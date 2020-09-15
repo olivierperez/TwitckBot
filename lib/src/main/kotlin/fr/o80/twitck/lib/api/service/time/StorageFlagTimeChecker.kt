@@ -16,27 +16,24 @@ class StorageFlagTimeChecker(
 ) : TimeChecker {
 
     override fun executeIfNotCooldown(login: String, block: () -> Unit) {
-        // TODO OPZ Faire l'inverse : if(shouldExecute()) {handle();block()}
-        if (shouldSkip(login)) {
-            return
+        if (couldExecute(login)) {
+            handled(login)
+            block()
         }
-
-        handled(login)
-        block()
     }
 
-    internal fun shouldSkip(login: String): Boolean {
-        val timeOfLastOccurrence = storage.getUserInfo(login, namespace, flag).parse() ?: return true
+    internal fun couldExecute(login: String): Boolean {
+        val timeOfLastOccurrence = storage.getUserInfo(login, namespace, flag)?.parse() ?: return true
         val durationSinceLastOccurrence = Duration.between(timeOfLastOccurrence, now())
 
-        return durationSinceLastOccurrence < interval
+        return durationSinceLastOccurrence > interval
     }
 
-    internal fun handled(login: String) {
-        storage.putUserInfo(login, namespace, "lastClaimedAt", now().format())
+    private fun handled(login: String) {
+        storage.putUserInfo(login, namespace, flag, now().format())
     }
 
-    private fun String?.parse(): LocalDateTime? {
+    private fun String.parse(): LocalDateTime? {
         return LocalDateTime.parse(this, FORMATTER)
     }
 

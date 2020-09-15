@@ -40,6 +40,8 @@ class Rewards(
     }
 
     private fun rewardTalkativeViewers(messageEvent: MessageEvent) {
+        if (rewardedPoints == 0) return
+
         talkingTimeChecker.executeIfNotCooldown(messageEvent.login) {
             extensionProvider.forEach(PointsManager::class) { points ->
                 points.addPoints(messageEvent.login, rewardedPoints)
@@ -55,10 +57,10 @@ class Rewards(
         private var channel: String? = null
 
         private var intervalBetweenTwoClaims: Duration = Duration.ofHours(12)
-        private var claimedPoints: Int = 10
+        private var claimedPoints: Int = 0
 
         private var intervalBetweenTwoTalkRewards: Duration = Duration.ofMinutes(15)
-        private var rewardedPoints: Int = 10
+        private var rewardedPoints: Int = 0
 
         private var messages: Messages? = null
 
@@ -96,16 +98,17 @@ class Rewards(
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
 
+            // TODO OPZ !! Écrite un TU pour la cas qui a foiré en priorité ultime !!
             val lastClaimChecker = StorageFlagTimeChecker(
                 storage = serviceLocator.extensionProvider.storage,
                 namespace = Rewards::class.java.name,
-                flag = "lastClaimedAt",
+                flag = "claimedAt",
                 interval = intervalBetweenTwoClaims
             )
             val lastTalkChecker = StorageFlagTimeChecker(
                 storage = serviceLocator.extensionProvider.storage,
                 namespace = Rewards::class.java.name,
-                flag = "lastTalkRewardedAt",
+                flag = "talkedRewardedAt",
                 interval = intervalBetweenTwoTalkRewards
             )
             val commands = RewardsCommands(

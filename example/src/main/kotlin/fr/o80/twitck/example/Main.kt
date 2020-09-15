@@ -24,8 +24,6 @@ import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
 import java.io.File
 import java.time.Duration
-import java.util.concurrent.TimeUnit
-
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -96,7 +94,7 @@ class Main : CliktCommand() {
                 rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(10))
                 messages(
                     points = "codes source",
-                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et possède donc #OWNED_POINTS#"
+                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
                 )
             }
             install(Market) {
@@ -110,7 +108,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
                 ignore(botName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
-                welcomeInterval(2, TimeUnit.HOURS)
+                welcomeInterval(Duration.ofHours(2))
                 messageForViewer("Compilation de #USER# impossible, trop de bugs.")
                 messageForViewer("Décompilation de #USER# en cours...")
                 messageForViewer("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
@@ -126,7 +124,7 @@ class Main : CliktCommand() {
             install(ViewerPromotion) {
                 channel(hostChannel)
                 ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
-                promotionInterval(1, TimeUnit.HOURS)
+                promotionInterval(Duration.ofHours(1))
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }

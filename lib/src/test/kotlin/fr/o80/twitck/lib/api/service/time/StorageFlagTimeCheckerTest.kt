@@ -28,9 +28,9 @@ class StorageFlagTimeCheckerTest {
             now = { now }
         )
 
-        val shouldSkip = timeChecker.shouldSkip("should be skipped")
+        val couldExecute = timeChecker.couldExecute("should be skipped")
 
-        assertTrue(shouldSkip)
+        assertFalse(couldExecute)
     }
 
     @Test
@@ -48,8 +48,28 @@ class StorageFlagTimeCheckerTest {
             now = { now }
         )
 
-        val shouldSkip = timeChecker.shouldSkip("should be played")
+        val couldExecute = timeChecker.couldExecute("should be played")
 
-        assertFalse(shouldSkip)
+        assertTrue(couldExecute)
+    }
+
+    @Test
+    fun `User interaction should be played if it never happened`() {
+        val interval = Duration.ofMinutes(30)
+        val now = LocalDateTime.of(2020, 9, 14, 16, 43, 13, 52)
+        val oldInteraction = null
+        every { storage.getUserInfo(any(), any(), any()) } returns oldInteraction
+
+        val timeChecker = StorageFlagTimeChecker(
+            storage = storage,
+            namespace = "don't care",
+            flag = "don't care",
+            interval = interval,
+            now = { now }
+        )
+
+        val couldExecute = timeChecker.couldExecute("should be played")
+
+        assertTrue(couldExecute)
     }
 }

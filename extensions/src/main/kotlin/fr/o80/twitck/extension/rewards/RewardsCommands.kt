@@ -26,6 +26,8 @@ class RewardsCommands(
     }
 
     private fun claim(bot: TwitckBot, login: String) {
+        if (claimedPoints == 0) return
+
         claimTimeChecker.executeIfNotCooldown(login) {
             val ownedPoints = extensionProvider.provide(PointsManager::class)
                 .filter { it.channel == channel }

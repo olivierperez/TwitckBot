@@ -9,17 +9,16 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.utils.tryToLong
-import java.util.concurrent.TimeUnit
+import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
+import fr.o80.twitck.lib.api.service.time.TimeChecker
+import java.time.Duration
 
 class ViewerPromotion(
     private val channel: String,
     private val messages: Collection<String>,
     private val ignoredLogins: MutableList<String>,
-    private val intervalBetweenTwoPromotions: Long,
+    private val promotionTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
-    private val logger: Logger,
     private val extensionProvider: ExtensionProvider
 ) {
 
@@ -37,21 +36,11 @@ class ViewerPromotion(
             return messageEvent
         }
 
-        when {
-            needToPromote(messageEvent.login) -> {
-                promoteViewer(messageEvent, bot)
-            }
-            else -> {
-                logger.debug("No need to re-promote ${messageEvent.login} yet.")
-            }
+        promotionTimeChecker.executeIfNotCooldown(messageEvent.login) {
+            promoteViewer(messageEvent, bot)
         }
 
         return messageEvent
-    }
-
-    private fun needToPromote(login: String): Boolean {
-        val lastPromotionAt = storage.getUserInfo(login, namespace, "lastPromotionAt").tryToLong() ?: 0
-        return lastPromotionAt + intervalBetweenTwoPromotions < System.currentTimeMillis()
     }
 
     private fun promoteViewer(messageEvent: MessageEvent, bot: TwitckBot) {
@@ -82,7 +71,7 @@ class ViewerPromotion(
 
         private var ignoredLogins: MutableList<String> = mutableListOf()
 
-        private var intervalBetweenTwoPromotions: Long = TimeUnit.HOURS.toMillis(12)
+        private var intervalBetweenTwoPromotions: Duration = Duration.ofHours(12)
 
         @ViewerPromotionDsl
         fun channel(channel: String) {
@@ -100,21 +89,27 @@ class ViewerPromotion(
         }
 
         @ViewerPromotionDsl
-        fun promotionInterval(time: Long, unit: TimeUnit) {
-            intervalBetweenTwoPromotions = unit.toMillis(time)
+        fun promotionInterval(time: Duration) {
+            intervalBetweenTwoPromotions = time
         }
 
         fun build(serviceLocator: ServiceLocator): ViewerPromotion {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
 
+            val promotionTimeChecker = StorageFlagTimeChecker(
+                serviceLocator.extensionProvider.storage,
+                ViewerPromotion::class.java.name,
+                "promotedAt",
+                intervalBetweenTwoPromotions
+            )
+
             return ViewerPromotion(
                 channel = channelName,
                 messages = messages,
                 ignoredLogins = ignoredLogins,
-                intervalBetweenTwoPromotions = intervalBetweenTwoPromotions,
+                promotionTimeChecker = promotionTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
-                logger = serviceLocator.loggerFactory.getLogger(ViewerPromotion::class),
                 extensionProvider = serviceLocator.extensionProvider
             )
         }
@@ -136,3 +131,7 @@ class ViewerPromotion(
         }
     }
 }
+
+// TODO OPZ ExtensionProvider.first(clazz)
+private val ExtensionProvider.storage: StorageExtension
+    get() = provide(StorageExtension::class).first()

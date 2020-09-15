@@ -9,9 +9,9 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.utils.tryToLong
-import java.util.concurrent.TimeUnit
+import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
+import fr.o80.twitck.lib.api.service.time.TimeChecker
+import java.time.Duration
 
 class Welcome(
     private val channel: String,
@@ -19,11 +19,10 @@ class Welcome(
     private val messages: Collection<String>,
     private val hostName: String,
     private val hostMessage: String?,
-    private val welcomeInterval: Long,
+    private val welcomeTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
     private val ignoredLogins: MutableList<String>,
-    private val extensionProvider: ExtensionProvider,
-    private val logger: Logger
+    private val extensionProvider: ExtensionProvider
 ) {
 
     private val storage: StorageExtension by lazy {
@@ -45,16 +44,13 @@ class Welcome(
             return joinEvent
         }
 
-        when {
-            isHost(joinEvent.login) -> {
-                welcomeHost(bot, joinEvent)
-            }
-            needToWelcome(joinEvent.login) -> {
-                welcomeViewer(joinEvent, bot)
-            }
-            else -> {
-                logger.debug("No need to re-welcome ${joinEvent.login} yet.")
-            }
+        if (isHost(joinEvent.login)) {
+            welcomeHost(bot, joinEvent)
+            return joinEvent
+        }
+
+        welcomeTimeChecker.executeIfNotCooldown(joinEvent.login) {
+            welcomeViewer(joinEvent, bot)
         }
 
         return joinEvent
@@ -69,16 +65,9 @@ class Welcome(
         storage.putUserInfo(joinEvent.login, namespace, "lastWelcomeAt", System.currentTimeMillis().toString())
     }
 
-    private fun needToWelcome(login: String): Boolean {
-        val lastWelcomeAt = storage.getUserInfo(login, namespace, "lastWelcomeAt").tryToLong() ?: 0
-        return lastWelcomeAt + welcomeInterval < System.currentTimeMillis()
-    }
-
     private fun welcomeViewer(joinEvent: JoinEvent, bot: TwitckBot) {
         val randomMessage = pickMessage(joinEvent)
         bot.send(joinEvent.channel, randomMessage)
-
-        storage.putUserInfo(joinEvent.login, namespace, "lastWelcomeAt", System.currentTimeMillis().toString())
     }
 
     private fun pickMessage(joinEvent: JoinEvent): String {
@@ -103,7 +92,7 @@ class Welcome(
     class Configuration {
 
         @DslMarker
-        private annotation class WelcomeDsl
+        private annotation class Dsl
 
         private var channel: String? = null
 
@@ -115,37 +104,37 @@ class Welcome(
 
         private var ignoredLogins: MutableList<String> = mutableListOf()
 
-        private var welcomeInterval = TimeUnit.HOURS.toMillis(12)
+        private var welcomeInterval: Duration = Duration.ofHours(12)
 
-        @WelcomeDsl
+        @Dsl
         fun channel(channel: String) {
             this.channel = channel
         }
 
-        @WelcomeDsl
+        @Dsl
         fun messageForViewer(message: String) {
             messages += message
         }
 
-        @WelcomeDsl
+        @Dsl
         fun messageForFollower(message: String) {
             messagesForFollowers += message
         }
 
-        @WelcomeDsl
+        @Dsl
         fun host(hostName: String, welcomeMessage: String) {
             this.hostName = hostName
             this.hostMessage = welcomeMessage
         }
 
-        @WelcomeDsl
+        @Dsl
         fun ignore(vararg logins: String) {
             ignoredLogins.addAll(logins)
         }
 
-        @WelcomeDsl
-        fun welcomeInterval(time: Long, unit: TimeUnit) {
-            this.welcomeInterval = unit.toMillis(time)
+        @Dsl
+        fun welcomeInterval(time: Duration) {
+            this.welcomeInterval = time
         }
 
         fun build(serviceLocator: ServiceLocator): Welcome {
@@ -154,16 +143,22 @@ class Welcome(
             val hostName = hostName
                 ?: throw IllegalStateException("Host name must be set for the extension ${Welcome::class.simpleName}")
 
+            val welcomeTimeChecker = StorageFlagTimeChecker(
+                storage = serviceLocator.extensionProvider.storage,
+                namespace = Welcome::class.java.name,
+                flag = "welcomedAt",
+                interval = welcomeInterval
+            )
+
             return Welcome(
                 channel = channelName,
                 messages = messages,
                 messagesForFollowers = messagesForFollowers,
                 hostName = hostName,
                 hostMessage = hostMessage,
-                welcomeInterval = welcomeInterval,
+                welcomeTimeChecker = welcomeTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 ignoredLogins = ignoredLogins,
-                logger = serviceLocator.loggerFactory.getLogger(Welcome::class),
                 extensionProvider = serviceLocator.extensionProvider
             )
         }
@@ -185,3 +180,6 @@ class Welcome(
         }
     }
 }
+
+private val ExtensionProvider.storage: StorageExtension
+    get() = provide(StorageExtension::class).first()
