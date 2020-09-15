@@ -100,7 +100,6 @@ class Rewards(
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
 
-            // TODO OPZ !! Écrite un TU pour la cas qui a foiré en priorité ultime !!
             val lastClaimChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Rewards::class.java.name,

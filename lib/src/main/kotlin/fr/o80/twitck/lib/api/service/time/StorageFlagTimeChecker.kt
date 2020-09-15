@@ -29,7 +29,7 @@ class StorageFlagTimeChecker(
         return durationSinceLastOccurrence > interval
     }
 
-    private fun handled(login: String) {
+    internal fun handled(login: String) {
         storage.putUserInfo(login, namespace, flag, now().format())
     }
 
