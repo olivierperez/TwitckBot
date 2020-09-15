@@ -143,8 +143,10 @@ class Welcome(
             val hostName = hostName
                 ?: throw IllegalStateException("Host name must be set for the extension ${Welcome::class.simpleName}")
 
+            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+
             val welcomeTimeChecker = StorageFlagTimeChecker(
-                storage = serviceLocator.extensionProvider.storage,
+                storage = storage,
                 namespace = Welcome::class.java.name,
                 flag = "welcomedAt",
                 interval = welcomeInterval
@@ -180,6 +182,3 @@ class Welcome(
         }
     }
 }
-
-private val ExtensionProvider.storage: StorageExtension
-    get() = provide(StorageExtension::class).first()

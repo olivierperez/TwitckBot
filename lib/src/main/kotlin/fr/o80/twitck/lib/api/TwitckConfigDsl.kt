@@ -34,6 +34,10 @@ class TwitckConfigurator(
 
     private val serviceLocator: ServiceLocator = ServiceLocator(
         extensionProvider = object : ExtensionProvider {
+            override fun <T : Any> first(extensionInterface: KClass<T>): T =
+                extensions.first { extensionInterface.isInstance(it) }
+                    .let { extension -> extensionInterface.cast(extension) }
+
             override fun <T : Any> provide(extensionInterface: KClass<T>): List<T> =
                 extensions
                     .filter { extension -> extensionInterface.isInstance(extension) }

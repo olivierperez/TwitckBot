@@ -97,8 +97,10 @@ class ViewerPromotion(
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
 
+            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+
             val promotionTimeChecker = StorageFlagTimeChecker(
-                serviceLocator.extensionProvider.storage,
+                storage,
                 ViewerPromotion::class.java.name,
                 "promotedAt",
                 intervalBetweenTwoPromotions
@@ -131,7 +133,3 @@ class ViewerPromotion(
         }
     }
 }
-
-// TODO OPZ ExtensionProvider.first(clazz)
-private val ExtensionProvider.storage: StorageExtension
-    get() = provide(StorageExtension::class).first()

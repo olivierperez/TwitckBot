@@ -48,6 +48,7 @@ class PointsCommands(
         }
     }
 
+    // TODO OPZ !! Vérifier si le viewer de destination existe (CamouilleLaFripouille VS @CamouilleLaFripouille)
     private fun handleGiveCommand(commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {

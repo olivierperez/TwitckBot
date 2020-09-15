@@ -98,19 +98,22 @@ class Rewards(
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
 
+            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+
             // TODO OPZ !! Écrite un TU pour la cas qui a foiré en priorité ultime !!
             val lastClaimChecker = StorageFlagTimeChecker(
-                storage = serviceLocator.extensionProvider.storage,
+                storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "claimedAt",
                 interval = intervalBetweenTwoClaims
             )
             val lastTalkChecker = StorageFlagTimeChecker(
-                storage = serviceLocator.extensionProvider.storage,
+                storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "talkedRewardedAt",
                 interval = intervalBetweenTwoTalkRewards
             )
+
             val commands = RewardsCommands(
                 channel = channelName,
                 extensionProvider = serviceLocator.extensionProvider,
@@ -118,6 +121,7 @@ class Rewards(
                 claimedPoints = claimedPoints,
                 messages = theMessages
             )
+
             return Rewards(
                 channel = channelName,
                 commands = commands,
@@ -148,7 +152,4 @@ class Rewards(
 
     }
 }
-
-private val ExtensionProvider.storage: StorageExtension
-    get() = provide(StorageExtension::class).first()
 
