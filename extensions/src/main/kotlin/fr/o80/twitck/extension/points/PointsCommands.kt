@@ -5,6 +5,7 @@ import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.utils.sanitizeLogin
 import fr.o80.twitck.lib.utils.tryToInt
 import java.time.Duration
 
@@ -38,7 +39,7 @@ class PointsCommands(
 
         val command = commandEvent.command
         if (command.options.size == 2) {
-            val login = command.options[0].toLowerCase()
+            val login = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
             logger.command(command, "${commandEvent.login} try to add $points to $login")
 
@@ -48,32 +49,31 @@ class PointsCommands(
         }
     }
 
-    // TODO OPZ !! Vérifier si le viewer de destination existe (CamouilleLaFripouille VS @CamouilleLaFripouille)
+    // TODO OPZ !! Vérifier si le viewer de destination existe (toto VS toot)
     private fun handleGiveCommand(commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {
             val fromLogin = commandEvent.login
-            val toLogin = command.options[0].toLowerCase()
+            val toLogin = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
             logger.command(command, "${commandEvent.login} try to transfer $points to $toLogin")
 
             if (toLogin == fromLogin) return
+            if (points == null) return
 
-            points?.let {
-                val transferSucceeded = bank.transferPoints(fromLogin, toLogin, points)
-                val msg = if (transferSucceeded) {
-                    // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
-                    message.pointsTransferred
-                        .replace("#FROM#", fromLogin)
-                        .replace("#TO#", toLogin)
-                } else {
-                    message.notEnoughPoints
-                        .replace("#FROM#", fromLogin)
-                        .replace("#TO#", toLogin)
-                }
-
-                extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
+            val transferSucceeded = bank.transferPoints(fromLogin, toLogin, points)
+            val msg = if (transferSucceeded) {
+                // TODO Faire ce message en whisper, directement à l'emetteur (si possible)
+                message.pointsTransferred
+                    .replace("#FROM#", fromLogin)
+                    .replace("#TO#", toLogin)
+            } else {
+                message.notEnoughPoints
+                    .replace("#FROM#", fromLogin)
+                    .replace("#TO#", toLogin)
             }
+
+            extensionProvider.alertOverlay(msg, Duration.ofSeconds(5))
         }
     }
 
