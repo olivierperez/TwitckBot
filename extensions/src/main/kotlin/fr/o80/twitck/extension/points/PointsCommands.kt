@@ -49,7 +49,7 @@ class PointsCommands(
         }
     }
 
-    // TODO OPZ !! Vérifier si le viewer de destination existe (toto VS toot)
+    // TODO OPZ Vérifier si le viewer de destination existe (toto VS toot)
     private fun handleGiveCommand(commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {

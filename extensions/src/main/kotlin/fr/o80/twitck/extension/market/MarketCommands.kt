@@ -51,14 +51,12 @@ class MarketCommands(
 
     private fun handleBuyCommand(bot: TwitckBot, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
-            // TODO OPZ Expliquer comment utilise le !buy
             bot.send(channel, "Usage de !buy => !buy <produit> <paramètres>")
             return
         }
 
         val product = products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
-            // TODO OPZ Bot, le produit n'existe pas
             bot.send(channel, "le produit n'existe pas")
             return
         }
@@ -107,7 +105,7 @@ class MarketCommands(
         commandEvent: CommandEvent,
         product: Product
     ) {
-        logger.info("${commandEvent.login} just bough a ${product.name}!")
+        logger.info("${commandEvent.login} just bought a ${product.name}!")
         purchaseResult.message?.let { bot.send(channel, it) }
     }
 

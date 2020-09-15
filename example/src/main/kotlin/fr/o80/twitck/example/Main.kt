@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import fr.o80.twitck.example.market.CodeReviewProduct
 import fr.o80.twitck.example.market.CommandProduct
+import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Help
@@ -102,7 +103,7 @@ class Main : CliktCommand() {
                 product(CommandProduct)
                 product(CodeReviewProduct)
                 product(KotlinProduct)
-                // TODO idée Thermo74 !buy language php js (Tout le monde sait que PHP est préféré depuis toujours à js
+                product(CompareLanguageProduct)
             }
             install(Welcome) {
                 channel(hostChannel)
