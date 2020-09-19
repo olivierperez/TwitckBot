@@ -1,10 +1,10 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 

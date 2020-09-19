@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.SendMessage
+import fr.o80.twitck.lib.internal.service.MessengerImpl
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.Duration
@@ -20,7 +21,7 @@ class MessengerImplTest {
 
     @BeforeTest
     fun setup() {
-        messenger = MessengerImpl(bot, Duration.ofMillis(500))
+        messenger = MessengerImpl(bot, Duration.ofMillis(250))
     }
 
     @AfterTest
@@ -64,6 +65,19 @@ class MessengerImplTest {
         verify { bot.send("chan", "Message 1") }
         Thread.sleep(500 + 20)
         verify { bot.send("chan", "Message 2") }
+    }
+
+    @Test
+    fun `should send HIGH importance message before LOW importance ones`() {
+        messenger.send(SendMessage("chan", "HIGH 1", Deadline.Postponed(Importance.HIGH)))
+        messenger.send(SendMessage("chan", "LOW 1", Deadline.Postponed(Importance.LOW)))
+        messenger.send(SendMessage("chan", "LOW 2", Deadline.Postponed(Importance.LOW)))
+        messenger.send(SendMessage("chan", "HIGH 2", Deadline.Postponed(Importance.HIGH)))
+
+        Thread.sleep(20)
+        verify(exactly = 1) { bot.send("chan", "HIGH 1") }
+        Thread.sleep(250 + 20)
+        verify(exactly = 1) { bot.send("chan", "HIGH 2") }
     }
 
 }

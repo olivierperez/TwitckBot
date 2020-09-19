@@ -1,14 +1,15 @@
 package fr.o80.twitck.lib.internal
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
+import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
 import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter

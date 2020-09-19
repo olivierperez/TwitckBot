@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.api.bean
 
-import fr.o80.twitck.lib.api.Messenger
+import fr.o80.twitck.lib.api.service.Messenger
 
 data class MessageEvent(
     val messenger: Messenger,

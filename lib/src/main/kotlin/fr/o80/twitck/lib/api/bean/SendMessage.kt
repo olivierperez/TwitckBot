@@ -17,8 +17,8 @@ sealed class Deadline {
     object Repeated : Deadline()
 }
 
-enum class Importance {
-    HIGH, LOW
+enum class Importance(val value: Int) {
+    HIGH(1), LOW(0)
 }
 
 class CoolDown(

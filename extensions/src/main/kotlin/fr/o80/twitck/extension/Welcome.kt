@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Follower
@@ -10,6 +9,7 @@ import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker

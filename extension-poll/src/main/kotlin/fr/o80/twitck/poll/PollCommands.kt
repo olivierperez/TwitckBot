@@ -1,6 +1,5 @@
 package fr.o80.twitck.poll
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.Deadline
@@ -8,6 +7,7 @@ import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.TimeParser
 import java.util.Timer
 import kotlin.concurrent.schedule

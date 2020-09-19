@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension.rewards
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
@@ -9,6 +8,7 @@ import fr.o80.twitck.lib.api.extension.Overlay
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import java.time.Duration

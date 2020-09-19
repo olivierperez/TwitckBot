@@ -1,8 +1,8 @@
 package fr.o80.twitck.lib.internal.handler
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.handler.CommandHandler
+import fr.o80.twitck.lib.api.service.Messenger
 
 internal class CommandDispatcher(
     private val messenger: Messenger,

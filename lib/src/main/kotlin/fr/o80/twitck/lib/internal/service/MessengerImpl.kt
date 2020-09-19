@@ -1,15 +1,15 @@
-package fr.o80.twitck.lib.internal
+package fr.o80.twitck.lib.internal.service
 
-import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.SendMessage
+import fr.o80.twitck.lib.api.service.Messenger
 import java.time.Duration
-import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.PriorityBlockingQueue
 
-// Besoin 1 : éviter les moments où le bot spam d'informations non-essentielles (ex : dire bonjour à tout le monde quand on se fait raid)
-// Besoin 2 : répondre immédiatement à une interraction du tchat (ex : quelqu'un achète sur le Market, il faut lui donner un feedback)
+// [x] Besoin 1 : éviter les moments où le bot spam d'informations non-essentielles (ex : dire bonjour à tout le monde quand on se fait raid)
+// [x] Besoin 2 : répondre immédiatement à une interraction du tchat (ex : quelqu'un achète sur le Market, il faut lui donner un feedback)
 // Besoin 3 : éviter les redites successives (ex : 2 utilisateurs utilisent la commande !market à quelques secondes d'interval, une seule réponse suffit)
 // Besoin 4 : référencer auprès du bot, une liste de messages récurrents (ex : "Retrouvez-nous aussi sur Discord -> http://...")
 
@@ -29,7 +29,7 @@ class MessengerImpl(
     private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ): Messenger {
 
-    private val messagesToSend: LinkedBlockingQueue<SendMessage> = LinkedBlockingQueue()
+    private val messagesToSend: PriorityBlockingQueue<SendMessage> = PriorityBlockingQueue(11, SendMessageComparator)
 
     private var interrupted: Boolean = false
 
