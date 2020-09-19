@@ -2,7 +2,11 @@ package fr.o80.twitck.lib.internal
 
 import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.SendMessage
+import java.time.Duration
+import java.util.concurrent.LinkedBlockingQueue
 
 // Besoin 1 : éviter les moments où le bot spam d'informations non-essentielles (ex : dire bonjour à tout le monde quand on se fait raid)
 // Besoin 2 : répondre immédiatement à une interraction du tchat (ex : quelqu'un achète sur le Market, il faut lui donner un feedback)
@@ -21,11 +25,41 @@ import fr.o80.twitck.lib.api.bean.SendMessage
 // Écriture b : send(channel, "Vous connaissez la commande !skarab42 ?", Repeating)
 
 class MessengerImpl(
-    private val bot: TwitckBot
+    private val bot: TwitckBot,
+    private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ): Messenger {
 
-    override fun send(message: SendMessage) {
-        bot.send(message.channel, message.content)
+    private val messagesToSend: LinkedBlockingQueue<SendMessage> = LinkedBlockingQueue()
+
+    private var interrupted: Boolean = false
+
+    init {
+        Thread {
+            while (!interrupted) {
+                val message = messagesToSend.take()
+                bot.send(message.channel, message.content)
+                Thread.sleep(intervalBetweenPostponed.toMillis())
+            }
+        }.start()
     }
 
+    override fun send(message: SendMessage) {
+        if (message.coolDown.isPending()) return
+
+        if (message.deadline == Deadline.Immediate) {
+            bot.send(message.channel, message.content)
+        } else {
+            messagesToSend.offer(message)
+        }
+    }
+
+    fun interrupt() {
+        interrupted = true
+    }
+
+}
+
+private fun CoolDown?.isPending(): Boolean {
+    // TODO OPZ Implémenter le Cool Down
+    return false
 }
