@@ -1,16 +1,18 @@
-package fr.o80.twitck.lib.internal
+package fr.o80.twitck.lib.internal.service
 
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.SendMessage
-import fr.o80.twitck.lib.internal.service.MessengerImpl
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.Duration
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 
 class MessengerImplTest {
@@ -80,4 +82,24 @@ class MessengerImplTest {
         verify(exactly = 1) { bot.send("chan", "HIGH 2") }
     }
 
+    @Test
+    fun `should remember cool downs`() {
+        val coolDown = CoolDown(Duration.ofMillis(1000))
+        val message = SendMessage("chan", "Le marché c'est ça", Deadline.Immediate, coolDown)
+        messenger.startCoolDown(message)
+
+        assertTrue(messenger.isCoolingDown(message))
+        Thread.sleep(2000)
+        assertFalse(messenger.isCoolingDown(message))
+    }
+
+    @Test
+    fun `should wait for cool down`() {
+        val coolDown = CoolDown(Duration.ofMillis(1000))
+        val message = SendMessage("chan", "Le marché c'est ça", Deadline.Immediate, coolDown)
+        messenger.send(message)
+        messenger.send(message)
+
+        verify(exactly = 1) { bot.send(any(), any()) }
+    }
 }
