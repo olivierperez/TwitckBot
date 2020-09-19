@@ -91,7 +91,7 @@ class Main : CliktCommand() {
             }
             install(Rewards) {
                 channel(hostChannel)
-                claim(points = 10, time = Duration.ofMinutes(10))
+                claim(points = 15, time = Duration.ofMinutes(20))
                 rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(10))
                 messages(
                     points = "codes source",
@@ -104,6 +104,7 @@ class Main : CliktCommand() {
                 product(CodeReviewProduct)
                 product(KotlinProduct)
                 product(CompareLanguageProduct)
+                // TODO idée CamouilleLaFripouille 500 codes source => assistance UML (15 min)
             }
             install(Welcome) {
                 channel(hostChannel)
