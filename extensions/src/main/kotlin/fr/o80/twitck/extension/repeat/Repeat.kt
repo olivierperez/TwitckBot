@@ -8,28 +8,35 @@ import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.api.service.log.Logger
+import java.time.Duration
 
 class Repeat(
-    val channel: String,
-    val messages: MutableList<String>,
-    val logger: Logger
+    private val channel: String,
+    private val intervalBetweenRepeatedMessages: Duration,
+    private val messages: MutableList<String>
 ) {
 
     private var configured = false
 
+    private var interrupted = false
+
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
         if (configured) return messageEvent
+
         configured = true
-        recordRepeatedMessage(messenger)
+        startLoop(messenger)
         return messageEvent
     }
 
-    private fun recordRepeatedMessage(messenger: Messenger) {
-        logger.info("Recording ${messages.size} repeated messages...")
-        messages.forEach { message ->
-            messenger.send(SendMessage(channel, message, Deadline.Repeated))
-        }
+    private fun startLoop(messenger: Messenger) {
+        Thread {
+            while (!interrupted) {
+                Thread.sleep(intervalBetweenRepeatedMessages.toMillis())
+                messages.randomOrNull()?.let { message ->
+                    messenger.send(SendMessage(channel, message, Deadline.Immediate))
+                }
+            }
+        }.start()
     }
 
     class Configuration {
@@ -39,6 +46,8 @@ class Repeat(
 
         private var channel: String? = null
 
+        private var intervalBetweenRepeatedMessages: Duration = Duration.ofMinutes(5)
+
         private val messages = mutableListOf<String>()
 
         @Dsl
@@ -47,19 +56,23 @@ class Repeat(
         }
 
         @Dsl
+        fun interval(interval: Duration) {
+            intervalBetweenRepeatedMessages = interval
+        }
+
+        @Dsl
         fun remind(message: String) {
             messages += message
         }
 
-        fun build(serviceLocator: ServiceLocator): Repeat {
+        fun build(): Repeat {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
-            val logger = serviceLocator.loggerFactory.getLogger(Repeat::class)
 
             return Repeat(
                 channelName,
-                messages,
-                logger
+                intervalBetweenRepeatedMessages,
+                messages
             )
         }
     }
@@ -73,7 +86,7 @@ class Repeat(
         ): Repeat {
             return Configuration()
                 .apply(configure)
-                .build(serviceLocator)
+                .build()
                 .also { repeat ->
                     pipeline.interceptMessageEvent(repeat::interceptMessageEvent)
                     pipeline.requestChannel(repeat.channel)

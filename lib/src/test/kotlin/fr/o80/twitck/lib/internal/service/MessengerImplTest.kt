@@ -25,8 +25,7 @@ class MessengerImplTest {
     fun setup() {
         messenger = MessengerImpl(
             bot = bot,
-            intervalBetweenPostponed = Duration.ofMillis(250),
-            intervalBetweenRepeatedMessages = Duration.ofMillis(250)
+            intervalBetweenPostponed = Duration.ofMillis(250)
         )
     }
 
@@ -107,10 +106,4 @@ class MessengerImplTest {
         verify(exactly = 1) { bot.send(any(), any()) }
     }
 
-    @Test
-    fun `should repeat messages`() {
-        messenger.send(SendMessage("chan", "Message répété", Deadline.Repeated))
-        Thread.sleep(600)
-        verify(exactly = 2) { bot.send("chan", "Message répété") }
-    }
 }

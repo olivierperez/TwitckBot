@@ -14,7 +14,6 @@ sealed class Deadline {
     class Postponed(
         val importance: Importance
     ) : Deadline()
-    object Repeated : Deadline()
 }
 
 enum class Importance(val value: Int) {

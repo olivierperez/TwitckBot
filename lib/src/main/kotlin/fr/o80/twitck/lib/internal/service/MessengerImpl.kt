@@ -10,8 +10,7 @@ import java.util.concurrent.PriorityBlockingQueue
 
 class MessengerImpl(
     private val bot: TwitckBot,
-    private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30),
-    private val intervalBetweenRepeatedMessages: Duration = Duration.ofMinutes(5),
+    private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ) : Messenger {
 
     private val messagesToSend: PriorityBlockingQueue<SendMessage> = PriorityBlockingQueue(11, SendMessageComparator)
@@ -19,8 +18,6 @@ class MessengerImpl(
     private var interrupted: Boolean = false
 
     private val coolDowns: MutableMap<String, LocalDateTime> = mutableMapOf()
-
-    private val repeatedMessages: MutableList<SendMessage> = mutableListOf()
 
     init {
         Thread {
@@ -31,14 +28,6 @@ class MessengerImpl(
                 Thread.sleep(intervalBetweenPostponed.toMillis())
             }
         }.start()
-        Thread {
-            while (!interrupted) {
-                Thread.sleep(intervalBetweenRepeatedMessages.toMillis())
-                repeatedMessages.randomOrNull()?.let { message ->
-                    bot.send(message.channel, message.content)
-                }
-            }
-        }.start()
     }
 
     override fun send(message: SendMessage) {
@@ -47,7 +36,6 @@ class MessengerImpl(
 
         when (message.deadline) {
             Deadline.Immediate -> bot.send(message.channel, message.content)
-            Deadline.Repeated -> recordRepeated(message)
             else -> messagesToSend.offer(message)
         }
     }
@@ -65,10 +53,6 @@ class MessengerImpl(
     internal fun isCoolingDown(message: SendMessage): Boolean {
         val expiry = coolDowns[message.content]
         return expiry != null && LocalDateTime.now().isBefore(expiry)
-    }
-
-    private fun recordRepeated(message: SendMessage) {
-        repeatedMessages += message
     }
 
 }

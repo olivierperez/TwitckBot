@@ -111,6 +111,7 @@ class Main : CliktCommand() {
             }
             install(Repeat) {
                 channel(hostChannel)
+                interval(Duration.ofMinutes(5))
                 remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
                 remind("Olivier tweet peu, mais bien https://twitter.com/olivierperez")
                 remind("Quelqu'un veut qu'on monte un discord ?")
