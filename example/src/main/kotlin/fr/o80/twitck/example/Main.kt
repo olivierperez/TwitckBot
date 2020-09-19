@@ -16,6 +16,7 @@ import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.Points
+import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.lib.api.TwitckBot
@@ -107,6 +108,16 @@ class Main : CliktCommand() {
                 product(KotlinProduct)
                 product(CompareLanguageProduct)
                 // TODO idée CamouilleLaFripouille 500 codes source => assistance UML (15 min)
+            }
+            install(Repeat) {
+                channel(hostChannel)
+                remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
+                remind("Olivier tweet peu, mais bien https://twitter.com/olivierperez")
+                remind("Quelqu'un veut qu'on monte un discord ?")
+                remind("Olivier partage quelques bouts de code sur https://github.com/olivierperez")
+                remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
+                remind("Vous faites de l'Android ? nous aussi, et on le streame parfois")
+                remind("Le refactoring Kata c'est bon pour la santé, du coup on le pratique ici de temps en temps")
             }
             install(Welcome) {
                 channel(hostChannel)

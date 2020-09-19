@@ -106,6 +106,6 @@ internal class TwitckBotImpl(
         hostname: String
     ) {
         super.onJoin(channel, sender, login, hostname)
-        logger.debug("$sender join the channel $channel")
+        logger.trace("$sender join the channel $channel")
     }
 }
