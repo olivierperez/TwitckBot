@@ -1,8 +1,11 @@
 package fr.o80.twitck.poll
 
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.Importance
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.service.TimeParser
@@ -20,13 +23,13 @@ class PollCommands(
 
     private var currentPoll: CurrentPoll? = null
 
-    fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
 
         when (commandEvent.command.tag) {
             // !poll 120 Est-ce que je dois changer de langage ?
-            "!poll" -> handlePoll(bot, commandEvent)
+            "!poll" -> handlePoll(messenger, commandEvent)
             // !vote Non
             "!vote" -> handleVote(commandEvent)
         }
@@ -34,13 +37,13 @@ class PollCommands(
         return commandEvent
     }
 
-    private fun handlePoll(bot: TwitckBot, commandEvent: CommandEvent) {
+    private fun handlePoll(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.badges.none { badge -> badge in privilegedBadges }) return
 
         if (commandEvent.command.options.isNotEmpty()) {
-            startPoll(bot, commandEvent)
+            startPoll(messenger, commandEvent)
         } else {
-            showResult(bot)
+            showResult(messenger)
         }
     }
 
@@ -55,10 +58,10 @@ class PollCommands(
         }
     }
 
-    private fun startPoll(bot: TwitckBot, commandEvent: CommandEvent) {
+    private fun startPoll(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size < 2) {
-            bot.send(channel, messages.errorCreationPollUsage)
+            messenger.send(SendMessage(channel, messages.errorCreationPollUsage, Deadline.Immediate))
             return
         }
 
@@ -66,12 +69,12 @@ class PollCommands(
         val title = command.options.subList(1, command.options.size).joinToString(" ")
 
         if (seconds == -1L) {
-            bot.send(channel, messages.errorDurationIsMissing)
+            messenger.send(SendMessage(channel, messages.errorDurationIsMissing, Deadline.Immediate))
             return
         }
 
         currentPoll = CurrentPoll(title)
-        bot.send(channel, messages.newPoll.replace("#TITLE#", title))
+        messenger.send(SendMessage(channel, messages.newPoll.replace("#TITLE#", title), Deadline.Immediate))
 
         // TODO idée Thermo74 Lister tous les résultats
         Timer().schedule(seconds * 1000) {
@@ -83,16 +86,20 @@ class PollCommands(
                         .replace("#TITLE#", poll.title)
                         .replace("#BEST#", best.first)
                         .replace("#COUNT#", best.second.toString())
-                    bot.send(channel, resultMsg)
+                    messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
                 } else {
-                    bot.send(channel, messages.pollHasNoVotes.replace("#TITLE#", poll.title))
+                    val noResultMsg = messages.pollHasNoVotes.replace("#TITLE#", poll.title)
+                    messenger.send(
+                        SendMessage(channel, noResultMsg, Deadline.Postponed(Importance.HIGH))
+                    )
                 }
                 currentPoll = null
             }
         }
     }
 
-    private fun showResult(bot: TwitckBot) {
+    // TODO OPZ Factoriser avec le code juste au dessus (avec un paramètre messages.currentPollResult)
+    private fun showResult(messenger: Messenger) {
         currentPoll?.let { poll ->
             val best = poll.best
             if (best.second >= 1) {
@@ -100,9 +107,10 @@ class PollCommands(
                     .replace("#TITLE#", poll.title)
                     .replace("#BEST#", best.first)
                     .replace("#COUNT#", best.second.toString())
-                bot.send(channel, resultMsg)
+                messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
             } else {
-                bot.send(channel, messages.pollHasNoVotes.replace("#TITLE#", poll.title))
+                val noResultMsg = messages.pollHasNoVotes.replace("#TITLE#", poll.title)
+                messenger.send(SendMessage(channel, noResultMsg, Deadline.Immediate))
             }
         }
     }

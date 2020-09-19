@@ -1,11 +1,15 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import java.time.Duration
 
 class Help(
     private val channel: String,
@@ -17,7 +21,7 @@ class Help(
     }
 
     private fun interceptCommandEvent(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent
     ): CommandEvent {
         if (channel != commandEvent.channel)
@@ -25,11 +29,12 @@ class Help(
 
         when (commandEvent.command.tag) {
             "!help" -> {
-                bot.sendHelp(commandEvent.channel, registeredCommands.keys)
+                messenger.sendHelp(commandEvent.channel, registeredCommands.keys)
             }
             in registeredCommands.keys -> {
                 registeredCommands[commandEvent.command.tag]?.let { message ->
-                    bot.send(commandEvent.channel, message)
+                    val coolDown = CoolDown(Duration.ofMinutes(1))
+                    messenger.send(SendMessage(commandEvent.channel, message, Deadline.Immediate, coolDown))
                 }
             }
         }
@@ -37,15 +42,17 @@ class Help(
         return commandEvent
     }
 
-    private fun TwitckBot.sendHelp(
+    private fun Messenger.sendHelp(
         channel: String,
         commands: Collection<String>
     ) {
         if (commands.isEmpty()) {
-            this.send(channel, "Je ne sais rien faire O_o du moins pour l'instant...")
+            val coolDown = CoolDown(Duration.ofMinutes(1))
+            this.send(SendMessage(channel, "Je ne sais rien faire O_o du moins pour l'instant...", Deadline.Immediate, coolDown))
         } else {
+            val coolDown = CoolDown(Duration.ofMinutes(1))
             val commandsExamples = commands.joinToString(", ")
-            this.send(channel, "Je sais faire un paquet de choses, par exemple : $commandsExamples")
+            this.send(SendMessage(channel, "Je sais faire un paquet de choses, par exemple : $commandsExamples", Deadline.Immediate, coolDown))
         }
     }
 

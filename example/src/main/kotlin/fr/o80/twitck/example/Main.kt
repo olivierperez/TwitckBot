@@ -20,6 +20,8 @@ import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
@@ -148,30 +150,30 @@ class Main : CliktCommand() {
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
             }
             install(Whisper) {
-                whisper { bot, whisper ->
+                whisper { messenger, whisper ->
                     when {
                         whisper.message.startsWith("!host") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> bot.send(botChannel, "/host ${split[1]}")
+                                2 -> messenger.send(SendMessage(botChannel, "/host ${split[1]}", Deadline.Immediate))
                                 else -> println("Quelque chose ne va pas dans la demande : \"${whisper.message}\"")
                             }
                         }
                         whisper.message == "!unhost" -> {
-                            bot.send(botChannel, "/unhost")
+                            messenger.send(SendMessage(botChannel, "/unhost", Deadline.Immediate))
                         }
                         whisper.message.startsWith("!shuto") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> bot.send(hostChannel, "Envoi d'un shuto à ${split[1]} !")
-                                3 -> bot.send(hostChannel, "Envoi d'un shuto ${split[1]} à ${split[2]} !")
+                                2 -> messenger.send(SendMessage(hostChannel, "Envoi d'un shuto à ${split[1]} !", Deadline.Immediate))
+                                3 -> messenger.send(SendMessage(hostChannel, "Envoi d'un shuto ${split[1]} à ${split[2]} !", Deadline.Immediate))
                             }
                         }
                         whisper.message.startsWith("!mawashi") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> bot.send(hostChannel, "Envoi d'un mawashi geri à ${split[1]} !")
-                                3 -> bot.send(hostChannel, "Envoi d'un mawashi geri ${split[1]} à ${split[2]} !")
+                                2 -> messenger.send(SendMessage(hostChannel, "Envoi d'un mawashi geri à ${split[1]} !", Deadline.Immediate))
+                                3 -> messenger.send(SendMessage(hostChannel, "Envoi d'un mawashi geri ${split[1]} à ${split[2]} !", Deadline.Immediate))
                             }
                         }
                     }
@@ -179,13 +181,13 @@ class Main : CliktCommand() {
             }
             install(Channel) {
                 channel(botChannel)
-                command("!help") { bot, _ ->
-                    bot.send(botChannel, "Il n'y a pas encore d'aide")
+                command("!help") { messenger, _ ->
+                    messenger.send(SendMessage(botChannel, "Il n'y a pas encore d'aide", Deadline.Immediate))
                 }
-                join { bot, join ->
+                join { messenger, join ->
                     if (!join.login.equals(botName, true)) {
-                        bot.send(join.channel, "Salut ${join.login} ! Que fais-tu ici ?")
-                        bot.send(hostChannel, "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?")
+                        messenger.send(SendMessage(join.channel, "Salut ${join.login} ! Que fais-tu ici ?", Deadline.Immediate))
+                        messenger.send(SendMessage(hostChannel, "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?", Deadline.Immediate))
                     }
                 }
             }

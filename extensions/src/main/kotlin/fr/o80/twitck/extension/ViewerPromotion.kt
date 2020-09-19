@@ -1,10 +1,12 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.bean.Video
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -18,17 +20,10 @@ class ViewerPromotion(
     private val messages: Collection<String>,
     private val ignoredLogins: MutableList<String>,
     private val promotionTimeChecker: TimeChecker,
-    private val twitchApi: TwitchApi,
-    private val extensionProvider: ExtensionProvider
+    private val twitchApi: TwitchApi
 ) {
 
-    private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class).first()
-    }
-
-    private val namespace: String = ViewerPromotion::class.java.name
-
-    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
+    fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
         if (channel != messageEvent.channel)
             return messageEvent
 
@@ -37,22 +32,20 @@ class ViewerPromotion(
         }
 
         promotionTimeChecker.executeIfNotCooldown(messageEvent.login) {
-            promoteViewer(messageEvent, bot)
+            promoteViewer(messenger, messageEvent)
         }
 
         return messageEvent
     }
 
-    private fun promoteViewer(messageEvent: MessageEvent, bot: TwitckBot) {
+    private fun promoteViewer(messenger: Messenger, messageEvent: MessageEvent) {
         val lastVideo = twitchApi.getVideos(messageEvent.userId, 1)
             .takeIf { it.isNotEmpty() }
             ?.first()
             ?: return
 
         val randomMessage = messages.random().formatViewer(messageEvent, lastVideo)
-        bot.send(messageEvent.channel, randomMessage)
-
-        storage.putUserInfo(messageEvent.login, namespace, "lastPromotionAt", System.currentTimeMillis().toString())
+        messenger.send(SendMessage(messageEvent.channel, randomMessage, Deadline.Postponed(Importance.HIGH)))
     }
 
     private fun String.formatViewer(messageEvent: MessageEvent, video: Video): String =
@@ -111,8 +104,7 @@ class ViewerPromotion(
                 messages = messages,
                 ignoredLogins = ignoredLogins,
                 promotionTimeChecker = promotionTimeChecker,
-                twitchApi = serviceLocator.twitchApi,
-                extensionProvider = serviceLocator.extensionProvider
+                twitchApi = serviceLocator.twitchApi
             )
         }
     }
@@ -127,7 +119,7 @@ class ViewerPromotion(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { viewerPromotion ->
-                    pipeline.interceptMessageEvent { bot, messageEvent -> viewerPromotion.interceptMessageEvent(bot, messageEvent) }
+                    pipeline.interceptMessageEvent(viewerPromotion::interceptMessageEvent)
                     pipeline.requestChannel(viewerPromotion.channel)
                 }
         }

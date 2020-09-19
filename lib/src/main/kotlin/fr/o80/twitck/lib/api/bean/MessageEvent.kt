@@ -1,9 +1,9 @@
 package fr.o80.twitck.lib.api.bean
 
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 
 data class MessageEvent(
-    val bot: TwitckBot,
+    val messenger: Messenger,
     val channel: String,
     val login: String,
     val userId: String,

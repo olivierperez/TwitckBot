@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.WhisperEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -15,11 +15,11 @@ class Whisper(
     private val logger: Logger
 ) {
 
-    fun interceptWhisperEvent(bot: TwitckBot, whisperEvent: WhisperEvent) {
+    fun interceptWhisperEvent(messenger: Messenger, whisperEvent: WhisperEvent) {
         logger.trace("I've just seen a whisper event: ${whisperEvent.destination} > ${whisperEvent.message}")
 
         whisperCallbacks.forEach { callback ->
-            callback(bot, whisperEvent)
+            callback(messenger, whisperEvent)
         }
     }
 
@@ -60,6 +60,6 @@ class Whisper(
 }
 
 typealias WhisperCallback = (
-    bot: TwitckBot,
+    messenger: Messenger,
     whisper: WhisperEvent
 ) -> Unit

@@ -1,9 +1,12 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Follower
+import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -36,7 +39,7 @@ class Welcome(
         twitchApi.getFollowers(user.id)
     }
 
-    fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
+    fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
         if (channel != joinEvent.channel)
             return joinEvent
 
@@ -45,12 +48,12 @@ class Welcome(
         }
 
         if (isHost(joinEvent.login)) {
-            welcomeHost(bot, joinEvent)
+            welcomeHost(messenger, joinEvent)
             return joinEvent
         }
 
         welcomeTimeChecker.executeIfNotCooldown(joinEvent.login) {
-            welcomeViewer(joinEvent, bot)
+            welcomeViewer(messenger, joinEvent)
         }
 
         return joinEvent
@@ -59,15 +62,16 @@ class Welcome(
     private fun isHost(login: String) =
         login == hostName
 
-    private fun welcomeHost(bot: TwitckBot, joinEvent: JoinEvent) {
-        bot.send(joinEvent.channel, hostMessage!!)
+    private fun welcomeHost(messenger: Messenger, joinEvent: JoinEvent) {
+        messenger.send(SendMessage(joinEvent.channel, hostMessage!!, Deadline.Postponed(Importance.LOW)))
 
+        // TODO OPZ !! Virer ça non ? ça sert à quoi ?
         storage.putUserInfo(joinEvent.login, namespace, "lastWelcomeAt", System.currentTimeMillis().toString())
     }
 
-    private fun welcomeViewer(joinEvent: JoinEvent, bot: TwitckBot) {
+    private fun welcomeViewer(messenger: Messenger, joinEvent: JoinEvent) {
         val randomMessage = pickMessage(joinEvent)
-        bot.send(joinEvent.channel, randomMessage)
+        messenger.send(SendMessage(joinEvent.channel, randomMessage, Deadline.Postponed(Importance.LOW)))
     }
 
     private fun pickMessage(joinEvent: JoinEvent): String {
@@ -176,7 +180,7 @@ class Welcome(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { welcome ->
-                    pipeline.interceptJoinEvent { bot, joinEvent -> welcome.interceptJoinEvent(bot, joinEvent) }
+                    pipeline.interceptJoinEvent(welcome::interceptJoinEvent)
                     pipeline.requestChannel(welcome.channel)
                 }
         }

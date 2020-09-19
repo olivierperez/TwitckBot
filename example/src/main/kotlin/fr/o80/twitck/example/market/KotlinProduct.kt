@@ -2,8 +2,10 @@ package fr.o80.twitck.example.market
 
 import fr.o80.twitck.extension.market.Product
 import fr.o80.twitck.extension.market.PurchaseResult
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -16,7 +18,7 @@ object KotlinProduct : Product {
     override fun computePrice(commandEvent: CommandEvent): Int = 10
 
     override fun execute(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent,
         logger: Logger,
         storageExtension: StorageExtension,
@@ -27,7 +29,11 @@ object KotlinProduct : Product {
         }
 
         val otherLanguage = commandEvent.command.options.skip(1).joinToString(" ")
-        bot.send(commandEvent.channel, "Tout le monde préfère Kotlin à $otherLanguage")
+        messenger.send(
+            SendMessage(
+                commandEvent.channel, "Tout le monde préfère Kotlin à $otherLanguage", Deadline.Immediate
+            )
+        )
 
         return PurchaseResult.Success()
     }

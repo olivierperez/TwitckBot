@@ -3,14 +3,18 @@ package fr.o80.twitck.extension.market
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.Do
+import java.time.Duration
 import java.util.Date
 
 // TODO OPZ Messages
@@ -40,42 +44,44 @@ class MarketCommands(
 
     private val lockWaitingForValidation = Any()
 
-    fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
-            "!buy" -> handleBuyCommand(bot, commandEvent)
-            "!market" -> handleMarketCommand(bot)
+            "!buy" -> handleBuyCommand(messenger, commandEvent)
+            "!market" -> handleMarketCommand(messenger)
         }
 
         return commandEvent
     }
 
-    private fun handleBuyCommand(bot: TwitckBot, commandEvent: CommandEvent) {
+    private fun handleBuyCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
-            bot.send(channel, "Usage de !buy => !buy <produit> <paramètres>")
+            val coolDown = CoolDown(Duration.ofMinutes(1))
+            messenger.send(SendMessage(channel, "Usage de !buy => !buy <produit> <paramètres>", Deadline.Immediate, coolDown))
             return
         }
 
         val product = products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
-            bot.send(channel, "le produit n'existe pas")
+            messenger.send(SendMessage(channel, "le produit n'existe pas", Deadline.Immediate))
             return
         }
 
         val price = product.computePrice(commandEvent)
         if (price == null) {
-            bot.send(channel, "Impossible de calculer le prix pour l'achat demandé !")
+            messenger.send(SendMessage(channel, "Impossible de calculer le prix pour l'achat demandé !", Deadline.Immediate))
         } else {
-            doBuy(bot, commandEvent, product, price)
+            doBuy(messenger, commandEvent, product, price)
         }
     }
 
-    private fun handleMarketCommand(bot: TwitckBot) {
+    private fun handleMarketCommand(messenger: Messenger) {
         val productNames = products.joinToString(", ") { it.name }
-        bot.send(channel, "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames))
+        val coolDown = CoolDown(Duration.ofMinutes(1))
+        messenger.send(SendMessage(channel, "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames), Deadline.Immediate, coolDown))
     }
 
     private fun doBuy(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent,
         product: Product,
         price: Int
@@ -83,46 +89,46 @@ class MarketCommands(
         if (points.consumePoints(commandEvent.login, price)) {
             logger.info("${commandEvent.login} just spend $price points for ${product.name}")
 
-            val purchaseResult = product.execute(bot, commandEvent, logger, storage, serviceLocator)
+            val purchaseResult = product.execute(messenger, commandEvent, logger, storage, serviceLocator)
             Do exhaustive when (purchaseResult) {
-                is PurchaseResult.Success -> onBuySucceeded(bot, purchaseResult, commandEvent, product)
-                is PurchaseResult.Fail -> onBuyFailed(bot, purchaseResult, commandEvent, product, price)
+                is PurchaseResult.Success -> onBuySucceeded(messenger, purchaseResult, commandEvent, product)
+                is PurchaseResult.Fail -> onBuyFailed(messenger, purchaseResult, commandEvent, product, price)
                 is PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(
-                    bot,
+                    messenger,
                     purchaseResult,
                     commandEvent,
                     product
                 )
             }
         } else {
-            bot.send(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !")
+            messenger.send(SendMessage(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !", Deadline.Immediate))
         }
     }
 
     private fun onBuySucceeded(
-        bot: TwitckBot,
+        messenger: Messenger,
         purchaseResult: PurchaseResult.Success,
         commandEvent: CommandEvent,
         product: Product
     ) {
         logger.info("${commandEvent.login} just bought a ${product.name}!")
-        purchaseResult.message?.let { bot.send(channel, it) }
+        purchaseResult.message?.let { messenger.send(SendMessage(channel, it, Deadline.Immediate)) }
     }
 
     private fun onBuyFailed(
-        bot: TwitckBot,
+        messenger: Messenger,
         purchaseResult: PurchaseResult.Fail,
         commandEvent: CommandEvent,
         product: Product,
         price: Int
     ) {
         logger.info("${commandEvent.login} failed to buy ${product.name}!")
-        bot.send(channel, purchaseResult.message)
+        messenger.send(SendMessage(channel, purchaseResult.message, Deadline.Immediate))
         points.addPoints(commandEvent.login, price)
     }
 
     private fun onBuyIsWaitingForValidation(
-        bot: TwitckBot,
+        messenger: Messenger,
         purchaseResult: PurchaseResult.WaitingValidation,
         commandEvent: CommandEvent,
         product: Product
@@ -141,7 +147,7 @@ class MarketCommands(
             storage.putProductsInValidation(productsInValidation)
 
             logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
-            bot.send(channel, "Ton achat est en attente de validation")
+            messenger.send(SendMessage(channel, "${commandEvent.login} ton achat est en attente de validation", Deadline.Immediate))
         }
     }
 

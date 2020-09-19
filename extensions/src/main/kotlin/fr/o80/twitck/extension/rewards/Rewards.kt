@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.rewards
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
@@ -34,7 +34,7 @@ class Rewards(
         }
     }
 
-    fun interceptMessageEvent(bot: TwitckBot, messageEvent: MessageEvent): MessageEvent {
+    fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
         rewardTalkativeViewers(messageEvent)
         return messageEvent
     }

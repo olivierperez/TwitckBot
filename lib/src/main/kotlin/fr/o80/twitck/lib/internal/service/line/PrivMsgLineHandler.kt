@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.MessageEvent
@@ -9,7 +9,7 @@ import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 
 internal class PrivMsgLineHandler(
-    private val bot: TwitckBot,
+    private val messenger: Messenger,
     private val commandParser: CommandParser,
     private val messageDispatcher: MessageDispatcher,
     private val commandDispatcher: CommandDispatcher
@@ -43,9 +43,9 @@ internal class PrivMsgLineHandler(
 
             val command = commandParser.parse(msg)
             if (command != null) {
-                commandDispatcher.dispatch(CommandEvent(bot, channel, user, userId, badges, command))
+                commandDispatcher.dispatch(CommandEvent(messenger, channel, user, userId, badges, command))
             } else {
-                messageDispatcher.dispatch(MessageEvent(bot, channel, user, userId, badges, msg))
+                messageDispatcher.dispatch(MessageEvent(messenger, channel, user, userId, badges, msg))
             }
         }
     }

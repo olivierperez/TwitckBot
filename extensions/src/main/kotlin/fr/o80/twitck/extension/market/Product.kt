@@ -1,6 +1,6 @@
 package fr.o80.twitck.extension.market
 
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -15,7 +15,7 @@ interface Product {
     ): Int?
 
     fun execute(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent,
         logger: Logger,
         storageExtension: StorageExtension,

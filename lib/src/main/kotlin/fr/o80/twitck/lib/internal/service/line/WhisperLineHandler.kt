@@ -1,9 +1,9 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
+import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 
 internal class WhisperLineHandler(
     private val bot: TwitckBot,

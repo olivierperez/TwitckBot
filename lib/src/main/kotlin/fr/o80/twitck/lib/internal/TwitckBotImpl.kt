@@ -1,5 +1,6 @@
 package fr.o80.twitck.lib.internal
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -23,14 +24,17 @@ internal class TwitckBotImpl(
 
     private val ping = Ping(this)
 
+    private val messenger: Messenger = MessengerImpl(this)
+
     private val privMsgLineHandler = PrivMsgLineHandler(
-        this,
+        messenger,
         configuration.commandParser,
-        MessageDispatcher(this, configuration.messageHandlers),
-        CommandDispatcher(this, configuration.commandHandlers)
+        MessageDispatcher(messenger, configuration.messageHandlers),
+        CommandDispatcher(messenger, configuration.commandHandlers)
     )
-    private val joinLineHandler = JoinLineHandler(this, JoinDispatcher(this, configuration.joinHandlers))
-    private val whisperLineHandler = WhisperLineHandler(this, WhisperDispatcher(this, configuration.whisperHandlers))
+
+    private val joinLineHandler = JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
+    private val whisperLineHandler = WhisperLineHandler(this, WhisperDispatcher(messenger, configuration.whisperHandlers))
 
     private val autoJoiner = AutoJoiner(this, configuration.requestedChannels, configuration.loggerFactory)
 

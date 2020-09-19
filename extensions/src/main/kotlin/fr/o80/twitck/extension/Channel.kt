@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -21,27 +21,27 @@ class Channel(
     private val logger: Logger
 ) {
 
-    fun interceptJoinEvent(bot: TwitckBot, joinEvent: JoinEvent): JoinEvent {
+    fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
         if (channel != joinEvent.channel)
             return joinEvent
 
         logger.trace("I've just seen a join event: ${joinEvent.channel} > ${joinEvent.login}")
 
         joinCallbacks.forEach { callback ->
-            callback(bot, joinEvent)
+            callback(messenger, joinEvent)
 
         }
 
         return joinEvent
     }
 
-    fun interceptCommandEvent(bot: TwitckBot, commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
 
         commandCallbacks.forEach { (commandTag, callback) ->
             if (commandTag == commandEvent.command.tag) {
-                callback(bot, commandEvent)
+                callback(messenger, commandEvent)
             }
         }
 
@@ -104,11 +104,11 @@ class Channel(
 }
 
 typealias CommandCallback = (
-    bot: TwitckBot,
+    messenger: Messenger,
     commandEvent: CommandEvent
 ) -> Unit
 
 typealias JoinCallback = (
-    bot: TwitckBot,
+    messenger: Messenger,
     joinEvent: JoinEvent
 ) -> Unit

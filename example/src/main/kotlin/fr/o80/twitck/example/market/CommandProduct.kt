@@ -4,7 +4,7 @@ import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.SCOPE_PERMANENT
 import fr.o80.twitck.extension.market.Product
 import fr.o80.twitck.extension.market.PurchaseResult
-import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -19,7 +19,7 @@ object CommandProduct : Product {
     override fun computePrice(commandEvent: CommandEvent): Int = 200
 
     override fun execute(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent,
         logger: Logger,
         storageExtension: StorageExtension,

@@ -1,15 +1,19 @@
 package fr.o80.twitck.extension
 
+import fr.o80.twitck.lib.api.Messenger
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.Deadline
+import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import java.time.Duration
 import java.util.Locale
 
 const val SCOPE_STREAM = "stream"
@@ -38,7 +42,7 @@ class RuntimeCommand(
     }
 
     private fun interceptCommandEvent(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent
     ): CommandEvent {
         if (channel != commandEvent.channel)
@@ -47,15 +51,15 @@ class RuntimeCommand(
         // !cmd stream !exo Aujourd'hui on développe des trucs funs
         // !cmd permanent !twitter Retrouvez-moi sur https://twitter.com/olivierperez
         when (commandEvent.command.tag) {
-            "!cmd" -> handleAddCommand(bot, commandEvent)
-            in runtimeCommands.keys -> handleRegisteredCommand(bot, commandEvent)
+            "!cmd" -> handleAddCommand(messenger, commandEvent)
+            in runtimeCommands.keys -> handleRegisteredCommand(messenger, commandEvent)
         }
 
         return commandEvent
     }
 
     private fun handleAddCommand(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent
     ) {
         if (privilegedBadges.intersect(commandEvent.badges).isEmpty()) {
@@ -78,15 +82,16 @@ class RuntimeCommand(
 
         registerRuntimeCommand(newCommand, scope, message)
         registerToHelper(newCommand)
-        bot.send(commandEvent.channel, "Commande $newCommand ajoutée")
+        messenger.send(SendMessage(commandEvent.channel, "Commande $newCommand ajoutée", Deadline.Immediate))
     }
 
     private fun handleRegisteredCommand(
-        bot: TwitckBot,
+        messenger: Messenger,
         commandEvent: CommandEvent
     ) {
         runtimeCommands[commandEvent.command.tag]?.let { message ->
-            bot.send(commandEvent.channel, message)
+            val coolDown = CoolDown(Duration.ofMinutes(1))
+            messenger.send(SendMessage(commandEvent.channel, message, Deadline.Immediate, coolDown))
         }
     }
 
