@@ -6,7 +6,6 @@ import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.bean.SendMessage
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -24,15 +23,8 @@ class Welcome(
     private val hostMessage: String?,
     private val welcomeTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
-    private val ignoredLogins: MutableList<String>,
-    private val extensionProvider: ExtensionProvider
+    private val ignoredLogins: MutableList<String>
 ) {
-
-    private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class).first()
-    }
-
-    private val namespace: String = Welcome::class.java.name
 
     private val followers: List<Follower> by lazy {
         val user = twitchApi.getUser(hostName)
@@ -64,9 +56,6 @@ class Welcome(
 
     private fun welcomeHost(messenger: Messenger, joinEvent: JoinEvent) {
         messenger.send(SendMessage(joinEvent.channel, hostMessage!!, Deadline.Postponed(Importance.LOW)))
-
-        // TODO OPZ !! Virer ça non ? ça sert à quoi ?
-        storage.putUserInfo(joinEvent.login, namespace, "lastWelcomeAt", System.currentTimeMillis().toString())
     }
 
     private fun welcomeViewer(messenger: Messenger, joinEvent: JoinEvent) {
@@ -158,14 +147,13 @@ class Welcome(
 
             return Welcome(
                 channel = channelName,
-                messages = messages,
                 messagesForFollowers = messagesForFollowers,
+                messages = messages,
                 hostName = hostName,
                 hostMessage = hostMessage,
                 welcomeTimeChecker = welcomeTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
-                ignoredLogins = ignoredLogins,
-                extensionProvider = serviceLocator.extensionProvider
+                ignoredLogins = ignoredLogins
             )
         }
     }
