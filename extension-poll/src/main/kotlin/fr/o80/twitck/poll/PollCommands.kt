@@ -77,7 +77,7 @@ class PollCommands(
 
         Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
-                val resultMsg = poll.generateResultMessage(messages.pollHasJustFinished)
+                val resultMsg = generateResultMessage(poll, messages.pollHasJustFinished)
                 messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
                 currentPoll = null
             }
@@ -86,50 +86,26 @@ class PollCommands(
 
     private fun showResult(messenger: Messenger) {
         currentPoll?.let { poll ->
-            val resultMsg = poll.generateResultMessage(messages.currentPollResult)
+            val resultMsg = generateResultMessage(poll, messages.currentPollResult)
             messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
         }
     }
 
-    // TODO idée Thermo74 Lister tous les résultats (ou au moins les X premiers)
-    private fun CurrentPoll.generateResultMessage(endMsg: String): String {
-        val best = this.computedBest
-        return if (best.second >= 1) {
-            endMsg
-                .replace("#TITLE#", this.title)
-                .replace("#BEST#", best.first)
-                .replace("#COUNT#", best.second.toString())
+    internal fun generateResultMessage(poll: CurrentPoll, globalResultFormat: String): String {
+        val bestResults = poll.getBestResults(5)
+
+        return if (bestResults.isNotEmpty()) {
+            val resultsMsg = bestResults.joinToString(", ") {
+                messages.oneResultFormat
+                    .replace("#ANSWER#", it.first)
+                    .replace("#COUNT#", it.second.toString())
+            }
+            globalResultFormat
+                .replace("#TITLE#", poll.title)
+                .replace("#RESULTS#", resultsMsg)
         } else {
-            messages.pollHasNoVotes.replace("#TITLE#", this.title)
+            messages.pollHasNoVotes.replace("#TITLE#", poll.title)
         }
     }
 
-}
-
-class CurrentPoll(
-    val title: String
-) {
-
-    private val votes: MutableMap<String, String> = mutableMapOf()
-
-    val computedBest: Pair<String, Int>
-        get() = votes.values.groupBy { it }
-            .maxByOrNull { it.value.size }
-            ?.let { Pair(it.key, it.value.size) }
-            ?: Pair("", 0)
-
-    fun addVote(login: String, vote: String): Vote {
-        return if (votes.containsKey(login)) {
-            votes[login] = vote
-            Vote.VOTE_CHANGED
-        } else {
-            votes[login] = vote
-            Vote.NEW_VOTE
-        }
-    }
-}
-
-enum class Vote {
-    NEW_VOTE,
-    VOTE_CHANGED
 }

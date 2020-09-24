@@ -6,5 +6,6 @@ class Messages(
     val newPoll: String,
     val pollHasJustFinished: String,
     val currentPollResult: String,
+    val oneResultFormat: String,
     val pollHasNoVotes: String
 )

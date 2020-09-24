@@ -45,6 +45,7 @@ class Poll(
             newPoll: String = "New poll: #TITLE#",
             pollHasJustFinished: String = "Poll has just finished, to the question #TITLE# You've answered #BEST# #COUNT times",
             currentPollResult: String = "Poll is still running, the question is #TITLE# For now you've answered #BEST# #COUNT times",
+            resultFormat: String = "#ANSWER# (#COUNT#)",
             pollHasNoVotes: String = "No one has answered to the question #TITLE#"
         ) {
             messages = Messages(
@@ -53,6 +54,7 @@ class Poll(
                 newPoll,
                 pollHasJustFinished,
                 currentPollResult,
+                resultFormat,
                 pollHasNoVotes
             )
         }

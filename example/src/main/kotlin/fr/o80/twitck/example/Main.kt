@@ -152,8 +152,8 @@ class Main : CliktCommand() {
                     errorCreationPollUsage = "Pour créer un sondage : \"!poll <durée> <question>\"",
                     errorDurationIsMissing = "Il faut choisir la durée du sondage !",
                     newPoll = "Nouveau sondage : #TITLE# Utilisez !vote pour répondre",
-                    pollHasJustFinished = "Sondage terminé, à la question #TITLE# Vous avez répondu \"#BEST#\" #COUNT# fois",
-                    currentPollResult = "Sondage en cours... la question est #TITLE# Pour le moment \"#BEST#\" est en tête avec #COUNT# votes",
+                    pollHasJustFinished = "Sondage terminé. #TITLE# #RESULTS#",
+                    currentPollResult = "Sondage en cours... #TITLE# #RESULTS#",
                     pollHasNoVotes = "Personne n'a répondu à la question #TITLE#"
                 )
             }
