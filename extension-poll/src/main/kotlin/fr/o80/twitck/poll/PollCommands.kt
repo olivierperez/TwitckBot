@@ -3,7 +3,6 @@ package fr.o80.twitck.poll
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
@@ -76,42 +75,32 @@ class PollCommands(
         currentPoll = CurrentPoll(title)
         messenger.send(SendMessage(channel, messages.newPoll.replace("#TITLE#", title), Deadline.Immediate))
 
-        // TODO idée Thermo74 Lister tous les résultats
         Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
-                val best = poll.best
-
-                if (best.second >= 1) {
-                    val resultMsg = messages.pollHasJustFinished
-                        .replace("#TITLE#", poll.title)
-                        .replace("#BEST#", best.first)
-                        .replace("#COUNT#", best.second.toString())
-                    messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
-                } else {
-                    val noResultMsg = messages.pollHasNoVotes.replace("#TITLE#", poll.title)
-                    messenger.send(
-                        SendMessage(channel, noResultMsg, Deadline.Postponed(Importance.HIGH))
-                    )
-                }
+                val resultMsg = poll.generateResultMessage(messages.pollHasJustFinished)
+                messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
                 currentPoll = null
             }
         }
     }
 
-    // TODO OPZ Factoriser avec le code juste au dessus (avec un paramètre messages.currentPollResult)
     private fun showResult(messenger: Messenger) {
         currentPoll?.let { poll ->
-            val best = poll.best
-            if (best.second >= 1) {
-                val resultMsg = messages.currentPollResult
-                    .replace("#TITLE#", poll.title)
-                    .replace("#BEST#", best.first)
-                    .replace("#COUNT#", best.second.toString())
-                messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
-            } else {
-                val noResultMsg = messages.pollHasNoVotes.replace("#TITLE#", poll.title)
-                messenger.send(SendMessage(channel, noResultMsg, Deadline.Immediate))
-            }
+            val resultMsg = poll.generateResultMessage(messages.currentPollResult)
+            messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
+        }
+    }
+
+    // TODO idée Thermo74 Lister tous les résultats (ou au moins les X premiers)
+    private fun CurrentPoll.generateResultMessage(endMsg: String): String {
+        val best = this.computedBest
+        return if (best.second >= 1) {
+            endMsg
+                .replace("#TITLE#", this.title)
+                .replace("#BEST#", best.first)
+                .replace("#COUNT#", best.second.toString())
+        } else {
+            messages.pollHasNoVotes.replace("#TITLE#", this.title)
         }
     }
 
@@ -123,7 +112,7 @@ class CurrentPoll(
 
     private val votes: MutableMap<String, String> = mutableMapOf()
 
-    val best: Pair<String, Int>
+    val computedBest: Pair<String, Int>
         get() = votes.values.groupBy { it }
             .maxByOrNull { it.value.size }
             ?.let { Pair(it.key, it.value.size) }
