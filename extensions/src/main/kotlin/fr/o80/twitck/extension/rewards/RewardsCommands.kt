@@ -1,9 +1,6 @@
 package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.Importance
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.service.Messenger
@@ -43,7 +40,8 @@ class RewardsCommands(
                 .replace("#USER#", login)
                 .replace("#NEW_POINTS#", claimedPoints.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())
-            messenger.send(SendMessage(channel, message, Deadline.Postponed(Importance.HIGH)))
+
+            messenger.sendImmediately(channel, message)
         }
     }
 

@@ -2,9 +2,7 @@ package fr.o80.twitck.extension.repeat
 
 import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -33,7 +31,7 @@ class Repeat(
             while (!interrupted) {
                 Thread.sleep(intervalBetweenRepeatedMessages.toMillis())
                 messages.randomOrNull()?.let { message ->
-                    messenger.send(SendMessage(channel, message, Deadline.Immediate))
+                    messenger.sendImmediately(channel, message)
                 }
             }
         }.start()

@@ -5,8 +5,6 @@ import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
@@ -56,19 +54,22 @@ class MarketCommands(
     private fun handleBuyCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
             val coolDown = CoolDown(Duration.ofMinutes(1))
-            messenger.send(SendMessage(channel, "Usage de !buy => !buy <produit> <paramètres>", Deadline.Immediate, coolDown))
+            messenger.sendImmediately(channel, "Usage de !buy => !buy <produit> <paramètres>", coolDown)
             return
         }
 
         val product = products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
-            messenger.send(SendMessage(channel, "le produit n'existe pas", Deadline.Immediate))
+            messenger.sendImmediately(channel, "le produit n'existe pas")
             return
         }
 
         val price = product.computePrice(commandEvent)
         if (price == null) {
-            messenger.send(SendMessage(channel, "Impossible de calculer le prix pour l'achat demandé !", Deadline.Immediate))
+            messenger.sendImmediately(
+                channel,
+                "Impossible de calculer le prix pour l'achat demandé !"
+            )
         } else {
             doBuy(messenger, commandEvent, product, price)
         }
@@ -77,7 +78,11 @@ class MarketCommands(
     private fun handleMarketCommand(messenger: Messenger) {
         val productNames = products.joinToString(", ") { it.name }
         val coolDown = CoolDown(Duration.ofMinutes(1))
-        messenger.send(SendMessage(channel, "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames), Deadline.Immediate, coolDown))
+        messenger.sendImmediately(
+            channel,
+            "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames),
+            coolDown
+        )
     }
 
     private fun doBuy(
@@ -101,7 +106,10 @@ class MarketCommands(
                 )
             }
         } else {
-            messenger.send(SendMessage(channel, "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !", Deadline.Immediate))
+            messenger.sendImmediately(
+                channel,
+                "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !"
+            )
         }
     }
 
@@ -112,7 +120,7 @@ class MarketCommands(
         product: Product
     ) {
         logger.info("${commandEvent.login} just bought a ${product.name}!")
-        purchaseResult.message?.let { messenger.send(SendMessage(channel, it, Deadline.Immediate)) }
+        purchaseResult.message?.let { messenger.sendImmediately(channel, it) }
     }
 
     private fun onBuyFailed(
@@ -123,7 +131,7 @@ class MarketCommands(
         price: Int
     ) {
         logger.info("${commandEvent.login} failed to buy ${product.name}!")
-        messenger.send(SendMessage(channel, purchaseResult.message, Deadline.Immediate))
+        messenger.sendImmediately(channel, purchaseResult.message)
         points.addPoints(commandEvent.login, price)
     }
 
@@ -147,7 +155,10 @@ class MarketCommands(
             storage.putProductsInValidation(productsInValidation)
 
             logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
-            messenger.send(SendMessage(channel, "${commandEvent.login} ton achat est en attente de validation", Deadline.Immediate))
+            messenger.sendImmediately(
+                channel,
+                "${commandEvent.login} ton achat est en attente de validation"
+            )
         }
     }
 

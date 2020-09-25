@@ -1,10 +1,8 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -45,7 +43,7 @@ class ViewerPromotion(
             ?: return
 
         val randomMessage = messages.random().formatViewer(messageEvent, lastVideo)
-        messenger.send(SendMessage(messageEvent.channel, randomMessage, Deadline.Postponed(Importance.HIGH)))
+        messenger.sendWhenAvailable(messageEvent.channel, randomMessage, Importance.HIGH)
     }
 
     private fun String.formatViewer(messageEvent: MessageEvent, video: Video): String =

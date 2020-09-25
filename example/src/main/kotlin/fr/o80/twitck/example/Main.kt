@@ -21,8 +21,6 @@ import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
@@ -168,25 +166,37 @@ class Main : CliktCommand() {
                         whisper.message.startsWith("!host") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> messenger.send(SendMessage(botChannel, "/host ${split[1]}", Deadline.Immediate))
+                                2 -> messenger.sendImmediately(botChannel, "/host ${split[1]}")
                                 else -> println("Quelque chose ne va pas dans la demande : \"${whisper.message}\"")
                             }
                         }
                         whisper.message == "!unhost" -> {
-                            messenger.send(SendMessage(botChannel, "/unhost", Deadline.Immediate))
+                            messenger.sendImmediately(botChannel, "/unhost")
                         }
                         whisper.message.startsWith("!shuto") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> messenger.send(SendMessage(hostChannel, "Envoi d'un shuto à ${split[1]} !", Deadline.Immediate))
-                                3 -> messenger.send(SendMessage(hostChannel, "Envoi d'un shuto ${split[1]} à ${split[2]} !", Deadline.Immediate))
+                                2 -> messenger.sendImmediately(
+                                    hostChannel,
+                                    "Envoi d'un shuto à ${split[1]} !"
+                                )
+                                3 -> messenger.sendImmediately(
+                                    hostChannel,
+                                    "Envoi d'un shuto ${split[1]} à ${split[2]} !"
+                                )
                             }
                         }
                         whisper.message.startsWith("!mawashi") -> {
                             val split = whisper.message.split(" ")
                             when (split.size) {
-                                2 -> messenger.send(SendMessage(hostChannel, "Envoi d'un mawashi geri à ${split[1]} !", Deadline.Immediate))
-                                3 -> messenger.send(SendMessage(hostChannel, "Envoi d'un mawashi geri ${split[1]} à ${split[2]} !", Deadline.Immediate))
+                                2 -> messenger.sendImmediately(
+                                    hostChannel,
+                                    "Envoi d'un mawashi geri à ${split[1]} !"
+                                )
+                                3 -> messenger.sendImmediately(
+                                    hostChannel,
+                                    "Envoi d'un mawashi geri ${split[1]} à ${split[2]} !"
+                                )
                             }
                         }
                     }
@@ -195,12 +205,18 @@ class Main : CliktCommand() {
             install(Channel) {
                 channel(botChannel)
                 command("!help") { messenger, _ ->
-                    messenger.send(SendMessage(botChannel, "Il n'y a pas encore d'aide", Deadline.Immediate))
+                    messenger.sendImmediately(botChannel, "Il n'y a pas encore d'aide")
                 }
                 join { messenger, join ->
                     if (!join.login.equals(botName, true)) {
-                        messenger.send(SendMessage(join.channel, "Salut ${join.login} ! Que fais-tu ici ?", Deadline.Immediate))
-                        messenger.send(SendMessage(hostChannel, "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?", Deadline.Immediate))
+                        messenger.sendImmediately(
+                            join.channel,
+                            "Salut ${join.login} ! Que fais-tu ici ?"
+                        )
+                        messenger.sendImmediately(
+                            hostChannel,
+                            "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?"
+                        )
                     }
                 }
             }

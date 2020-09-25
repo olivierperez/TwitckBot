@@ -1,8 +1,9 @@
 package fr.o80.twitck.lib.internal.service
 
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.Importance
+import fr.o80.twitck.lib.api.bean.PostponedMessage
 import fr.o80.twitck.lib.api.service.Messenger
 import java.time.Duration
 import java.time.LocalDateTime
@@ -13,7 +14,7 @@ class MessengerImpl(
     private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ) : Messenger {
 
-    private val messagesToSend: PriorityBlockingQueue<SendMessage> = PriorityBlockingQueue(11, SendMessageComparator)
+    private val messagesToSend: PriorityBlockingQueue<PostponedMessage> = PriorityBlockingQueue(11, PostponedMessageComparator)
 
     private var interrupted: Boolean = false
 
@@ -30,14 +31,18 @@ class MessengerImpl(
         }.start()
     }
 
-    override fun send(message: SendMessage) {
-        if (isCoolingDown(message)) return
-        startCoolDown(message)
+    override fun sendImmediately(channel: String, content: String, coolDown: CoolDown?) {
+        if (isCoolingDown(content)) return
+        startCoolDown(content, coolDown)
 
-        when (message.deadline) {
-            Deadline.Immediate -> bot.send(message.channel, message.content)
-            else -> messagesToSend.offer(message)
-        }
+        bot.send(channel, content)
+    }
+
+    override fun sendWhenAvailable(channel: String, content: String, importance: Importance, coolDown: CoolDown?) {
+        if (isCoolingDown(content)) return
+        startCoolDown(content, coolDown)
+
+        messagesToSend.offer(PostponedMessage(channel, content, importance))
     }
 
     override fun sendLine(line: String) {
@@ -52,14 +57,14 @@ class MessengerImpl(
         interrupted = true
     }
 
-    internal fun startCoolDown(message: SendMessage) {
-        message.coolDown?.duration?.let { duration ->
-            coolDowns[message.content] = LocalDateTime.now() + duration
+    internal fun startCoolDown(content: String, coolDown: CoolDown?) {
+        coolDown?.duration?.let { duration ->
+            coolDowns[content] = LocalDateTime.now() + duration
         }
     }
 
-    internal fun isCoolingDown(message: SendMessage): Boolean {
-        val expiry = coolDowns[message.content]
+    internal fun isCoolingDown(content: String): Boolean {
+        val expiry = coolDowns[content]
         return expiry != null && LocalDateTime.now().isBefore(expiry)
     }
 

@@ -2,8 +2,6 @@ package fr.o80.twitck.poll
 
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.service.Messenger
@@ -60,7 +58,7 @@ class PollCommands(
     private fun startPoll(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size < 2) {
-            messenger.send(SendMessage(channel, messages.errorCreationPollUsage, Deadline.Immediate))
+            messenger.sendImmediately(channel, messages.errorCreationPollUsage)
             return
         }
 
@@ -68,17 +66,17 @@ class PollCommands(
         val title = command.options.subList(1, command.options.size).joinToString(" ")
 
         if (seconds == -1L) {
-            messenger.send(SendMessage(channel, messages.errorDurationIsMissing, Deadline.Immediate))
+            messenger.sendImmediately(channel, messages.errorDurationIsMissing)
             return
         }
 
         currentPoll = CurrentPoll(title)
-        messenger.send(SendMessage(channel, messages.newPoll.replace("#TITLE#", title), Deadline.Immediate))
+        messenger.sendImmediately(channel, messages.newPoll.replace("#TITLE#", title))
 
         Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
                 val resultMsg = generateResultMessage(poll, messages.pollHasJustFinished)
-                messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
+                messenger.sendImmediately(channel, resultMsg)
                 currentPoll = null
             }
         }
@@ -87,7 +85,7 @@ class PollCommands(
     private fun showResult(messenger: Messenger) {
         currentPoll?.let { poll ->
             val resultMsg = generateResultMessage(poll, messages.currentPollResult)
-            messenger.send(SendMessage(channel, resultMsg, Deadline.Immediate))
+            messenger.sendImmediately(channel, resultMsg)
         }
     }
 

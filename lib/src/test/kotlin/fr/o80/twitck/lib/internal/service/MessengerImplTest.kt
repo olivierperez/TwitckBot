@@ -2,9 +2,7 @@ package fr.o80.twitck.lib.internal.service
 
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Importance
-import fr.o80.twitck.lib.api.bean.SendMessage
 import io.mockk.mockk
 import io.mockk.verify
 import java.time.Duration
@@ -36,8 +34,8 @@ class MessengerImplTest {
 
     @Test
     fun shouldSendImmediateMessages() {
-        messenger.send(SendMessage("chan", "Message 1", Deadline.Immediate))
-        messenger.send(SendMessage("chan", "Message 2", Deadline.Immediate))
+        messenger.sendImmediately("chan", "Message 1")
+        messenger.sendImmediately("chan", "Message 2")
 
         verify { bot.send("chan", "Message 1") }
         verify { bot.send("chan", "Message 2") }
@@ -45,8 +43,8 @@ class MessengerImplTest {
 
     @Test
     fun `should wait before sending HIGH importance postponed messages`() {
-        messenger.send(SendMessage("chan", "Message 1", Deadline.Postponed(Importance.HIGH)))
-        messenger.send(SendMessage("chan", "Message 2", Deadline.Postponed(Importance.HIGH)))
+        messenger.sendWhenAvailable("chan", "Message 1", Importance.HIGH)
+        messenger.sendWhenAvailable("chan", "Message 2", Importance.HIGH)
 
         Thread.sleep(20)
         verify(exactly = 1) { bot.send("chan", any()) }
@@ -54,8 +52,8 @@ class MessengerImplTest {
 
     @Test
     fun `should wait before sending LOW importance postponed messages`() {
-        messenger.send(SendMessage("chan", "Message 1", Deadline.Postponed(Importance.LOW)))
-        messenger.send(SendMessage("chan", "Message 2", Deadline.Postponed(Importance.LOW)))
+        messenger.sendWhenAvailable("chan", "Message 1", Importance.LOW)
+        messenger.sendWhenAvailable("chan", "Message 2", Importance.LOW)
 
         Thread.sleep(20)
         verify(exactly = 1) { bot.send("chan", any()) }
@@ -63,8 +61,8 @@ class MessengerImplTest {
 
     @Test
     fun `should wait before sending postponed messages`() {
-        messenger.send(SendMessage("chan", "Message 1", Deadline.Postponed(Importance.HIGH)))
-        messenger.send(SendMessage("chan", "Message 2", Deadline.Postponed(Importance.LOW)))
+        messenger.sendWhenAvailable("chan", "Message 1", Importance.HIGH)
+        messenger.sendWhenAvailable("chan", "Message 2", Importance.LOW)
 
         Thread.sleep(20)
         verify { bot.send("chan", "Message 1") }
@@ -74,10 +72,10 @@ class MessengerImplTest {
 
     @Test
     fun `should send HIGH importance message before LOW importance ones`() {
-        messenger.send(SendMessage("chan", "HIGH 1", Deadline.Postponed(Importance.HIGH)))
-        messenger.send(SendMessage("chan", "LOW 1", Deadline.Postponed(Importance.LOW)))
-        messenger.send(SendMessage("chan", "LOW 2", Deadline.Postponed(Importance.LOW)))
-        messenger.send(SendMessage("chan", "HIGH 2", Deadline.Postponed(Importance.HIGH)))
+        messenger.sendWhenAvailable("chan", "HIGH 1", Importance.HIGH)
+        messenger.sendWhenAvailable("chan", "LOW 1", Importance.LOW)
+        messenger.sendWhenAvailable("chan", "LOW 2", Importance.LOW)
+        messenger.sendWhenAvailable("chan", "HIGH 2", Importance.HIGH)
 
         Thread.sleep(20)
         verify(exactly = 1) { bot.send("chan", "HIGH 1") }
@@ -88,8 +86,8 @@ class MessengerImplTest {
     @Test
     fun `should remember cool downs`() {
         val coolDown = CoolDown(Duration.ofMillis(1000))
-        val message = SendMessage("chan", "Le marché c'est ça", Deadline.Immediate, coolDown)
-        messenger.startCoolDown(message)
+        val message = "Le marché c'est ça"
+        messenger.startCoolDown(message, coolDown)
 
         assertTrue(messenger.isCoolingDown(message))
         Thread.sleep(2000)
@@ -99,9 +97,8 @@ class MessengerImplTest {
     @Test
     fun `should wait for cool down`() {
         val coolDown = CoolDown(Duration.ofMillis(1000))
-        val message = SendMessage("chan", "Le marché c'est ça", Deadline.Immediate, coolDown)
-        messenger.send(message)
-        messenger.send(message)
+        messenger.sendImmediately("chan", "Le marché c'est ça", coolDown)
+        messenger.sendImmediately("chan", "Le marché c'est ça", coolDown)
 
         verify(exactly = 1) { bot.send(any(), any()) }
     }

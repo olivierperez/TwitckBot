@@ -1,11 +1,9 @@
 package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Deadline
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -55,12 +53,13 @@ class Welcome(
         login == hostName
 
     private fun welcomeHost(messenger: Messenger, joinEvent: JoinEvent) {
-        messenger.send(SendMessage(joinEvent.channel, hostMessage!!, Deadline.Postponed(Importance.LOW)))
+        // TODO OPZ !! C'est n'imp ce !!
+        messenger.sendWhenAvailable(joinEvent.channel, hostMessage!!, Importance.LOW)
     }
 
     private fun welcomeViewer(messenger: Messenger, joinEvent: JoinEvent) {
         val randomMessage = pickMessage(joinEvent)
-        messenger.send(SendMessage(joinEvent.channel, randomMessage, Deadline.Postponed(Importance.LOW)))
+        messenger.sendWhenAvailable(joinEvent.channel, randomMessage, Importance.LOW)
     }
 
     private fun pickMessage(joinEvent: JoinEvent): String {

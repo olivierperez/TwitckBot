@@ -4,8 +4,6 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
@@ -82,7 +80,7 @@ class RuntimeCommand(
 
         registerRuntimeCommand(newCommand, scope, message)
         registerToHelper(newCommand)
-        messenger.send(SendMessage(commandEvent.channel, "Commande $newCommand ajoutée", Deadline.Immediate))
+        messenger.sendImmediately(commandEvent.channel, "Commande $newCommand ajoutée")
     }
 
     private fun handleRegisteredCommand(
@@ -91,7 +89,7 @@ class RuntimeCommand(
     ) {
         runtimeCommands[commandEvent.command.tag]?.let { message ->
             val coolDown = CoolDown(Duration.ofMinutes(1))
-            messenger.send(SendMessage(commandEvent.channel, message, Deadline.Immediate, coolDown))
+            messenger.sendImmediately(commandEvent.channel, message, coolDown)
         }
     }
 

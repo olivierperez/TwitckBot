@@ -3,8 +3,6 @@ package fr.o80.twitck.extension
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -34,7 +32,7 @@ class Help(
             in registeredCommands.keys -> {
                 registeredCommands[commandEvent.command.tag]?.let { message ->
                     val coolDown = CoolDown(Duration.ofMinutes(1))
-                    messenger.send(SendMessage(commandEvent.channel, message, Deadline.Immediate, coolDown))
+                    messenger.sendImmediately(commandEvent.channel, message, coolDown)
                 }
             }
         }
@@ -48,11 +46,15 @@ class Help(
     ) {
         if (commands.isEmpty()) {
             val coolDown = CoolDown(Duration.ofMinutes(1))
-            this.send(SendMessage(channel, "Je ne sais rien faire O_o du moins pour l'instant...", Deadline.Immediate, coolDown))
+            this.sendImmediately(channel, "Je ne sais rien faire O_o du moins pour l'instant...", coolDown)
         } else {
             val coolDown = CoolDown(Duration.ofMinutes(1))
             val commandsExamples = commands.joinToString(", ")
-            this.send(SendMessage(channel, "Je sais faire un paquet de choses, par exemple : $commandsExamples", Deadline.Immediate, coolDown))
+            this.sendImmediately(
+                channel,
+                "Je sais faire un paquet de choses, par exemple : $commandsExamples",
+                coolDown
+            )
         }
     }
 
@@ -74,7 +76,7 @@ class Help(
             registeredCommands[command] = message
         }
 
-        fun build(serviceLocator: ServiceLocator): Help {
+        fun build(): Help {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Help::class.simpleName}")
 
@@ -90,7 +92,7 @@ class Help(
         ): Help {
             return Configuration()
                 .apply(configure)
-                .build(serviceLocator)
+                .build()
                 .also { localHelp ->
                     pipeline.interceptCommandEvent(localHelp::interceptCommandEvent)
                 }

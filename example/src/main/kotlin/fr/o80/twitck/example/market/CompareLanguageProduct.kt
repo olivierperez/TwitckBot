@@ -3,8 +3,6 @@ package fr.o80.twitck.example.market
 import fr.o80.twitck.extension.market.Product
 import fr.o80.twitck.extension.market.PurchaseResult
 import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.Deadline
-import fr.o80.twitck.lib.api.bean.SendMessage
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -31,9 +29,7 @@ object CompareLanguageProduct : Product {
         return if (worse.equals("kotlin", true)) {
             PurchaseResult.Fail("Rien n'est mieux que Kotlin, achat non pris en compte")
         } else {
-            messenger.send(
-                SendMessage(commandEvent.channel, "Tout le monde préfère $better à $worse", Deadline.Immediate)
-            )
+            messenger.sendImmediately(commandEvent.channel, "Tout le monde préfère $better à $worse")
             PurchaseResult.Success()
         }
     }
