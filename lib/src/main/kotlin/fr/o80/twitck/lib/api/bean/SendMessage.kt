@@ -7,17 +7,7 @@ class SendMessage(
     val content: String,
     val deadline: Deadline,
     val coolDown: CoolDown? = null
-) {
-    companion object {
-        fun whisper(channel: String, recipient: String, message: String): SendMessage =
-            SendMessage(
-                channel = channel,
-                content = "/w $recipient $message",
-                deadline = Deadline.Immediate,
-                coolDown = null
-            )
-    }
-}
+)
 
 sealed class Deadline {
     object Immediate : Deadline()

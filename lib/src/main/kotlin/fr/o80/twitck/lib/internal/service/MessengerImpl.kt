@@ -44,6 +44,10 @@ class MessengerImpl(
         bot.sendLine(line)
     }
 
+    override fun whisper(channel: String, recipient: String, message: String) {
+        bot.send(channel, "/w $recipient $message")
+    }
+
     fun interrupt() {
         interrupted = true
     }

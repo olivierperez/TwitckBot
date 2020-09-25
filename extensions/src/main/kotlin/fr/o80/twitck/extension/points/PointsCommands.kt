@@ -70,7 +70,7 @@ class PointsCommands(
                     .replace("#TO#", toLogin)
             }
 
-            messenger.send(SendMessage.whisper(commandEvent.channel, commandEvent.login, msg))
+            messenger.whisper(commandEvent.channel, commandEvent.login, msg)
         }
     }
 
@@ -91,6 +91,6 @@ class PointsCommands(
                 .replace("#POINTS#", points.toString())
         }
 
-        messenger.send(SendMessage.whisper(commandEvent.channel, login, msg))
+        messenger.whisper(commandEvent.channel, login, msg)
     }
 }
