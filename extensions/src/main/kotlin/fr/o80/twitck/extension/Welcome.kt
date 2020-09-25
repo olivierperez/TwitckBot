@@ -37,8 +37,8 @@ class Welcome(
             return joinEvent
         }
 
-        if (isHost(joinEvent.login)) {
-            welcomeHost(messenger, joinEvent)
+        if (hostMessage != null && isHost(joinEvent.login)) {
+            welcomeHost(messenger, joinEvent.login, hostMessage)
             return joinEvent
         }
 
@@ -52,9 +52,8 @@ class Welcome(
     private fun isHost(login: String) =
         login == hostName
 
-    private fun welcomeHost(messenger: Messenger, joinEvent: JoinEvent) {
-        // TODO OPZ !! C'est n'imp ce !!
-        messenger.sendWhenAvailable(joinEvent.channel, hostMessage!!, Importance.LOW)
+    private fun welcomeHost(messenger: Messenger, channel: String, message: String) {
+        messenger.sendWhenAvailable(channel, message, Importance.LOW)
     }
 
     private fun welcomeViewer(messenger: Messenger, joinEvent: JoinEvent) {
