@@ -17,16 +17,14 @@ private annotation class TwitckConfigDsl
 @TwitckConfigDsl
 fun twitckBot(
     oauthToken: String,
-    clientId: String,
     configurator: TwitckConfigurator.() -> Unit
 ): TwitckBot {
-    val configuration = TwitckConfigurator(oauthToken, clientId).apply(configurator).build()
+    val configuration = TwitckConfigurator(oauthToken).apply(configurator).build()
     return TwitckBotImpl(configuration)
 }
 
 class TwitckConfigurator(
-    private val oauthToken: String,
-    clientId: String
+    private val oauthToken: String
 ) {
     private val extensions: MutableList<Any> = mutableListOf()
     private val pipeline = PipelineImpl()
@@ -49,7 +47,7 @@ class TwitckConfigurator(
             }
         },
         loggerFactory = loggerFactory,
-        twitchApi = TwitchApiImpl(clientId, oauthToken, loggerFactory)
+        twitchApi = TwitchApiImpl(oauthToken, loggerFactory)
     )
 
     @TwitckConfigDsl
@@ -70,7 +68,8 @@ class TwitckConfigurator(
             commandHandlers = pipeline.commandHandlers,
             whisperHandlers = pipeline.whisperHandlers,
             loggerFactory = loggerFactory,
-            commandParser = serviceLocator.commandParser
+            commandParser = serviceLocator.commandParser,
+            twitchApi = serviceLocator.twitchApi
         )
     }
 

@@ -46,3 +46,26 @@ data class Video(
     @Json(name = "published_at")
     val publishedAt: Date
 )
+
+@JsonClass(generateAdapter = true)
+data class ValidateResponse(
+    @Json(name = "client_id")
+    val clientId: String,
+    @Json(name = "user_id")
+    val userId: String,
+    val login: String
+)
+
+@JsonClass(generateAdapter = true)
+data class NewFollowers(
+    val data: List<NewFollower>
+)
+
+@JsonClass(generateAdapter = true)
+data class NewFollower(
+    val from_id: String,
+    val from_name: String,
+    val to_id: String,
+    val to_name: String,
+    val followed_at: Date
+)

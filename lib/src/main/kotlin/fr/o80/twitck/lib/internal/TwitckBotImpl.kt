@@ -11,6 +11,7 @@ import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
+import fr.o80.twitck.lib.internal.service.TopicSubscriber
 import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler
@@ -43,6 +44,8 @@ internal class TwitckBotImpl(
 
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
+    private val topicSubscriber = TopicSubscriber(configuration.twitchApi)
+
     override fun connectToServer() {
         logger.info("Attempting to connect to irc.twitch.tv...")
 
@@ -62,13 +65,9 @@ internal class TwitckBotImpl(
             if (!initializer.initialized) logger.debug("Not yet initialized")
         }
 
-        val recipient = "gnu_coding_cafe"
-        val sender = "bothusky"
-        // :gnu_coding_cafe !gnu_coding_cafe @gnu_coding_cafe .tmi.twitch.tv WHISPER bothusky :eee
-        // :idontwantgiftsub!idontwantgiftsub@idontwantgiftsub.tmi.twitch.tv WHISPER bothusky :cc
-        sendLine(":$sender!$sender@$sender.tmi.twitch.tv WHISPER $recipient :T'as vu ?")
-
         autoJoiner.join()
+
+        topicSubscriber.start()
     }
 
     override fun join(channel: String) {

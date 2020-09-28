@@ -34,7 +34,6 @@ class Main : CliktCommand() {
     private val oauthToken: String by option(help = "Oauth token of the bot").prompt("Bot's oauth token (oauth-token)")
     private val hostName: String by option(help = "Name of the host channel").prompt("Host's name (host-name)")
     private val botName: String by option(help = "Name of the bot channel").prompt("Bot's name (bot-name)")
-    private val clientId: String by option(help = "Twitch Client-ID").prompt("The Client-ID to access Twitch API")
     private val presenceName: String? by option(help = "Name of the host channel")
 
     override fun run() {
@@ -42,13 +41,12 @@ class Main : CliktCommand() {
         val botChannel = "#$botName"
 
         val bot = configureBot(
-            clientId,
-            oauthToken,
-            hostName,
-            hostChannel,
-            botName,
-            botChannel,
-            presenceName
+            oauthToken = oauthToken,
+            hostName = hostName,
+            hostChannel = hostChannel,
+            botName = botName,
+            botChannel = botChannel,
+            presenceChannel = presenceName
         )
 
         bot.connectToServer()
@@ -59,7 +57,6 @@ class Main : CliktCommand() {
     }
 
     private fun configureBot(
-        clientId: String,
         oauthToken: String,
         hostName: String,
         hostChannel: String,
@@ -68,7 +65,7 @@ class Main : CliktCommand() {
         presenceChannel: String?
     ): TwitckBot {
         println("Start...")
-        return twitckBot(oauthToken, clientId) {
+        return twitckBot(oauthToken) {
             install(StandardOverlay) {
             }
             install(Storage) {
