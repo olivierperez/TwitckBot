@@ -2,8 +2,11 @@ package fr.o80.twitck.lib.internal.service
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import fr.o80.twitck.lib.api.bean.FollowEvent
 import fr.o80.twitck.lib.api.bean.NewFollowers
 import fr.o80.twitck.lib.api.bean.StreamsChanged
+import fr.o80.twitck.lib.api.handler.FollowHandler
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
@@ -24,6 +27,8 @@ import java.time.Duration
 
 class TopicSubscriber(
     private val api: TwitchApi,
+    private val messenger: Messenger,
+    private val handlers: MutableList<FollowHandler>,
     loggerFactory: LoggerFactory
 ) : Thread() {
 
@@ -75,10 +80,9 @@ class TopicSubscriber(
         withContext(Dispatchers.IO) {
             val rawResponse = call.receiveText()
             val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(rawResponse)!!
-            val newFollowersNames = newFollowers.data.joinToString(",") { follower -> follower.fromName }
+            val event = FollowEvent(newFollowers)
 
-            // TODO Notify extensions
-            logger.info("New followers: $newFollowersNames")
+            handlers.forEach { handler -> handler(messenger, event) }
         }
     }
 

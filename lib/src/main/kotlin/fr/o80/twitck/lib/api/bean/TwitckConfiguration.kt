@@ -1,6 +1,7 @@
 package fr.o80.twitck.lib.api.bean
 
 import fr.o80.twitck.lib.api.handler.CommandHandler
+import fr.o80.twitck.lib.api.handler.FollowHandler
 import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.handler.MessageHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
@@ -15,6 +16,7 @@ class TwitckConfiguration(
     val messageHandlers: List<MessageHandler>,
     val commandHandlers: List<CommandHandler>,
     val whisperHandlers: List<WhisperHandler>,
+    val followHandlers: MutableList<FollowHandler>,
     val loggerFactory: LoggerFactory,
     val commandParser: CommandParser,
     val twitchApi: TwitchApi

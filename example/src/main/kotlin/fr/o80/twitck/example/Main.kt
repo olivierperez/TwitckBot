@@ -21,6 +21,7 @@ import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
@@ -214,6 +215,16 @@ class Main : CliktCommand() {
                             hostChannel,
                             "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?"
                         )
+                    }
+                }
+                follow { messenger, followEvent ->
+                    val newFollowers = followEvent.followers.data
+
+                    if (newFollowers.size == 1) {
+                        messenger.sendImmediately(hostChannel, "Merci ${newFollowers[0].fromName} pour ton follow!", CoolDown(Duration.ofHours(1)))
+                    } else {
+                        val names = newFollowers.joinToString(" ") { it.fromName }
+                        messenger.sendImmediately(hostChannel, "Merci pour vos follows $names", CoolDown(Duration.ofHours(1)))
                     }
                 }
             }

@@ -46,6 +46,8 @@ internal class TwitckBotImpl(
 
     private val topicSubscriber = TopicSubscriber(
         api = configuration.twitchApi,
+        messenger = messenger,
+        handlers = configuration.followHandlers,
         loggerFactory = configuration.loggerFactory
     )
 
