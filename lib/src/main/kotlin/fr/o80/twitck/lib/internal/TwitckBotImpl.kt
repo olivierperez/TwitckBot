@@ -44,7 +44,10 @@ internal class TwitckBotImpl(
 
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
-    private val topicSubscriber = TopicSubscriber(configuration.twitchApi)
+    private val topicSubscriber = TopicSubscriber(
+        api = configuration.twitchApi,
+        loggerFactory = configuration.loggerFactory
+    )
 
     override fun connectToServer() {
         logger.info("Attempting to connect to irc.twitch.tv...")

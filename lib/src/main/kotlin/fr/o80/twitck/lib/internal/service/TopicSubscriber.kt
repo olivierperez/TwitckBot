@@ -2,6 +2,7 @@ package fr.o80.twitck.lib.internal.service
 
 import fr.o80.twitck.lib.api.bean.NewFollowers
 import fr.o80.twitck.lib.api.service.TwitchApi
+import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
@@ -16,8 +17,11 @@ import io.ktor.util.pipeline.PipelineContext
 import java.time.Duration
 
 class TopicSubscriber(
-    private val api: TwitchApi
+    private val api: TwitchApi,
+    loggerFactory: LoggerFactory
 ) : Thread() {
+
+    private val logger = loggerFactory.getLogger(TopicSubscriber::class)
 
     override fun run() {
         startWebServer()
@@ -29,7 +33,7 @@ class TopicSubscriber(
             callbackUrl = "$url/twitch-follows",
             leaseSeconds = Duration.ofHours(2).toSeconds()
         )
-        println("Subscribed to topics")
+        logger.info("Subscribed to topics")
     }
 
     private fun startWebServer() {
@@ -48,15 +52,15 @@ class TopicSubscriber(
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.respondToChallenge() {
         val challenge = call.parameters["hub.challenge"]
-        println("Twitch challenged us with: $challenge")
+        logger.debug("Twitch challenged us with: $challenge")
         call.respondText(challenge ?: "oops", contentType = ContentType.Text.Plain)
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.onNewFollowers() {
-        println("Twitch notified us en POST")
+        logger.trace("Twitch notified us en POST")
         val newFollowers = call.receive<NewFollowers>()
         val newFollowersNames = newFollowers.data.joinToString(",") { follower -> follower.from_name }
-        println("New followers: $newFollowersNames")
+        logger.info("New followers: $newFollowersNames")
     }
 
     private fun buildRedirect(): String {
