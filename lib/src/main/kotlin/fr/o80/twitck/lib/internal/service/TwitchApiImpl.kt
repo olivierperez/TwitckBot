@@ -92,6 +92,21 @@ class TwitchApiImpl(
         return response.body()
     }
 
+    override fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long): String {
+        val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.twitch.tv/helix/webhooks/hub"))
+            .header("Client-ID", clientId)
+            .header("Authorization", "Bearer $oauthToken")
+            .header("Content-Type", "application/json")
+            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "unsubscribe", ""))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
+
     override fun validate(): ValidateResponse {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("https://id.twitch.tv/oauth2/validate"))

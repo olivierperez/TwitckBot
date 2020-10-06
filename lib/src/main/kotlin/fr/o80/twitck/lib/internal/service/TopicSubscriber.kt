@@ -46,17 +46,29 @@ class TopicSubscriber(
         api.validate()
         // TODO OPZ Changer le secret
         val hostUserId = api.getUser("gnu_coding_cafe").id // TODO OPZ utiliser le UserName du broadcaster
+        val followsLeaseSeconds = Duration.ofMinutes(30).toSeconds()
+        val streamsLeaseSeconds = Duration.ofMinutes(30).toSeconds()
+        api.unsubscribeFrom(
+            topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
+            callbackUrl = "$url/twitch-follows",
+            leaseSeconds = followsLeaseSeconds
+        )
+        api.unsubscribeFrom(
+            topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
+            callbackUrl = "$url/twitch-streams",
+            leaseSeconds = streamsLeaseSeconds
+        )
         api.subscribeTo(
             topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
             callbackUrl = "$url/twitch-follows",
-            leaseSeconds = Duration.ofMinutes(5).toSeconds(),
-            secret = "TODO Faire générer un secrte à la volée"
+            leaseSeconds = followsLeaseSeconds,
+            secret = "TODO Faire générer un secret à la volée"
         )
         api.subscribeTo(
             topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
             callbackUrl = "$url/twitch-streams",
-            leaseSeconds = Duration.ofMinutes(5).toSeconds(),
-            secret = "TODO Faire générer un secrte à la volée"
+            leaseSeconds = streamsLeaseSeconds,
+            secret = "TODO Faire générer un secret à la volée"
         )
         logger.info("Subscribed to topics")
     }
