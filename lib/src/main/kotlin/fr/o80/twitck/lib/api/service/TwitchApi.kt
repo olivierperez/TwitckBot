@@ -11,6 +11,6 @@ interface TwitchApi {
     fun getUser(userName: String): User
     fun getChannel(channelId: String): Channel
     fun getVideos(channelId: String, limit: Int): List<Video>
-    fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long): String
+    fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String
     fun validate(): ValidateResponse
 }

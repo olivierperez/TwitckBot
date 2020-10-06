@@ -77,7 +77,7 @@ class TwitchApiImpl(
         }
     }
 
-    override fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long): String {
+    override fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String {
         val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
 
         val request = HttpRequest.newBuilder()
@@ -85,7 +85,7 @@ class TwitchApiImpl(
             .header("Client-ID", clientId)
             .header("Authorization", "Bearer $oauthToken")
             .header("Content-Type", "application/json")
-            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe"))
+            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe", secret))
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -113,16 +113,16 @@ class TwitchApiImpl(
         callbackUrl: String,
         topic: String,
         leaseSeconds: Long,
-        mode: String
+        mode: String,
+        secret: String
     ): HttpRequest.BodyPublisher {
-        // TODO OPZ Changer le secret
         return HttpRequest.BodyPublishers.ofString("""
                 {
                     "hub.callback": "$callbackUrl",
                     "hub.mode": "$mode",
                     "hub.topic": "$topic",
                     "hub.lease_seconds": $leaseSeconds,
-                    "hub.secret": "Un message SECRET à changer hors stream"
+                    "hub.secret": "$secret"
                 }
             """.trimIndent())
     }

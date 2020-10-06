@@ -44,17 +44,19 @@ class TopicSubscriber(
         startWebServer()
         val url = getCallbackUrl()
         api.validate()
-        // TODO OPZ utiliser le UserName du broadcaster
-        val hostUserId = api.getUser("gnu_coding_cafe").id
+        // TODO OPZ Changer le secret
+        val hostUserId = api.getUser("gnu_coding_cafe").id // TODO OPZ utiliser le UserName du broadcaster
         api.subscribeTo(
             topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
             callbackUrl = "$url/twitch-follows",
-            leaseSeconds = Duration.ofMinutes(5).toSeconds()
+            leaseSeconds = Duration.ofMinutes(5).toSeconds(),
+            secret = "TODO Faire générer un secrte à la volée"
         )
         api.subscribeTo(
             topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
             callbackUrl = "$url/twitch-streams",
-            leaseSeconds = Duration.ofMinutes(5).toSeconds()
+            leaseSeconds = Duration.ofMinutes(5).toSeconds(),
+            secret = "TODO Faire générer un secrte à la volée"
         )
         logger.info("Subscribed to topics")
     }
