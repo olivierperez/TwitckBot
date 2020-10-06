@@ -11,7 +11,7 @@ import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
-import fr.o80.twitck.lib.internal.service.TopicSubscriber
+import fr.o80.twitck.lib.internal.service.topic.TopicSubscriber
 import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler

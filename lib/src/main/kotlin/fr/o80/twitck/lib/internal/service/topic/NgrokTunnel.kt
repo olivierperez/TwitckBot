@@ -1,4 +1,4 @@
-package fr.o80.twitck.lib.internal.service
+package fr.o80.twitck.lib.internal.service.topic
 
 
 import com.mashape.unirest.http.HttpResponse

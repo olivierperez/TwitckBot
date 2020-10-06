@@ -1,4 +1,4 @@
-package fr.o80.twitck.lib.internal.service
+package fr.o80.twitck.lib.internal.service.topic
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -13,8 +13,10 @@ import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
 import io.ktor.http.ContentType
+import io.ktor.request.path
 import io.ktor.request.receiveText
 import io.ktor.response.respondText
+import io.ktor.routing.Routing
 import io.ktor.routing.get
 import io.ktor.routing.post
 import io.ktor.routing.routing
@@ -23,10 +25,9 @@ import io.ktor.server.netty.Netty
 import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.time.Duration
 
 class TopicSubscriber(
-   // private val hostUserId: String,
+    // private val hostUserId: String,
     private val api: TwitchApi,
     private val messenger: Messenger,
     private val newFollowersHandlers: MutableList<FollowHandler>,
@@ -42,52 +43,62 @@ class TopicSubscriber(
 
     override fun run() {
         startWebServer()
-        val url = getCallbackUrl()
+
         api.validate()
+
+        val callbackUrl = getCallbackUrl()
+        subscribeToTopics(callbackUrl)
+    }
+
+    private fun subscribeToTopics(callbackUrl: String) {
+        // TODO OPZ utiliser le UserName du broadcaster
+        val hostUserId = api.getUser("gnu_coding_cafe").id
+
         // TODO OPZ Changer le secret
-        val hostUserId = api.getUser("gnu_coding_cafe").id // TODO OPZ utiliser le UserName du broadcaster
-        val followsLeaseSeconds = Duration.ofMinutes(30).toSeconds()
-        val streamsLeaseSeconds = Duration.ofMinutes(30).toSeconds()
-        api.unsubscribeFrom(
-            topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
-            callbackUrl = "$url/twitch-follows",
-            leaseSeconds = followsLeaseSeconds
-        )
-        api.unsubscribeFrom(
-            topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
-            callbackUrl = "$url/twitch-streams",
-            leaseSeconds = streamsLeaseSeconds
-        )
-        api.subscribeTo(
-            topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
-            callbackUrl = "$url/twitch-follows",
-            leaseSeconds = followsLeaseSeconds,
-            secret = "TODO Faire générer un secret à la volée"
-        )
-        api.subscribeTo(
-            topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
-            callbackUrl = "$url/twitch-streams",
-            leaseSeconds = streamsLeaseSeconds,
-            secret = "TODO Faire générer un secret à la volée"
-        )
-        logger.info("Subscribed to topics")
+        val secret = "TODO Faire générer un secret à la volée"
+
+        Topic.values().forEach { topic ->
+            logger.info("Subscribing to $topic...")
+            api.unsubscribeFrom(
+                topic = topic.topicUrl(hostUserId),
+                callbackUrl = topic.callbackUrl(callbackUrl),
+                leaseSeconds = topic.leaseDuration.toSeconds()
+            )
+            api.subscribeTo(
+                topic = topic.topicUrl(hostUserId),
+                callbackUrl = topic.callbackUrl(callbackUrl),
+                leaseSeconds = topic.leaseDuration.toSeconds(),
+                secret = secret
+            )
+        }
     }
 
     private fun startWebServer() {
         embeddedServer(Netty, 8080) {
             routing {
-                get("/twitch-follows") { respondToChallenge("followers") }
-                post("/twitch-follows") { onNewFollowers() }
-                get("/twitch-streams") { respondToChallenge("streams") }
-                post("/twitch-streams") { onStreamChanged() }
+                respondTo(Topic.FOLLOWS) { onNewFollowers() }
+                respondTo(Topic.STREAMS) { onStreamChanged() }
             }
         }.start(wait = false)
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respondToChallenge(type: String) {
-        val challenge: String = call.parameters["hub.challenge"] ?: "No challenge provided"
-        logger.debug("Twitch challenged us for $type with: $challenge")
-        call.respondText(challenge, contentType = ContentType.Text.Html)
+    private fun Routing.respondTo(topic: Topic, block: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit) {
+        get(topic.path) { respondToChallenge() }
+        post(topic.path, block)
+    }
+
+    private suspend fun PipelineContext<Unit, ApplicationCall>.respondToChallenge() {
+        val challenge = call.parameters["hub.challenge"]
+        val mode = call.parameters["hub.mode"]
+
+        if (challenge == null) {
+            val reason: String = call.parameters["hub.reason"] ?: "No reason given"
+            logger.debug("Twitch denied us on ${call.request.path()} because: $reason")
+            call.respondText("", contentType = ContentType.Text.Html)
+        } else {
+            logger.debug("Twitch challenged us for $mode on ${call.request.path()} with $challenge")
+            call.respondText(challenge, contentType = ContentType.Text.Html)
+        }
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.onNewFollowers() {
