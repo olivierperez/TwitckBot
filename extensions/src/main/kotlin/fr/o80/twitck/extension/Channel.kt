@@ -38,8 +38,10 @@ class Channel(
     }
 
     fun interceptFollowEvent(messenger: Messenger, followEvent: FollowEvent): FollowEvent {
-        followCallbacks.forEach {
-            it(messenger, followEvent)
+        logger.debug("New followers intercepted: ${followEvent.followers}")
+        followCallbacks.forEach { callback ->
+            logger.debug("New followers callback called: $callback")
+            callback(messenger, followEvent)
         }
 
         return followEvent

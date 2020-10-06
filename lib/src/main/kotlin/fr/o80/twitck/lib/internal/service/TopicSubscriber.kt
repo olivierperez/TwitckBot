@@ -26,9 +26,10 @@ import kotlinx.coroutines.withContext
 import java.time.Duration
 
 class TopicSubscriber(
+   // private val hostUserId: String,
     private val api: TwitchApi,
     private val messenger: Messenger,
-    private val handlers: MutableList<FollowHandler>,
+    private val newFollowersHandlers: MutableList<FollowHandler>,
     loggerFactory: LoggerFactory
 ) : Thread() {
 
@@ -44,14 +45,14 @@ class TopicSubscriber(
         val url = buildRedirect()
         api.validate()
         // TODO OPZ utiliser le UserName du broadcaster
-        val gnuCodingCafeId = api.getUser("gnu_coding_cafe").id
+        val hostUserId = api.getUser("gnu_coding_cafe").id
         api.subscribeTo(
-            topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$gnuCodingCafeId",
+            topic = "https://api.twitch.tv/helix/users/follows?first=1&to_id=$hostUserId",
             callbackUrl = "$url/twitch-follows",
-            leaseSeconds = Duration.ofHours(2).toSeconds()
+            leaseSeconds = Duration.ofMinutes(5).toSeconds()
         )
         api.subscribeTo(
-            topic = "https://api.twitch.tv/helix/streams?user_id=$gnuCodingCafeId",
+            topic = "https://api.twitch.tv/helix/streams?user_id=$hostUserId",
             callbackUrl = "$url/twitch-streams",
             leaseSeconds = Duration.ofMinutes(5).toSeconds()
         )
@@ -76,18 +77,24 @@ class TopicSubscriber(
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.onNewFollowers() {
-        logger.trace("Twitch notified new followers")
+        logger.debug("Twitch notified new followers")
         withContext(Dispatchers.IO) {
             val rawResponse = call.receiveText()
+            logger.debug("New followers, raw: $rawResponse")
             val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(rawResponse)!!
+            logger.debug("New followers, parsed: $newFollowers")
             val event = FollowEvent(newFollowers)
 
-            handlers.forEach { handler -> handler(messenger, event) }
+            newFollowersHandlers.forEach { handler ->
+                logger.debug("New followers, handler: ${handler::class.java}")
+                handler(messenger, event)
+            }
         }
+        call.respondText("OK", ContentType.Text.Html)
     }
 
     private suspend fun PipelineContext<Unit, ApplicationCall>.onStreamChanged() {
-        logger.trace("Twitch notified stream has changed")
+        logger.debug("Twitch notified stream has changed")
         withContext(Dispatchers.IO) {
             val rawResponse = call.receiveText()
             val streamsChanged = moshi.adapter(StreamsChanged::class.java).fromJson(rawResponse)!!
@@ -96,6 +103,7 @@ class TopicSubscriber(
                 logger.info("Stream changes: ${streamChanges.title} - ${streamChanges.type}")
             }
         }
+        call.respondText("OK", ContentType.Text.Html)
     }
 
     private fun buildRedirect(): String {
