@@ -218,7 +218,6 @@ class Main : CliktCommand() {
                     }
                 }
                 follow { messenger, followEvent ->
-                    println(">>>> Main follow <<<< ${followEvent.followers}")
                     val newFollowers = followEvent.followers.data
 
                     if (newFollowers.size == 1) {

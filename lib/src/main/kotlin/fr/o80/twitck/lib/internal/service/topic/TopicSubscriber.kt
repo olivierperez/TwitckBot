@@ -9,6 +9,7 @@ import fr.o80.twitck.lib.api.handler.FollowHandler
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
+import fr.o80.twitck.lib.utils.Do
 import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -22,9 +23,10 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
 
 class TopicSubscriber(
     // private val hostUserId: String,
@@ -41,6 +43,9 @@ class TopicSubscriber(
         .add(LocalDateTimeAdapter())
         .build()
 
+    // TODO OPZ Changer le secret
+    val secret = "TODO Faire générer un secret à la volée"
+
     override fun run() {
         startWebServer()
 
@@ -53,9 +58,6 @@ class TopicSubscriber(
     private fun subscribeToTopics(callbackUrl: String) {
         // TODO OPZ utiliser le UserName du broadcaster
         val hostUserId = api.getUser("gnu_coding_cafe").id
-
-        // TODO OPZ Changer le secret
-        val secret = "TODO Faire générer un secret à la volée"
 
         Topic.values().forEach { topic ->
             logger.info("Subscribing to $topic...")
@@ -73,21 +75,52 @@ class TopicSubscriber(
         }
     }
 
+    // TODO OPZ Extraire la partie WebServer dans une classe / package à part
     private fun startWebServer() {
         embeddedServer(Netty, 8080) {
             routing {
-                respondTo(Topic.FOLLOWS) { onNewFollowers() }
-                respondTo(Topic.STREAMS) { onStreamChanged() }
+                respondTo(Topic.FOLLOWS, ::onNewFollowers)
+                respondTo(Topic.STREAMS, ::onStreamChanged)
             }
         }.start(wait = false)
     }
 
-    private fun Routing.respondTo(topic: Topic, block: suspend PipelineContext<Unit, ApplicationCall>.(Unit) -> Unit) {
-        get(topic.path) { respondToChallenge() }
-        post(topic.path, block)
+    private fun Routing.respondTo(topic: Topic, block: suspend (ApplicationCall, String) -> Unit) {
+        get(topic.path) { respondToChallenge(call) }
+        post(topic.path) {
+            val body = call.receiveText()
+            Do exhaustive when (val result = isSignatureValid(call, body)) {
+                SignatureResult.Valid -> {
+                    logger.debug("Signature is valid!")
+                    block(call, body)
+                }
+                is SignatureResult.Invalid -> {
+                    logger.warn("Failed to check signature \"${result.signature}\" / \"${result.computedSignature}\"! but for now we authorize unchecked signature...\n----\n${result.body}\n----")
+                    // TODO OPZ Ne plus laisser passer les appels avec une mauvaise signature (quand on aura vu que ça marche)
+                    block(call, body)
+                }
+                is SignatureResult.Failed -> {
+                    logger.error("Something gone wrong while checking signature: ${result.message}")
+                    // TODO OPZ Ne plus laisser passer les appels avec une mauvaise signature (quand on aura vu que ça marche)
+                    block(call, body)
+                }
+            }
+        }
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.respondToChallenge() {
+    private fun isSignatureValid(call: ApplicationCall, body: String): SignatureResult {
+        val signature = call.request.headers["X-Hub-Signature"]
+            ?: return SignatureResult.Failed("There are no X-Hub-Signature in the headers")
+
+        val computedSignature = body.toSignature(secret)
+        if (computedSignature != signature) {
+            return SignatureResult.Invalid(signature, computedSignature, body)
+        }
+
+        return SignatureResult.Valid
+    }
+
+    private suspend fun respondToChallenge(call: ApplicationCall) {
         val challenge = call.parameters["hub.challenge"]
         val mode = call.parameters["hub.mode"]
 
@@ -101,12 +134,10 @@ class TopicSubscriber(
         }
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.onNewFollowers() {
+    private suspend fun onNewFollowers(call: ApplicationCall, body: String) {
         logger.debug("Twitch notified new followers")
         withContext(Dispatchers.IO) {
-            val rawResponse = call.receiveText()
-            logger.debug("New followers, raw: $rawResponse")
-            val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(rawResponse)!!
+            val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(body)!!
             logger.debug("New followers, parsed: $newFollowers")
             val event = FollowEvent(newFollowers)
 
@@ -118,11 +149,10 @@ class TopicSubscriber(
         call.respondText("OK", ContentType.Text.Html)
     }
 
-    private suspend fun PipelineContext<Unit, ApplicationCall>.onStreamChanged() {
+    private suspend fun onStreamChanged(call: ApplicationCall, body: String) {
         logger.debug("Twitch notified stream has changed")
         withContext(Dispatchers.IO) {
-            val rawResponse = call.receiveText()
-            val streamsChanged = moshi.adapter(StreamsChanged::class.java).fromJson(rawResponse)!!
+            val streamsChanged = moshi.adapter(StreamsChanged::class.java).fromJson(body)!!
 
             streamsChanged.data.forEach { streamChanges ->
                 logger.info("Stream changes: ${streamChanges.title} - ${streamChanges.type}")
@@ -136,4 +166,18 @@ class TopicSubscriber(
         return ngrokTunnel.getOrOpenTunnel()
     }
 
+    sealed class SignatureResult {
+        object Valid : SignatureResult()
+        class Invalid(val signature: String, val computedSignature: String, val body: String) : SignatureResult()
+        class Failed(val message: String) : SignatureResult()
+    }
+
+}
+
+fun String.toSignature(secret: String): String {
+    val mac = Mac.getInstance("HmacSHA256")
+    val signingKey = SecretKeySpec(secret.toByteArray(), "HmacSHA256")
+    mac.init(signingKey)
+    val rawSignature = mac.doFinal(this.toByteArray())
+    return "sha256=" + rawSignature.fold("") { str, it -> str + "%02x".format(it) }
 }
