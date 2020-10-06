@@ -42,7 +42,7 @@ class TopicSubscriber(
 
     override fun run() {
         startWebServer()
-        val url = buildRedirect()
+        val url = getCallbackUrl()
         api.validate()
         // TODO OPZ utiliser le UserName du broadcaster
         val hostUserId = api.getUser("gnu_coding_cafe").id
@@ -106,9 +106,9 @@ class TopicSubscriber(
         call.respondText("OK", ContentType.Text.Html)
     }
 
-    private fun buildRedirect(): String {
+    private fun getCallbackUrl(): String {
         val ngrokTunnel = NgrokTunnel("BotHusky", 8080)
-        return ngrokTunnel.url
+        return ngrokTunnel.getOrOpenTunnel()
     }
 
 }
