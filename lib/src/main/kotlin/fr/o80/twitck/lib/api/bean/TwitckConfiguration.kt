@@ -16,7 +16,7 @@ class TwitckConfiguration(
     val messageHandlers: List<MessageHandler>,
     val commandHandlers: List<CommandHandler>,
     val whisperHandlers: List<WhisperHandler>,
-    val followHandlers: MutableList<FollowHandler>,
+    val followHandlers: List<FollowHandler>,
     val loggerFactory: LoggerFactory,
     val commandParser: CommandParser,
     val twitchApi: TwitchApi
