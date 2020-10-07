@@ -6,16 +6,21 @@ import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
+import fr.o80.twitck.lib.internal.handler.FollowDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
-import fr.o80.twitck.lib.internal.service.topic.TopicSubscriber
 import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler
 import fr.o80.twitck.lib.internal.service.line.WhisperLineHandler
+import fr.o80.twitck.lib.internal.service.topic.CheckSignature
+import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
+import fr.o80.twitck.lib.internal.service.topic.SecretHolder
+import fr.o80.twitck.lib.internal.service.topic.TopicManager
+import fr.o80.twitck.lib.internal.service.topic.WebhooksServer
 import org.jibble.pircbot.PircBot
 
 internal class TwitckBotImpl(
@@ -44,10 +49,15 @@ internal class TwitckBotImpl(
 
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
-    private val topicSubscriber = TopicSubscriber(
+    private val topicManager = TopicManager(
         api = configuration.twitchApi,
-        messenger = messenger,
-        newFollowersHandlers = configuration.followHandlers,
+        ngrokTunnel = NgrokTunnel("BotHusky", 8080),
+        secret = SecretHolder.secret,
+        webhooksServer = WebhooksServer(
+            dispatcher = FollowDispatcher(messenger, configuration.followHandlers),
+            checkSignature = CheckSignature(SecretHolder.secret),
+            loggerFactory = configuration.loggerFactory
+        ),
         loggerFactory = configuration.loggerFactory
     )
 
@@ -72,7 +82,7 @@ internal class TwitckBotImpl(
 
         autoJoiner.join()
 
-        topicSubscriber.start()
+        topicManager.subscribe()
     }
 
     override fun join(channel: String) {

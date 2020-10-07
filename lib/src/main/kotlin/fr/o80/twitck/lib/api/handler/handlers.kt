@@ -11,4 +11,4 @@ typealias JoinHandler = (messenger: Messenger, joinEvent: JoinEvent) -> JoinEven
 typealias MessageHandler = (messenger: Messenger, messageEvent: MessageEvent) -> MessageEvent
 typealias CommandHandler = (messenger: Messenger, commandEvent: CommandEvent) -> CommandEvent
 typealias WhisperHandler = (messenger: Messenger, whisper: WhisperEvent) -> Unit
-typealias FollowHandler = (messenger: Messenger, follow: FollowEvent) -> Unit
+typealias FollowHandler = (messenger: Messenger, follow: FollowEvent) -> FollowEvent
