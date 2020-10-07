@@ -2,7 +2,8 @@ package fr.o80.twitck.lib.internal.service.topic
 
 object SecretHolder {
 
-    // TODO OPZ Générer un secret
-    val secret: String = "TODO Faire générer un secret à la volée"
+    private const val alphabet = "azertyuiopqsdfghjklmwxcvbn0123456789/*-+&é'(-è_çà)=^\$ù*,;:!?./§%µ¨£"
+
+    val secret: String = (0..100).map { alphabet.random() }.joinToString("")
 
 }
