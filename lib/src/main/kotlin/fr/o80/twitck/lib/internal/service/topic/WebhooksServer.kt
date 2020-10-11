@@ -7,10 +7,11 @@ import fr.o80.twitck.lib.api.bean.NewFollowers
 import fr.o80.twitck.lib.api.bean.StreamsChanged
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import fr.o80.twitck.lib.internal.handler.FollowDispatcher
-import fr.o80.twitck.lib.utils.Do
 import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.DoubleReceive
 import io.ktor.http.ContentType
 import io.ktor.request.path
 import io.ktor.request.receiveText
@@ -21,12 +22,13 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
+import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class WebhooksServer(
     private val dispatcher: FollowDispatcher,
-    private val checkSignature: CheckSignature,
+    private val secret: String,
     loggerFactory: LoggerFactory
 ) {
 
@@ -37,9 +39,10 @@ class WebhooksServer(
         .add(LocalDateTimeAdapter())
         .build()
 
+    @KtorExperimentalAPI
     fun start() {
         embeddedServer(Netty, 8080) {
-            // TODO OPZ Voir avec Ktor pour faire un intercepteur qui vérifie les signatures
+            install(DoubleReceive)
             routing {
                 respondTo(Topic.FOLLOWS, ::onNewFollowers)
                 respondTo(Topic.STREAMS, ::onStreamChanged)
@@ -49,23 +52,10 @@ class WebhooksServer(
 
     private fun Routing.respondTo(topic: Topic, block: suspend (ApplicationCall, String) -> Unit) {
         get(topic.path) { respondToChallenge(call) }
-        post(topic.path) {
-            val body = call.receiveText()
-            Do exhaustive when (val result = checkSignature(call, body)) {
-                SignatureResult.Valid -> {
-                    logger.debug("Signature is valid!")
-                    block(call, body)
-                }
-                is SignatureResult.Invalid -> {
-                    logger.warn("Failed to check signature \"${result.signature}\" / \"${result.computedSignature}\"! but for now we authorize unchecked signature...\n----\n${result.body}\n----")
-                    // TODO OPZ Ne plus laisser passer les appels avec une mauvaise signature (quand on aura vu que ça marche)
-                    block(call, body)
-                }
-                is SignatureResult.Failed -> {
-                    logger.error("Something gone wrong while checking signature: ${result.message}")
-                    // TODO OPZ Ne plus laisser passer les appels avec une mauvaise signature (quand on aura vu que ça marche)
-                    block(call, body)
-                }
+        protectedBySignature(logger, secret) {
+            post(topic.path) {
+                val body = call.receiveText()
+                block(call, body)
             }
         }
     }
@@ -89,8 +79,8 @@ class WebhooksServer(
         withContext(Dispatchers.IO) {
             val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(body)!!
             logger.debug("New followers, parsed: $newFollowers")
-            val event = FollowEvent(newFollowers)
 
+            val event = FollowEvent(newFollowers)
             dispatcher.dispatch(event)
         }
         call.respondText("OK", ContentType.Text.Html)

@@ -16,7 +16,6 @@ import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler
 import fr.o80.twitck.lib.internal.service.line.WhisperLineHandler
-import fr.o80.twitck.lib.internal.service.topic.CheckSignature
 import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
 import fr.o80.twitck.lib.internal.service.topic.SecretHolder
 import fr.o80.twitck.lib.internal.service.topic.TopicManager
@@ -55,7 +54,7 @@ internal class TwitckBotImpl(
         secret = SecretHolder.secret,
         webhooksServer = WebhooksServer(
             dispatcher = FollowDispatcher(messenger, configuration.followHandlers),
-            checkSignature = CheckSignature(SecretHolder.secret),
+            secret = SecretHolder.secret,
             loggerFactory = configuration.loggerFactory
         ),
         loggerFactory = configuration.loggerFactory

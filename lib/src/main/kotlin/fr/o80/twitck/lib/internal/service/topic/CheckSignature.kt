@@ -1,6 +1,7 @@
 package fr.o80.twitck.lib.internal.service.topic
 
 import io.ktor.application.ApplicationCall
+import io.ktor.request.receiveText
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
@@ -11,6 +12,19 @@ class CheckSignature(
 ) {
 
     operator fun invoke(call: ApplicationCall, body: String): SignatureResult {
+        val signature = call.request.headers["X-Hub-Signature"]
+            ?: return SignatureResult.Failed("There are no X-Hub-Signature in the headers")
+
+        val computedSignature = body.toSignature(secret)
+        if (computedSignature != signature) {
+            return SignatureResult.Invalid(signature, computedSignature, body)
+        }
+
+        return SignatureResult.Valid
+    }
+
+    suspend operator fun invoke(call: ApplicationCall): SignatureResult {
+        val body = call.receiveText()
         val signature = call.request.headers["X-Hub-Signature"]
             ?: return SignatureResult.Failed("There are no X-Hub-Signature in the headers")
 
