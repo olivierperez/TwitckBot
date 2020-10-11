@@ -10,4 +10,5 @@
     </root>
 
     <logger name="NETWORK" level="INFO"/>
+    <logger name="io.netty" level="INFO"/>
 </configuration>

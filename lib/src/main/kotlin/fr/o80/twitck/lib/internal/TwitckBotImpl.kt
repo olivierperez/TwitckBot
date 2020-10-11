@@ -6,6 +6,7 @@ import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
+import fr.o80.twitck.lib.internal.handler.FollowDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
@@ -15,6 +16,10 @@ import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
 import fr.o80.twitck.lib.internal.service.line.LineInterpreter
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler
 import fr.o80.twitck.lib.internal.service.line.WhisperLineHandler
+import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
+import fr.o80.twitck.lib.internal.service.topic.SecretHolder
+import fr.o80.twitck.lib.internal.service.topic.TopicManager
+import fr.o80.twitck.lib.internal.service.topic.WebhooksServer
 import org.jibble.pircbot.PircBot
 
 internal class TwitckBotImpl(
@@ -43,6 +48,18 @@ internal class TwitckBotImpl(
 
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
+    private val topicManager = TopicManager(
+        api = configuration.twitchApi,
+        ngrokTunnel = NgrokTunnel("BotHusky", 8080),
+        secret = SecretHolder.secret,
+        webhooksServer = WebhooksServer(
+            dispatcher = FollowDispatcher(messenger, configuration.followHandlers),
+            secret = SecretHolder.secret,
+            loggerFactory = configuration.loggerFactory
+        ),
+        loggerFactory = configuration.loggerFactory
+    )
+
     override fun connectToServer() {
         logger.info("Attempting to connect to irc.twitch.tv...")
 
@@ -62,13 +79,9 @@ internal class TwitckBotImpl(
             if (!initializer.initialized) logger.debug("Not yet initialized")
         }
 
-        val recipient = "gnu_coding_cafe"
-        val sender = "bothusky"
-        // :gnu_coding_cafe !gnu_coding_cafe @gnu_coding_cafe .tmi.twitch.tv WHISPER bothusky :eee
-        // :idontwantgiftsub!idontwantgiftsub@idontwantgiftsub.tmi.twitch.tv WHISPER bothusky :cc
-        sendLine(":$sender!$sender@$sender.tmi.twitch.tv WHISPER $recipient :T'as vu ?")
-
         autoJoiner.join()
+
+        topicManager.subscribe()
     }
 
     override fun join(channel: String) {

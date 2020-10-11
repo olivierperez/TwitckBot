@@ -2,6 +2,7 @@ package fr.o80.twitck.lib.internal
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.handler.CommandHandler
+import fr.o80.twitck.lib.api.handler.FollowHandler
 import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.handler.MessageHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
@@ -11,6 +12,7 @@ internal class PipelineImpl : Pipeline {
     val messageHandlers: MutableList<MessageHandler> = mutableListOf()
     val commandHandlers: MutableList<CommandHandler> = mutableListOf()
     val whisperHandlers: MutableList<WhisperHandler> = mutableListOf()
+    val followHandlers: MutableList<FollowHandler> = mutableListOf()
     val requestedChannels: MutableSet<String> = mutableSetOf()
 
     override fun interceptJoinEvent(joinHandler: JoinHandler) {
@@ -27,6 +29,10 @@ internal class PipelineImpl : Pipeline {
 
     override fun interceptWhisperEvent(whisperHandler: WhisperHandler) {
         whisperHandlers += whisperHandler
+    }
+
+    override fun interceptFollowHandler(followHandler: FollowHandler) {
+        followHandlers += followHandler
     }
 
     override fun requestChannel(channel: String) {

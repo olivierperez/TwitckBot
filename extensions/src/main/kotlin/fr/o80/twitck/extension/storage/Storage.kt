@@ -28,7 +28,7 @@ class Storage(
     }
 
     override fun putUserInfo(login: String, namespace: String, key: String, value: String) {
-        logger.debug("Putting user info into $login [$namespace//$key] => $value")
+        logger.trace("Putting user info into $login [$namespace//$key] => $value")
         with(getOrCreateUser(login)) {
             putExtra("$namespace//$key", value)
             save(this)
@@ -36,12 +36,12 @@ class Storage(
     }
 
     override fun getUserInfo(login: String, namespace: String, key: String): String? {
-        logger.debug("Getting user info of $login [$namespace//$key]")
+        logger.trace("Getting user info of $login [$namespace//$key]")
         return getOrCreateUser(login).getExtra("$namespace//$key")
     }
 
     override fun putGlobalInfo(namespace: String, key: String, value: String) {
-        logger.debug("Putting info into [$namespace//$key] => $value")
+        logger.trace("Putting info into [$namespace//$key] => $value")
         with(getOrCreateGlobal()) {
             putExtra(namespace, key, value)
             save(this)
@@ -49,7 +49,7 @@ class Storage(
     }
 
     override fun getGlobalInfo(namespace: String): List<Pair<String, String>> {
-        logger.debug("Getting all info [$namespace]")
+        logger.trace("Getting all info [$namespace]")
         return getOrCreateGlobal().getExtras(namespace)
     }
 
@@ -66,7 +66,7 @@ class Storage(
     }
 
     private fun save(global: Global) {
-        logger.debug("Saving global...")
+        logger.trace("Saving global...")
         synchronized(lock) {
             val globalFile = getGlobalFile()
             val globalJson = moshi.adapter(Global::class.java).indent("  ").toJson(global)

@@ -30,6 +30,10 @@ private class Slf4jLoggerAdapter(name: String) : Logger {
         slf4jLogger.debug(message)
     }
 
+    override fun warn(message: String) {
+        slf4jLogger.warn(message)
+    }
+
     override fun info(message: String) {
         slf4jLogger.info(message)
     }

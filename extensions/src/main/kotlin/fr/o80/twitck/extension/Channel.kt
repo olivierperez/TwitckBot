@@ -2,6 +2,7 @@ package fr.o80.twitck.extension
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.FollowEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -17,6 +18,7 @@ import fr.o80.twitck.lib.api.service.log.Logger
 class Channel(
     private val channel: String,
     private val joinCallbacks: Iterable<JoinCallback>,
+    private val followCallbacks: Iterable<FollowCallback>,
     private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
     private val logger: Logger
 ) {
@@ -33,6 +35,16 @@ class Channel(
         }
 
         return joinEvent
+    }
+
+    fun interceptFollowEvent(messenger: Messenger, followEvent: FollowEvent): FollowEvent {
+        logger.debug("New followers intercepted: ${followEvent.followers}")
+        followCallbacks.forEach { callback ->
+            logger.debug("New followers callback called: $callback")
+            callback(messenger, followEvent)
+        }
+
+        return followEvent
     }
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
@@ -56,6 +68,7 @@ class Channel(
         private var channel: String? = null
 
         private val joinCallbacks: MutableList<JoinCallback> = mutableListOf()
+        private val followCallbacks: MutableList<FollowCallback> = mutableListOf()
         private val commandCallbacks: MutableList<Pair<String, CommandCallback>> = mutableListOf()
 
         @ChannelDsl
@@ -73,12 +86,18 @@ class Channel(
             joinCallbacks += callback
         }
 
+        @ChannelDsl
+        fun follow(callback: FollowCallback) {
+            followCallbacks += callback
+        }
+
         fun build(serviceLocator: ServiceLocator): Channel {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Channel::class.simpleName}")
             return Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
+                followCallbacks = followCallbacks,
                 commandCallbacks = commandCallbacks,
                 logger = serviceLocator.loggerFactory.getLogger(Channel::class)
             )
@@ -97,6 +116,7 @@ class Channel(
                 .also { channel ->
                     pipeline.interceptJoinEvent(channel::interceptJoinEvent)
                     pipeline.interceptCommandEvent(channel::interceptCommandEvent)
+                    pipeline.interceptFollowHandler(channel::interceptFollowEvent)
                     pipeline.requestChannel(channel.channel)
                 }
         }
@@ -111,4 +131,9 @@ typealias CommandCallback = (
 typealias JoinCallback = (
     messenger: Messenger,
     joinEvent: JoinEvent
+) -> Unit
+
+typealias FollowCallback = (
+    messenger: Messenger,
+    followEvent: FollowEvent
 ) -> Unit

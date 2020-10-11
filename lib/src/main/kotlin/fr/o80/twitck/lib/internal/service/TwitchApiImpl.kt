@@ -7,6 +7,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.bean.Channel
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.User
+import fr.o80.twitck.lib.api.bean.ValidateResponse
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
@@ -17,10 +18,11 @@ import java.net.http.HttpResponse
 import java.util.Date
 
 class TwitchApiImpl(
-    private val clientId: String,
     private val oauthToken: String,
     loggerFactory: LoggerFactory
 ) : TwitchApi {
+
+    private var clientId: String? = null
 
     private val logger = loggerFactory.getLogger("NETWORK")
 
@@ -30,6 +32,8 @@ class TwitchApiImpl(
         .build()
 
     private val client: HttpClient = HttpClient.newHttpClient()
+
+    // TODO OPZ Migrer vers helix => https://dev.twitch.tv/docs/authentication/#sending-user-access-and-app-access-tokens
     private val baseUrl: String = "https://api.twitch.tv/kraken"
 
     override fun getFollowers(streamId: String): List<Follower> {
@@ -58,9 +62,13 @@ class TwitchApiImpl(
     private fun doRequest(url: String): String {
         val request = HttpRequest.newBuilder()
             .uri(URI.create("$baseUrl$url"))
-            .header("Client-ID", clientId)
             .header("Authorization", "OAuth $oauthToken")
             .header("Accept", "application/vnd.twitchtv.v5+json")
+            .apply {
+                if (clientId != null) {
+                    header("Client-ID", clientId)
+                }
+            }
             .build()
 
         val response = client.send(request, HttpResponse.BodyHandlers.ofString())
@@ -69,8 +77,69 @@ class TwitchApiImpl(
         }
     }
 
+    override fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String {
+        val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.twitch.tv/helix/webhooks/hub"))
+            .header("Client-ID", clientId)
+            .header("Authorization", "Bearer $oauthToken")
+            .header("Content-Type", "application/json")
+            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe", secret))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
+
+    override fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long): String {
+        val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
+
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://api.twitch.tv/helix/webhooks/hub"))
+            .header("Client-ID", clientId)
+            .header("Authorization", "Bearer $oauthToken")
+            .header("Content-Type", "application/json")
+            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "unsubscribe", ""))
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body()
+    }
+
+    override fun validate(): ValidateResponse {
+        val request = HttpRequest.newBuilder()
+            .uri(URI.create("https://id.twitch.tv/oauth2/validate"))
+            .header("Authorization", "Bearer $oauthToken")
+            .header("Content-Type", "application/json")
+            .build()
+
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+        return response.body().parse<ValidateResponse>().also { validateResponse ->
+            clientId = validateResponse.clientId
+        }
+    }
+
     private inline fun <reified T> String.parse(): T {
         return moshi.adapter(T::class.java).fromJson(this)!!
+    }
+
+    private fun buildTopicSubscriptionPayload(
+        callbackUrl: String,
+        topic: String,
+        leaseSeconds: Long,
+        mode: String,
+        secret: String
+    ): HttpRequest.BodyPublisher {
+        return HttpRequest.BodyPublishers.ofString("""
+                {
+                    "hub.callback": "$callbackUrl",
+                    "hub.mode": "$mode",
+                    "hub.topic": "$topic",
+                    "hub.lease_seconds": $leaseSeconds,
+                    "hub.secret": "$secret"
+                }
+            """.trimIndent())
     }
 }
 
