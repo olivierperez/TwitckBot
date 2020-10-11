@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.kapt"
 }
 
@@ -11,12 +11,9 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    implementation 'org.slf4j:slf4j-api:1.7.25'
-
-    compileOnly project(':lib')
-
+    implementation project(':lib')
     implementation 'com.squareup.moshi:moshi:1.9.3'
     implementation 'com.squareup.moshi:moshi-adapters:1.9.3'
     implementation 'com.squareup.moshi:moshi-kotlin:1.9.3'

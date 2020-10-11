@@ -19,6 +19,9 @@ dependencies {
     implementation project(':extension-overlay')
     implementation project(':extension-points')
     implementation project(':extension-poll')
+    implementation project(':extension-repeat')
+    implementation project(':extension-rewards')
+    implementation project(':extension-storage')
     // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
     // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
     // implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'
