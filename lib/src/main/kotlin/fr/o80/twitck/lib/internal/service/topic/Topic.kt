@@ -5,7 +5,7 @@ import java.time.Duration
 enum class Topic {
     FOLLOWS {
         override val leaseDuration: Duration
-            get() = Duration.ofHours(2)
+            get() = Duration.ofHours(6)
 
         override val path: String
             get() = "/twitch-follows"
@@ -15,7 +15,7 @@ enum class Topic {
     },
     STREAMS {
         override val leaseDuration: Duration
-            get() = Duration.ofHours(2)
+            get() = Duration.ofHours(6)
 
         override val path: String
             get() = "/twitch-streams"
