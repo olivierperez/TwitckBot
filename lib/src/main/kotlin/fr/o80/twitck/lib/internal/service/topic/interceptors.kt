@@ -4,10 +4,12 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.Do
 import io.ktor.application.ApplicationCallPipeline
 import io.ktor.application.call
+import io.ktor.request.receiveText
 import io.ktor.routing.Route
 import io.ktor.routing.RouteSelector
 import io.ktor.routing.RouteSelectorEvaluation
 import io.ktor.routing.RoutingResolveContext
+import io.ktor.util.toMap
 
 fun Route.protectedBySignature(logger: Logger, secret: String, route: Route.() -> Unit): Route {
     val checkSignature = CheckSignature(secret)
@@ -17,7 +19,9 @@ fun Route.protectedBySignature(logger: Logger, secret: String, route: Route.() -
             RouteSelectorEvaluation.Constant
     }).apply {
         intercept(ApplicationCallPipeline.Features) {
-            Do exhaustive when (val result = checkSignature(call)) {
+            val headers = call.request.headers.toMap()
+            val body = call.receiveText()
+            Do exhaustive when (val result = checkSignature(headers, body)) {
                 SignatureResult.Valid -> {
                     logger.debug("Signature is valid!")
                     proceed()
