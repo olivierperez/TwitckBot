@@ -8,12 +8,12 @@ import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Channel
-import fr.o80.twitck.extension.Help
 import fr.o80.twitck.extension.Presence
 import fr.o80.twitck.extension.RuntimeCommand
 import fr.o80.twitck.extension.ViewerPromotion
 import fr.o80.twitck.extension.Welcome
 import fr.o80.twitck.extension.Whisper
+import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.extension.repeat.Repeat

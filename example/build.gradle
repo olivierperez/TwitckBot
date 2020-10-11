@@ -14,6 +14,7 @@ dependencies {
 
     implementation project(':lib')
     implementation project(':extensions')
+    implementation project(':extension-help')
     implementation project(':extension-overlay')
     implementation project(':extension-poll')
     // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'

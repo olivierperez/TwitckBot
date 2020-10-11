@@ -1,9 +1,8 @@
 plugins {
-    id 'java'
     id 'org.jetbrains.kotlin.jvm'
 }
 
-group 'fr.o80.twitck.overlay'
+group 'fr.o80.twitck'
 version '0.0.3'
 
 repositories {
@@ -13,7 +12,6 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    implementation 'org.slf4j:slf4j-api:1.7.25'
     implementation project(':lib')
 
     testImplementation "org.jetbrains.kotlin:kotlin-test"
