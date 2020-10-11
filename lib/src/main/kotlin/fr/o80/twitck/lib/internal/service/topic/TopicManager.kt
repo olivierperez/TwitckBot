@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 
 class TopicManager(
+    private val userId: String,
     private val ngrokTunnel: NgrokTunnel,
     private val api: TwitchApi,
     private val secret: String,
@@ -23,18 +24,15 @@ class TopicManager(
     private fun subscribeToTopics(callbackUrl: String) {
         api.validate()
 
-        // TODO OPZ utiliser le UserName du broadcaster
-        val hostUserId = api.getUser("gnu_coding_cafe").id
-
         Topic.values().forEach { topic ->
             logger.info("Subscribing to $topic...")
             api.unsubscribeFrom(
-                topic = topic.topicUrl(hostUserId),
+                topic = topic.topicUrl(userId),
                 callbackUrl = topic.callbackUrl(callbackUrl),
                 leaseSeconds = topic.leaseDuration.toSeconds()
             )
             api.subscribeTo(
-                topic = topic.topicUrl(hostUserId),
+                topic = topic.topicUrl(userId),
                 callbackUrl = topic.callbackUrl(callbackUrl),
                 leaseSeconds = topic.leaseDuration.toSeconds(),
                 secret = secret

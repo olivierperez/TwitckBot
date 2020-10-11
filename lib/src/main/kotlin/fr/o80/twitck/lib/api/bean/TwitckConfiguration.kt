@@ -11,6 +11,7 @@ import fr.o80.twitck.lib.api.service.log.LoggerFactory
 
 class TwitckConfiguration(
     val oauthToken: String,
+    val hostName: String,
     val requestedChannels: Iterable<String>,
     val joinHandlers: List<JoinHandler>,
     val messageHandlers: List<MessageHandler>,

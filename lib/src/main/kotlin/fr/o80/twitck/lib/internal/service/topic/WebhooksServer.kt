@@ -22,7 +22,6 @@ import io.ktor.routing.post
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -39,7 +38,6 @@ class WebhooksServer(
         .add(LocalDateTimeAdapter())
         .build()
 
-    @KtorExperimentalAPI
     fun start() {
         embeddedServer(Netty, 8080) {
             install(DoubleReceive)

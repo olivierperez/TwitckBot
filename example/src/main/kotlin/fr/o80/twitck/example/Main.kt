@@ -66,7 +66,7 @@ class Main : CliktCommand() {
         presenceChannel: String?
     ): TwitckBot {
         println("Start...")
-        return twitckBot(oauthToken) {
+        return twitckBot(oauthToken, hostName) {
             install(StandardOverlay) {
             }
             install(Storage) {

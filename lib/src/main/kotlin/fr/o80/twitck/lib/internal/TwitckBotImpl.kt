@@ -39,8 +39,13 @@ internal class TwitckBotImpl(
         CommandDispatcher(messenger, configuration.commandHandlers)
     )
 
-    private val joinLineHandler = JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
-    private val whisperLineHandler = WhisperLineHandler(this, WhisperDispatcher(messenger, configuration.whisperHandlers))
+    private val hostUserId: String = configuration.twitchApi.getUser(configuration.hostName).id
+
+    private val joinLineHandler =
+        JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
+
+    private val whisperLineHandler =
+        WhisperLineHandler(this, WhisperDispatcher(messenger, configuration.whisperHandlers))
 
     private val autoJoiner = AutoJoiner(this, configuration.requestedChannels, configuration.loggerFactory)
 
@@ -49,7 +54,9 @@ internal class TwitckBotImpl(
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
     private val topicManager = TopicManager(
+        userId = hostUserId,
         api = configuration.twitchApi,
+        // TODO OPZ BotHusky ne devrait pas se trouver dans la lib
         ngrokTunnel = NgrokTunnel("BotHusky", 8080),
         secret = SecretHolder.secret,
         webhooksServer = WebhooksServer(
