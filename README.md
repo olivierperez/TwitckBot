@@ -66,23 +66,23 @@ fun main() {
 
 ## Extensions
 
-There's some extension you may want to use:
+There are some extensions you may want to use,
+some of them are available via their own module `extension-...`,
+some others are still in experimental and accessible via `extensions-experimental`.
 
-- `Channel`: The more opened extension, it allows you to do whatever you want
-- `Help`: Responds to `!help` from the users
-- `Presence`: Your bot will also connect (but won't operate) on a channel of your friend
-- `RuntimeCommand`: You can add command at runtime thanks (eg: `!addcmd language Kotlin <3`)
-- `ViewerPromotion`: Promote the viewer channel when he/she starts talking
-- `Welcome`: Welcomes everyone
-- `Whisper`: React to whispering
-
-```groovy
-// For Gradle
-dependecies {
-    implementation 'com.github.olivierperez.TwitckBot:extensions-experimental:0.0.4'
-    implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.4'
-}
-```
+- [Channel](doc/extensions/Channel.md) - Implement whatever you need, if you're ready to write code
+- [Help](doc/extensions/Help.md) - Responds to `!help` from the users
+- [Market](doc/extensions/Market.md) - Let the viewer "buy" some things you're [Points](doc/extensions/Points.md)
+- [Overlay](doc/extensions/Overlay.md) - Helps to create an overlay
+- [Points](doc/extensions/Points.md) - Manage a bank of points your viewer can spend in [Market](doc/extensions/Market.md)
+- [Poll](doc/extensions/Poll.md) - Let your community make some choices
+- [Repeat](doc/extensions/Repeat.md) - The bot will say, once in a way, some preset sentences
+- [Rewards](doc/extensions/Rewards.md) - Your community will earn [Points](doc/extensions/Points.md) thanks to interactions
+- [Runtime Command](doc/extensions/RuntimeCommand.md) - Add a command at runtime thanks to `!cmd`
+- [Storage](doc/extensions/Storage.md) - Basically data saved for all other extensions
+- [Viewer Promotion](doc/extensions/ViewerPromotion.md) - Promote the viewer channel when he/she starts talking
+- [Welcome](doc/extensions/Welcome.md) - Welcomes everyone that connects
+- [Whisper](doc/extensions/Whisper.md) - React to whispering
 
 ## Make your own extension 🎨
 
