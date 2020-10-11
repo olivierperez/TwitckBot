@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension.repeat
 
-import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -65,7 +64,7 @@ class Repeat(
 
         fun build(): Repeat {
             val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
+                ?: throw IllegalStateException("Channel must be set for the extension ${Repeat::class.simpleName}")
 
             return Repeat(
                 channelName,

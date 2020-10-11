@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension.market
 
-import fr.o80.twitck.extension.points.Points
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
@@ -40,7 +39,7 @@ class Market(
 
         fun build(serviceLocator: ServiceLocator): Market {
             val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
+                ?: throw IllegalStateException("Channel must be set for the extension ${Market::class.simpleName}")
 
             val logger = serviceLocator.loggerFactory.getLogger(Market::class)
 
