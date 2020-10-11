@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.jvm"
 }
 
 group 'fr.o80.twitck'
@@ -14,6 +14,7 @@ dependencies {
 
     implementation project(':lib')
     implementation project(':extensions')
+    implementation project(':extension-channel')
     implementation project(':extension-help')
     implementation project(':extension-market')
     implementation project(':extension-overlay')
@@ -21,7 +22,11 @@ dependencies {
     implementation project(':extension-poll')
     implementation project(':extension-repeat')
     implementation project(':extension-rewards')
+    implementation project(':extension-runtime-command')
     implementation project(':extension-storage')
+    implementation project(':extension-viewer-promotion')
+    implementation project(':extension-welcome')
+    implementation project(':extension-whisper')
     // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
     // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
     // implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'

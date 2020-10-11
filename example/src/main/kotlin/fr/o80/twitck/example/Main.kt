@@ -7,18 +7,18 @@ import fr.o80.twitck.example.market.CodeReviewProduct
 import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
-import fr.o80.twitck.extension.Channel
 import fr.o80.twitck.extension.Presence
-import fr.o80.twitck.extension.RuntimeCommand
-import fr.o80.twitck.extension.ViewerPromotion
-import fr.o80.twitck.extension.Welcome
-import fr.o80.twitck.extension.Whisper
+import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.Points
+import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
+import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
 import fr.o80.twitck.extension.storage.Storage
+import fr.o80.twitck.extension.welcome.Welcome
+import fr.o80.twitck.extension.whisper.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
@@ -221,10 +221,18 @@ class Main : CliktCommand() {
                     val newFollowers = followEvent.followers.data
 
                     if (newFollowers.size == 1) {
-                        messenger.sendImmediately(hostChannel, "Merci ${newFollowers[0].fromName} pour ton follow!", CoolDown(Duration.ofHours(1)))
+                        messenger.sendImmediately(
+                            hostChannel,
+                            "Merci ${newFollowers[0].fromName} pour ton follow!",
+                            CoolDown(Duration.ofHours(1))
+                        )
                     } else {
                         val names = newFollowers.joinToString(" ") { it.fromName }
-                        messenger.sendImmediately(hostChannel, "Merci pour vos follows $names", CoolDown(Duration.ofHours(1)))
+                        messenger.sendImmediately(
+                            hostChannel,
+                            "Merci pour vos follows $names",
+                            CoolDown(Duration.ofHours(1))
+                        )
                     }
                 }
             }

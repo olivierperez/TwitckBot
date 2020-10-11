@@ -1,4 +1,4 @@
-package fr.o80.twitck.extension
+package fr.o80.twitck.extension.promotion
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Importance
