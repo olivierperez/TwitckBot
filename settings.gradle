@@ -1,6 +1,6 @@
 rootProject.name = 'TwitckBot'
 
-include ':lib', ':extensions', ':example'
+include ':lib', ':example', ':extensions-experimental'
 include ':extension-channel'
 include ':extension-help'
 include ':extension-market'

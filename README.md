@@ -19,7 +19,7 @@ repositories {
 }
 
 dependecies {
-    implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
+    implementation 'com.github.olivierperez.TwitckBot:lib:0.0.4'
 }
 ```
 
@@ -79,8 +79,8 @@ There's some extension you may want to use:
 ```groovy
 // For Gradle
 dependecies {
-    implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
-    implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'
+    implementation 'com.github.olivierperez.TwitckBot:extensions-experimental:0.0.4'
+    implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.4'
 }
 ```
 

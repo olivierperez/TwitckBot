@@ -13,7 +13,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     implementation project(':lib')
-    implementation project(':extensions')
+    implementation project(':extensions-experimental')
     implementation project(':extension-channel')
     implementation project(':extension-help')
     implementation project(':extension-market')
@@ -27,10 +27,11 @@ dependencies {
     implementation project(':extension-viewer-promotion')
     implementation project(':extension-welcome')
     implementation project(':extension-whisper')
-    // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.3'
-    // implementation 'com.github.olivierperez.TwitckBot:extensions:0.0.3'
-    // implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.3'
-    // implementation 'com.github.olivierperez.TwitckBot:extension-poll:0.0.3'
+    // implementation 'com.github.olivierperez.TwitckBot:lib:0.0.4'
+    // implementation 'com.github.olivierperez.TwitckBot:extensions-experimental:0.0.4'
+    // implementation 'com.github.olivierperez.TwitckBot:extension-overlay:0.0.4'
+    // implementation 'com.github.olivierperez.TwitckBot:extension-poll:0.0.4'
+    // etc.
 
     implementation 'com.github.ajalt:clikt:2.6.0'
     implementation 'ch.qos.logback:logback-classic:1.0.13'

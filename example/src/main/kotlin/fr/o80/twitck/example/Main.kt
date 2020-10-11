@@ -66,6 +66,7 @@ class Main : CliktCommand() {
         presenceChannel: String?
     ): TwitckBot {
         println("Start...")
+        // TODO CamouilleLaFrippouille -> répondre à quelques questions, genre : pourquoi tu t'appelles comme ça ?
         return twitckBot(oauthToken, hostName) {
             install(StandardOverlay) {
             }
