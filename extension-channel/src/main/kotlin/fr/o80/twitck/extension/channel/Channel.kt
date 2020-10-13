@@ -2,7 +2,7 @@ package fr.o80.twitck.extension.channel
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.FollowEvent
+import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -37,14 +37,14 @@ class Channel(
         return joinEvent
     }
 
-    fun interceptFollowEvent(messenger: Messenger, followEvent: FollowEvent): FollowEvent {
-        logger.debug("New followers intercepted: ${followEvent.followers}")
+    fun interceptFollowEvent(messenger: Messenger, followsEvent: FollowsEvent): FollowsEvent {
+        logger.debug("New followers intercepted: ${followsEvent.followers}")
         followCallbacks.forEach { callback ->
             logger.debug("New followers callback called: $callback")
-            callback(messenger, followEvent)
+            callback(messenger, followsEvent)
         }
 
-        return followEvent
+        return followsEvent
     }
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
@@ -135,5 +135,5 @@ typealias JoinCallback = (
 
 typealias FollowCallback = (
     messenger: Messenger,
-    followEvent: FollowEvent
+    followsEvent: FollowsEvent
 ) -> Unit

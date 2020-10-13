@@ -1,5 +1,5 @@
 package fr.o80.twitck.lib.api.bean
 
-class FollowEvent(
+class FollowsEvent(
     val followers: NewFollowers
 )

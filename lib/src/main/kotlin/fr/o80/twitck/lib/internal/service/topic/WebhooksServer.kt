@@ -2,11 +2,16 @@ package fr.o80.twitck.lib.internal.service.topic
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import fr.o80.twitck.lib.api.bean.FollowEvent
+import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.NewFollowers
+import fr.o80.twitck.lib.api.bean.NewSubscriptionsEvent
+import fr.o80.twitck.lib.api.bean.NotificationSubscriptionsEvent
 import fr.o80.twitck.lib.api.bean.StreamsChanged
+import fr.o80.twitck.lib.api.bean.UnknownSubscriptionsEvent
+import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionEvents
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
-import fr.o80.twitck.lib.internal.handler.FollowDispatcher
+import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
+import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
 import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
 import io.ktor.application.ApplicationCall
 import io.ktor.application.call
@@ -26,7 +31,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class WebhooksServer(
-    private val dispatcher: FollowDispatcher,
+    private val followsDispatcher: FollowsDispatcher,
+    private val subscriptionsDispatcher: SubscriptionsDispatcher,
     private val secret: String,
     loggerFactory: LoggerFactory
 ) {
@@ -43,6 +49,7 @@ class WebhooksServer(
             install(DoubleReceive)
             routing {
                 respondTo(Topic.FOLLOWS, ::onNewFollowers)
+                respondTo(Topic.SUBSCRIBE, ::onNewSubscription)
                 respondTo(Topic.STREAMS, ::onStreamChanged)
             }
         }.start(wait = false)
@@ -78,8 +85,30 @@ class WebhooksServer(
             val newFollowers = moshi.adapter(NewFollowers::class.java).fromJson(body)!!
             logger.debug("New followers, parsed: $newFollowers")
 
-            val event = FollowEvent(newFollowers)
-            dispatcher.dispatch(event)
+            val event = FollowsEvent(newFollowers)
+            followsDispatcher.dispatch(event)
+        }
+        call.respondText("OK", ContentType.Text.Html)
+    }
+
+    private suspend fun onNewSubscription(call: ApplicationCall, body: String) {
+        logger.debug("Twitch notified subscriptions")
+        withContext(Dispatchers.IO) {
+            val subscriptionEvents = moshi.adapter(TwitchSubscriptionEvents::class.java).fromJson(body)!!
+            logger.debug("Subscription events, parsed: $subscriptionEvents")
+
+            val eventsByType = subscriptionEvents.data.groupBy { it.type }
+            eventsByType["subscriptions.subscribe"]
+                ?.let { subscriptionsDispatcher.dispatch(NewSubscriptionsEvent(it)) }
+            eventsByType["subscriptions.notification"]
+                ?.let { subscriptionsDispatcher.dispatch(NotificationSubscriptionsEvent(it)) }
+
+            eventsByType.entries
+                .filterNot { (eventType, _) ->
+                    eventType in listOf("subscriptions.subscribe", "subscriptions.notification")
+                }.forEach { (eventType, events) ->
+                    subscriptionsDispatcher.dispatch(UnknownSubscriptionsEvent(eventType, events))
+                }
         }
         call.respondText("OK", ContentType.Text.Html)
     }

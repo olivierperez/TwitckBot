@@ -13,6 +13,16 @@ enum class Topic {
         override fun topicUrl(userId: String): String =
             "https://api.twitch.tv/helix/users/follows?first=1&to_id=$userId"
     },
+    SUBSCRIBE {
+        override val leaseDuration: Duration
+            get() = Duration.ofHours(6)
+
+        override val path: String
+            get() = "/twitch-subscribers"
+
+        override fun topicUrl(userId: String): String =
+            "https://api.twitch.tv/helix/subscriptions/events?first=1&broadcaster_id=$userId"
+    },
     STREAMS {
         override val leaseDuration: Duration
             get() = Duration.ofHours(6)
