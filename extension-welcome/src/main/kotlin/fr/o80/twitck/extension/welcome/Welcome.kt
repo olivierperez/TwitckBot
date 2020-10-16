@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.MessageEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -30,23 +31,31 @@ class Welcome(
     }
 
     fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
-        if (channel != joinEvent.channel)
-            return joinEvent
-
-        if (ignoredLogins.any { joinEvent.login.equals(it, true) }) {
-            return joinEvent
-        }
-
-        if (hostMessage != null && isHost(joinEvent.login)) {
-            welcomeHost(messenger, joinEvent.login, hostMessage)
-            return joinEvent
-        }
-
-        welcomeTimeChecker.executeIfNotCooldown(joinEvent.login) {
-            welcomeViewer(messenger, joinEvent)
-        }
-
+        handleNewViewer(joinEvent.channel, joinEvent.login, messenger)
         return joinEvent
+    }
+
+    fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
+        handleNewViewer(messageEvent.channel, messageEvent.login, messenger)
+        return messageEvent
+    }
+
+    private fun handleNewViewer(channel: String, login: String, messenger: Messenger) {
+        if (this.channel != channel)
+            return
+
+        if (ignoredLogins.any { login.equals(it, true) }) {
+            return
+        }
+
+        if (hostMessage != null && isHost(login)) {
+            welcomeHost(messenger, login, hostMessage)
+            return
+        }
+
+        welcomeTimeChecker.executeIfNotCooldown(login) {
+            welcomeViewer(channel, login, messenger)
+        }
     }
 
     private fun isHost(login: String) =
@@ -56,17 +65,17 @@ class Welcome(
         messenger.sendWhenAvailable(channel, message, Importance.LOW)
     }
 
-    private fun welcomeViewer(messenger: Messenger, joinEvent: JoinEvent) {
-        val randomMessage = pickMessage(joinEvent)
-        messenger.sendWhenAvailable(joinEvent.channel, randomMessage, Importance.LOW)
+    private fun welcomeViewer(channel: String, login: String, messenger: Messenger) {
+        val randomMessage = pickMessage(login)
+        messenger.sendWhenAvailable(channel, randomMessage, Importance.LOW)
     }
 
-    private fun pickMessage(joinEvent: JoinEvent): String {
-        val follower = joinEvent.login.getFollowerOrNull()
+    private fun pickMessage(login: String): String {
+        val follower = login.getFollowerOrNull()
         return if (follower != null) {
             messagesForFollowers.random().formatFollower(follower)
         } else {
-            messages.random().formatViewer(joinEvent.login)
+            messages.random().formatViewer(login)
         }
     }
 
@@ -167,6 +176,7 @@ class Welcome(
                 .build(serviceLocator)
                 .also { welcome ->
                     pipeline.interceptJoinEvent(welcome::interceptJoinEvent)
+                    pipeline.interceptMessageEvent(welcome::interceptMessageEvent)
                     pipeline.requestChannel(welcome.channel)
                 }
         }
