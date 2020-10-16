@@ -220,6 +220,42 @@ class Main : CliktCommand() {
                         )
                     }
                 }
+                newSubscriptions { messenger, events ->
+                    events.forEach { subscription ->
+                        if (subscription.isGift) {
+                            messenger.sendWhenAvailable(
+                                hostChannel,
+                                "Merci ${subscription.gifterName} pour le cadeau à ${subscription.userName}!",
+                                Importance.HIGH
+                            )
+                        } else {
+                            messenger.sendWhenAvailable(
+                                hostChannel,
+                                "Merci ${subscription.userName} pour le sub!",
+                                Importance.HIGH
+                            )
+                        }
+                    }
+                }
+                notificationSubscriptions { messenger, events ->
+                    events.forEach { notification ->
+                        println("T'as un message de ${notification.userName} -> ${notification.message}")
+                    }
+                    messenger.sendImmediately(
+                        hostChannel,
+                        "DEBUG Hé $hostName, tu as vu le message de ${events.joinToString(", ") { it.userName }}"
+                    )
+                }
+                unknownTypeSubscriptions { messenger, eventType, events ->
+                    messenger.sendImmediately(
+                        hostChannel,
+                        "DEBUG J'ai reçu des notification bizarres, regarde donc les logs !"
+                    )
+                    println(">>Notifications bizarres<<\n\n")
+                    println("---${eventType}---\n$events\n---")
+                    events.forEach { println("$it") }
+                    println("\n\n>>/Notifications bizarres<<")
+                }
             }
             install(Channel) {
                 channel(botChannel)
@@ -237,43 +273,6 @@ class Main : CliktCommand() {
                             "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?"
                         )
                     }
-                }
-                // TODO OPZ Voir pourquoi ce follow fonctionne alors qu'on l'a configuré sur le channel "botChannel"
-                newSubscriptions { messenger, event ->
-                    event.events.forEach { subscription ->
-                        if (subscription.isGift) {
-                            messenger.sendWhenAvailable(
-                                hostChannel,
-                                "Merci ${subscription.gifterName} pour le cadeau à ${subscription.userName}!",
-                                Importance.HIGH
-                            )
-                        } else {
-                            messenger.sendWhenAvailable(
-                                hostChannel,
-                                "Merci ${subscription.userName} pour le sub!",
-                                Importance.HIGH
-                            )
-                        }
-                    }
-                }
-                notificationSubscriptions { messenger, event ->
-                    event.events.forEach { notification ->
-                        println("T'as un message de ${notification.userName} -> ${notification.message}")
-                    }
-                    messenger.sendImmediately(
-                        hostChannel,
-                        "DEBUG Hé $hostName, tu as vu le message de ${event.events.joinToString(", ") { it.userName }}"
-                    )
-                }
-                unknownTypeSubscriptions { messenger, event ->
-                    messenger.sendImmediately(
-                        hostChannel,
-                        "DEBUG J'ai reçu des notification bizarres, regarde donc les logs !"
-                    )
-                    println(">>Notifications bizarres<<\n\n")
-                    println("---${event.eventType}---\n$event\n---")
-                    event.events.forEach { println("$it") }
-                    println("\n\n>>/Notifications bizarres<<")
                 }
             }
             presenceChannel?.let {

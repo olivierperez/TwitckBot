@@ -9,6 +9,7 @@ import fr.o80.twitck.lib.api.bean.NewSubsEvent
 import fr.o80.twitck.lib.api.bean.SubNotificationsEvent
 import fr.o80.twitck.lib.api.bean.SubscriptionEvent
 import fr.o80.twitck.lib.api.bean.UnknownSubEvent
+import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionData
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -61,13 +62,18 @@ class Channel(
     }
 
     fun interceptSubscriptionEvent(messenger: Messenger, event: SubscriptionEvent): SubscriptionEvent {
+        val events = event.events
+            .filter { it.broadcasterName.equals(channel.substring(1), true) }
+        if (events.isEmpty())
+            return event
+
         Do exhaustive when (event) {
             is NewSubsEvent ->
-                newSubsCallbacks.forEach { callback -> callback(messenger, event) }
+                newSubsCallbacks.forEach { callback -> callback(messenger, events) }
             is SubNotificationsEvent ->
-                subNotificationsCallbacks.forEach { callback -> callback(messenger, event) }
+                subNotificationsCallbacks.forEach { callback -> callback(messenger, events) }
             is UnknownSubEvent ->
-                unknownSubCallbacks.forEach { callback -> callback(messenger, event) }
+                unknownSubCallbacks.forEach { callback -> callback(messenger, event.eventType, events) }
         }
         return event
     }
@@ -187,15 +193,16 @@ typealias FollowCallback = (
 
 typealias NewSubsEventCallback = (
     messenger: Messenger,
-    subscriptionsEvent: NewSubsEvent
+    events: List<TwitchSubscriptionData>
 ) -> Unit
 
 typealias SubNotificationsEventCallback = (
     messenger: Messenger,
-    subscriptionsEvent: SubNotificationsEvent
+    events: List<TwitchSubscriptionData>
 ) -> Unit
 
 typealias UnknownSubEventCallback = (
     messenger: Messenger,
-    subscriptionsEvent: UnknownSubEvent
+    type: String,
+    events: List<TwitchSubscriptionData>
 ) -> Unit

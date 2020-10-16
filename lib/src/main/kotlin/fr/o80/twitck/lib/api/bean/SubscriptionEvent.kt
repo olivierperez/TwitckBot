@@ -2,17 +2,19 @@ package fr.o80.twitck.lib.api.bean
 
 import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionData
 
-sealed class SubscriptionEvent
+sealed class SubscriptionEvent(
+    val events: List<TwitchSubscriptionData>
+)
 
 class NewSubsEvent(
-    val events: List<TwitchSubscriptionData>
-) : SubscriptionEvent()
+    events: List<TwitchSubscriptionData>
+) : SubscriptionEvent(events)
 
 class SubNotificationsEvent(
-    val events: List<TwitchSubscriptionData>
-) : SubscriptionEvent()
+    events: List<TwitchSubscriptionData>
+) : SubscriptionEvent(events)
 
 class UnknownSubEvent(
     val eventType: String,
-    val events: List<TwitchSubscriptionData>
-) : SubscriptionEvent()
+    events: List<TwitchSubscriptionData>
+) : SubscriptionEvent(events)
