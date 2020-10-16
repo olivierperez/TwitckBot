@@ -203,6 +203,25 @@ class Main : CliktCommand() {
                 }
             }
             install(Channel) {
+                channel(hostChannel)
+                follow { messenger, newFollowers ->
+                    if (newFollowers.size == 1) {
+                        messenger.sendImmediately(
+                            hostChannel,
+                            "Merci ${newFollowers[0].fromName} pour ton follow!",
+                            CoolDown(Duration.ofHours(1))
+                        )
+                    } else {
+                        val names = newFollowers.joinToString(" ") { it.fromName }
+                        messenger.sendImmediately(
+                            hostChannel,
+                            "Merci pour vos follows $names",
+                            CoolDown(Duration.ofHours(1))
+                        )
+                    }
+                }
+            }
+            install(Channel) {
                 channel(botChannel)
                 command("!help") { messenger, _ ->
                     messenger.sendImmediately(botChannel, "Il n'y a pas encore d'aide")
@@ -220,24 +239,6 @@ class Main : CliktCommand() {
                     }
                 }
                 // TODO OPZ Voir pourquoi ce follow fonctionne alors qu'on l'a configuré sur le channel "botChannel"
-                follow { messenger, followEvent ->
-                    val newFollowers = followEvent.followers.data
-
-                    if (newFollowers.size == 1) {
-                        messenger.sendImmediately(
-                            hostChannel,
-                            "Merci ${newFollowers[0].fromName} pour ton follow!",
-                            CoolDown(Duration.ofHours(1))
-                        )
-                    } else {
-                        val names = newFollowers.joinToString(" ") { it.fromName }
-                        messenger.sendImmediately(
-                            hostChannel,
-                            "Merci pour vos follows $names",
-                            CoolDown(Duration.ofHours(1))
-                        )
-                    }
-                }
                 newSubscriptions { messenger, event ->
                     event.events.forEach { subscription ->
                         if (subscription.isGift) {

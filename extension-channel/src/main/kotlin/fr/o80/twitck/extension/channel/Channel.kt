@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.NewFollower
 import fr.o80.twitck.lib.api.bean.NewSubsEvent
 import fr.o80.twitck.lib.api.bean.SubNotificationsEvent
 import fr.o80.twitck.lib.api.bean.SubscriptionEvent
@@ -39,17 +40,21 @@ class Channel(
 
         joinCallbacks.forEach { callback ->
             callback(messenger, joinEvent)
-
         }
 
         return joinEvent
     }
 
     fun interceptFollowEvent(messenger: Messenger, followsEvent: FollowsEvent): FollowsEvent {
-        logger.debug("New followers intercepted: ${followsEvent.followers}")
+        val newFollowers = followsEvent.followers.data
+            .filter { it.toName.equals(channel.substring(1), true) }
+        if (newFollowers.isEmpty())
+            return followsEvent
+
+        logger.debug("New followers intercepted: $newFollowers")
         followCallbacks.forEach { callback ->
             logger.debug("New followers callback called: $callback")
-            callback(messenger, followsEvent)
+            callback(messenger, newFollowers)
         }
 
         return followsEvent
@@ -177,7 +182,7 @@ typealias JoinCallback = (
 
 typealias FollowCallback = (
     messenger: Messenger,
-    followsEvent: FollowsEvent
+    newFollowers: List<NewFollower>
 ) -> Unit
 
 typealias NewSubsEventCallback = (
