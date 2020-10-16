@@ -4,8 +4,8 @@ import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.SubscriptionEvent
 import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.service.Messenger
 
 typealias JoinHandler = (messenger: Messenger, joinEvent: JoinEvent) -> JoinEvent

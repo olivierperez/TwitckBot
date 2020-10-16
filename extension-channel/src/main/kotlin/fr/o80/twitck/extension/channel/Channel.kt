@@ -5,10 +5,10 @@ import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.bean.NewFollower
-import fr.o80.twitck.lib.api.bean.NewSubsEvent
-import fr.o80.twitck.lib.api.bean.SubNotificationsEvent
-import fr.o80.twitck.lib.api.bean.SubscriptionEvent
-import fr.o80.twitck.lib.api.bean.UnknownSubEvent
+import fr.o80.twitck.lib.api.bean.subscription.NewSubscription
+import fr.o80.twitck.lib.api.bean.subscription.Notification
+import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
+import fr.o80.twitck.lib.api.bean.subscription.UnknownType
 import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionData
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -67,13 +67,13 @@ class Channel(
         if (events.isEmpty())
             return event
 
-        Do exhaustive when (event) {
-            is NewSubsEvent ->
+        Do exhaustive when (val type = event.eventType) {
+            is NewSubscription ->
                 newSubsCallbacks.forEach { callback -> callback(messenger, events) }
-            is SubNotificationsEvent ->
+            is Notification ->
                 subNotificationsCallbacks.forEach { callback -> callback(messenger, events) }
-            is UnknownSubEvent ->
-                unknownSubCallbacks.forEach { callback -> callback(messenger, event.eventType, events) }
+            is UnknownType ->
+                unknownSubCallbacks.forEach { callback -> callback(messenger, type.value, events) }
         }
         return event
     }

@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.internal.handler
 
-import fr.o80.twitck.lib.api.bean.SubscriptionEvent
+import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
 import fr.o80.twitck.lib.api.service.Messenger
 
