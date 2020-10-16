@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.welcome
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
@@ -28,6 +29,11 @@ class Welcome(
     private val followers: List<Follower> by lazy {
         val user = twitchApi.getUser(hostName)
         twitchApi.getFollowers(user.id)
+    }
+
+    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
+        handleNewViewer(commandEvent.channel, commandEvent.login, messenger)
+        return commandEvent
     }
 
     fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
@@ -175,6 +181,7 @@ class Welcome(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { welcome ->
+                    pipeline.interceptCommandEvent(welcome::interceptCommandEvent)
                     pipeline.interceptJoinEvent(welcome::interceptJoinEvent)
                     pipeline.interceptMessageEvent(welcome::interceptMessageEvent)
                     pipeline.requestChannel(welcome.channel)
