@@ -1,4 +1,4 @@
-### Extension - 
+### Extension - Overlay
 
 ```groovy
 dependency {

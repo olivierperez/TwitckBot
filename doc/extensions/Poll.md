@@ -1,4 +1,4 @@
-### Extension - 
+### Extension - Poll
 
 ```groovy
 dependency {

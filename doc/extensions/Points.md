@@ -1,4 +1,4 @@
-### Extension - 
+### Extension - Points
 
 ```groovy
 dependency {

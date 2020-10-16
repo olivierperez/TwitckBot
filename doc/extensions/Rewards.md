@@ -1,4 +1,4 @@
-### Extension - 
+### Extension - Rewards
 
 ```groovy
 dependency {
