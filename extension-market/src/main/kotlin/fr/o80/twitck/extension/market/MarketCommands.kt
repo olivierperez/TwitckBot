@@ -15,9 +15,9 @@ import fr.o80.twitck.lib.utils.Do
 import java.time.Duration
 import java.util.Date
 
-// TODO OPZ Messages
 class MarketCommands(
     private val channel: String,
+    private val messages: Messages,
     private val products: MutableList<Product>,
     private val logger: Logger,
     private val extensionProvider: ExtensionProvider,
@@ -54,13 +54,13 @@ class MarketCommands(
     private fun handleBuyCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
             val coolDown = CoolDown(Duration.ofMinutes(1))
-            messenger.sendImmediately(channel, "Usage de !buy => !buy <produit> <paramètres>", coolDown)
+            messenger.sendImmediately(channel, messages.usage, coolDown)
             return
         }
 
         val product = products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
-            messenger.sendImmediately(channel, "le produit n'existe pas")
+            messenger.sendImmediately(channel, messages.productNotFound)
             return
         }
 
@@ -68,7 +68,7 @@ class MarketCommands(
         if (price == null) {
             messenger.sendImmediately(
                 channel,
-                "Impossible de calculer le prix pour l'achat demandé !"
+                messages.couldNotGetProductPrice
             )
         } else {
             doBuy(messenger, commandEvent, product, price)
@@ -80,7 +80,7 @@ class MarketCommands(
         val coolDown = CoolDown(Duration.ofMinutes(1))
         messenger.sendImmediately(
             channel,
-            "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#".replace("#PRODUCTS#", productNames),
+            messages.weHaveThisProducts.replace("#PRODUCTS#", productNames),
             coolDown
         )
     }
@@ -108,7 +108,7 @@ class MarketCommands(
         } else {
             messenger.sendImmediately(
                 channel,
-                "@${commandEvent.login} tu n'as pas assez de codes source pour cet achat !"
+                messages.youDontHaveEnoughPoints.replace("#USER#", commandEvent.login)
             )
         }
     }
@@ -157,7 +157,7 @@ class MarketCommands(
             logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
             messenger.sendImmediately(
                 channel,
-                "${commandEvent.login} ton achat est en attente de validation"
+                messages.yourPurchaseIsPending.replace("#USER#", commandEvent.login)
             )
         }
     }

@@ -101,6 +101,14 @@ class Main : CliktCommand() {
             }
             install(Market) {
                 channel(hostChannel)
+                messages(
+                    couldNotGetProductPrice = "Impossible de calculer le prix pour l'achat demandé !",
+                    productNotFound = "le produit n'existe pas",
+                    usage = "Usage de !buy => !buy <produit> <paramètres>",
+                    weHaveThisProducts = "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#",
+                    youDontHaveEnoughPoints = "@#USER# tu n'as pas assez de codes source pour cet achat !",
+                    yourPurchaseIsPending = "@#USER# ton achat est en attente de validation"
+                )
                 product(CommandProduct)
                 product(CodeReviewProduct)
                 product(KotlinProduct)

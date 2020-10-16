@@ -25,11 +25,31 @@ class Market(
         private annotation class Dsl
 
         private var channel: String? = null
+        private var messages: Messages? = null
         private val products: MutableList<Product> = mutableListOf()
 
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
+        }
+
+        @Dsl
+        fun messages(
+            couldNotGetProductPrice: String,
+            productNotFound: String,
+            usage: String,
+            weHaveThisProducts: String,
+            youDontHaveEnoughPoints: String,
+            yourPurchaseIsPending: String
+        ) {
+            messages = Messages(
+                couldNotGetProductPrice = couldNotGetProductPrice,
+                productNotFound = productNotFound,
+                usage = usage,
+                weHaveThisProducts = weHaveThisProducts,
+                youDontHaveEnoughPoints = youDontHaveEnoughPoints,
+                yourPurchaseIsPending = yourPurchaseIsPending
+            )
         }
 
         @Dsl
@@ -40,11 +60,14 @@ class Market(
         fun build(serviceLocator: ServiceLocator): Market {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Market::class.simpleName}")
+            val theMessages = messages
+                ?: throw IllegalArgumentException("Messages must be set for the extension ${Market::class.simpleName}")
 
             val logger = serviceLocator.loggerFactory.getLogger(Market::class)
 
             val commands = MarketCommands(
                 channelName,
+                theMessages,
                 products,
                 logger,
                 serviceLocator.extensionProvider,
