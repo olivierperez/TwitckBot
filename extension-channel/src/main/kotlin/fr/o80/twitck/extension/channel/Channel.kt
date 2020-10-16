@@ -4,10 +4,15 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.NewSubsEvent
+import fr.o80.twitck.lib.api.bean.SubNotificationsEvent
+import fr.o80.twitck.lib.api.bean.SubscriptionEvent
+import fr.o80.twitck.lib.api.bean.UnknownSubEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.utils.Do
 
 /**
  * This extension provides basic configuration for a given channel.
@@ -19,6 +24,9 @@ class Channel(
     private val channel: String,
     private val joinCallbacks: Iterable<JoinCallback>,
     private val followCallbacks: Iterable<FollowCallback>,
+    private val newSubsCallbacks: Iterable<NewSubsEventCallback>,
+    private val subNotificationsCallbacks: Iterable<SubNotificationsEventCallback>,
+    private val unknownSubCallbacks: Iterable<UnknownSubEventCallback>,
     private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
     private val logger: Logger
 ) {
@@ -47,6 +55,18 @@ class Channel(
         return followsEvent
     }
 
+    fun interceptSubscriptionEvent(messenger: Messenger, event: SubscriptionEvent): SubscriptionEvent {
+        Do exhaustive when (event) {
+            is NewSubsEvent ->
+                newSubsCallbacks.forEach { callback -> callback(messenger, event) }
+            is SubNotificationsEvent ->
+                subNotificationsCallbacks.forEach { callback -> callback(messenger, event) }
+            is UnknownSubEvent ->
+                unknownSubCallbacks.forEach { callback -> callback(messenger, event) }
+        }
+        return event
+    }
+
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
@@ -69,6 +89,9 @@ class Channel(
 
         private val joinCallbacks: MutableList<JoinCallback> = mutableListOf()
         private val followCallbacks: MutableList<FollowCallback> = mutableListOf()
+        private val newSubsCallbacks: MutableList<NewSubsEventCallback> = mutableListOf()
+        private val subNotificationsCallbacks: MutableList<SubNotificationsEventCallback> = mutableListOf()
+        private val unknownSubCallbacks: MutableList<UnknownSubEventCallback> = mutableListOf()
         private val commandCallbacks: MutableList<Pair<String, CommandCallback>> = mutableListOf()
 
         @ChannelDsl
@@ -91,6 +114,21 @@ class Channel(
             followCallbacks += callback
         }
 
+        @ChannelDsl
+        fun newSubscriptions(callback: NewSubsEventCallback) {
+            newSubsCallbacks += callback
+        }
+
+        @ChannelDsl
+        fun notificationSubscriptions(callback: SubNotificationsEventCallback) {
+            subNotificationsCallbacks += callback
+        }
+
+        @ChannelDsl
+        fun unknownTypeSubscriptions(callback: UnknownSubEventCallback) {
+            unknownSubCallbacks += callback
+        }
+
         fun build(serviceLocator: ServiceLocator): Channel {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${Channel::class.simpleName}")
@@ -98,6 +136,9 @@ class Channel(
                 channel = channelName,
                 joinCallbacks = joinCallbacks,
                 followCallbacks = followCallbacks,
+                newSubsCallbacks = newSubsCallbacks,
+                subNotificationsCallbacks = subNotificationsCallbacks,
+                unknownSubCallbacks = unknownSubCallbacks,
                 commandCallbacks = commandCallbacks,
                 logger = serviceLocator.loggerFactory.getLogger(Channel::class)
             )
@@ -117,6 +158,7 @@ class Channel(
                     pipeline.interceptJoinEvent(channel::interceptJoinEvent)
                     pipeline.interceptCommandEvent(channel::interceptCommandEvent)
                     pipeline.interceptFollowHandler(channel::interceptFollowEvent)
+                    pipeline.interceptSubscriptionHandler(channel::interceptSubscriptionEvent)
                     pipeline.requestChannel(channel.channel)
                 }
         }
@@ -136,4 +178,19 @@ typealias JoinCallback = (
 typealias FollowCallback = (
     messenger: Messenger,
     followsEvent: FollowsEvent
+) -> Unit
+
+typealias NewSubsEventCallback = (
+    messenger: Messenger,
+    subscriptionsEvent: NewSubsEvent
+) -> Unit
+
+typealias SubNotificationsEventCallback = (
+    messenger: Messenger,
+    subscriptionsEvent: SubNotificationsEvent
+) -> Unit
+
+typealias UnknownSubEventCallback = (
+    messenger: Messenger,
+    subscriptionsEvent: UnknownSubEvent
 ) -> Unit

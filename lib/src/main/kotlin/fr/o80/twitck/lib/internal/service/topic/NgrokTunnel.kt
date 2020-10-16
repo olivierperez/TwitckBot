@@ -29,7 +29,7 @@ class NgrokTunnel(
     }
 
     private fun openTunnel(): String {
-        val payload = """{"addr":"$port", "name":"$name", "proto":"http", "bind_tls":"false"}"""
+        val payload = """{"addr":"$port", "name":"$name", "proto":"http", "bind_tls":"true"}"""
         val jsonResponse: HttpResponse<JsonNode> = Unirest.post("$NGROCK_ADDR/api/tunnels")
             .header("accept", "application/json")
             .header("Content-Type", "application/json; charset=utf8")

@@ -4,10 +4,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.bean.FollowsEvent
 import fr.o80.twitck.lib.api.bean.NewFollowers
-import fr.o80.twitck.lib.api.bean.NewSubscriptionsEvent
-import fr.o80.twitck.lib.api.bean.NotificationSubscriptionsEvent
+import fr.o80.twitck.lib.api.bean.NewSubsEvent
+import fr.o80.twitck.lib.api.bean.SubNotificationsEvent
 import fr.o80.twitck.lib.api.bean.StreamsChanged
-import fr.o80.twitck.lib.api.bean.UnknownSubscriptionsEvent
+import fr.o80.twitck.lib.api.bean.UnknownSubEvent
 import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionEvents
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
@@ -99,16 +99,21 @@ class WebhooksServer(
 
             val eventsByType = subscriptionEvents.data.groupBy { it.type }
             eventsByType["subscriptions.subscribe"]
-                ?.let { subscriptionsDispatcher.dispatch(NewSubscriptionsEvent(it)) }
+                ?.let { events -> NewSubsEvent(events.map { event -> event.data }) }
+                ?.also { subscriptionsDispatcher.dispatch(it) }
             eventsByType["subscriptions.notification"]
-                ?.let { subscriptionsDispatcher.dispatch(NotificationSubscriptionsEvent(it)) }
+                ?.let { events -> SubNotificationsEvent(events.map { event -> event.data }) }
+                ?.also { subscriptionsDispatcher.dispatch(it) }
 
             eventsByType.entries
+                .asSequence()
                 .filterNot { (eventType, _) ->
                     eventType in listOf("subscriptions.subscribe", "subscriptions.notification")
-                }.forEach { (eventType, events) ->
-                    subscriptionsDispatcher.dispatch(UnknownSubscriptionsEvent(eventType, events))
                 }
+                .map { (eventType, events) ->
+                    UnknownSubEvent(eventType, events.map { event -> event.data })
+                }
+                .forEach { subscriptionsDispatcher.dispatch(it) }
         }
         call.respondText("OK", ContentType.Text.Html)
     }

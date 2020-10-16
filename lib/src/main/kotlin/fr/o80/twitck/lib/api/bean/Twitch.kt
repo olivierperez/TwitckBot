@@ -53,7 +53,8 @@ data class ValidateResponse(
     val clientId: String,
     @Json(name = "user_id")
     val userId: String,
-    val login: String
+    val login: String,
+    val scopes: List<String>
 )
 
 @JsonClass(generateAdapter = true)
