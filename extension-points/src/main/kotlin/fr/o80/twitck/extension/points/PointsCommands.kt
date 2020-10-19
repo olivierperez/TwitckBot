@@ -32,13 +32,13 @@ class PointsCommands(
     }
 
     private fun handleAddCommand(commandEvent: CommandEvent) {
-        if (commandEvent.badges.none { badge -> badge in privilegedBadges }) return
+        if (commandEvent.viewer.badges.none { badge -> badge in privilegedBadges }) return
 
         val command = commandEvent.command
         if (command.options.size == 2) {
             val login = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${commandEvent.login} try to add $points to $login")
+            logger.command(command, "${commandEvent.viewer.displayName} try to add $points to $login")
 
             points?.let {
                 bank.addPoints(login, points)
@@ -50,10 +50,10 @@ class PointsCommands(
     private fun handleGiveCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {
-            val fromLogin = commandEvent.login
+            val fromLogin = commandEvent.viewer.login
             val toLogin = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${commandEvent.login} try to transfer $points to $toLogin")
+            logger.command(command, "${commandEvent.viewer.displayName} try to transfer $points to $toLogin")
 
             if (toLogin == fromLogin) return
             if (points == null) return
@@ -61,35 +61,34 @@ class PointsCommands(
             val transferSucceeded = bank.transferPoints(fromLogin, toLogin, points)
             val msg = if (transferSucceeded) {
                 message.pointsTransferred
-                    .replace("#FROM#", fromLogin)
+                    .replace("#FROM#", commandEvent.viewer.displayName)
                     .replace("#TO#", toLogin)
             } else {
                 message.notEnoughPoints
-                    .replace("#FROM#", fromLogin)
+                    .replace("#FROM#", commandEvent.viewer.displayName)
                     .replace("#TO#", toLogin)
             }
 
-            messenger.whisper(commandEvent.channel, commandEvent.login, msg)
+            messenger.whisper(commandEvent.channel, commandEvent.viewer.login, msg)
         }
     }
 
     private fun handleInfoCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
-        val login = commandEvent.login
-        val points = bank.getPoints(login)
+        val points = bank.getPoints(commandEvent.viewer.login)
 
-        logger.command(command, "$login requested points info ($points)")
+        logger.command(command, "${commandEvent.viewer.displayName} requested points info ($points)")
 
         val msg = if (points == 0) {
             message.viewerHasNoPoints
-                .replace("#USER#", login)
+                .replace("#USER#", commandEvent.viewer.displayName)
                 .replace("#POINTS#", points.toString())
         } else {
             message.viewerHasPoints
-                .replace("#USER#", login)
+                .replace("#USER#", commandEvent.viewer.displayName)
                 .replace("#POINTS#", points.toString())
         }
 
-        messenger.whisper(commandEvent.channel, login, msg)
+        messenger.whisper(commandEvent.channel, commandEvent.viewer.login, msg)
     }
 }

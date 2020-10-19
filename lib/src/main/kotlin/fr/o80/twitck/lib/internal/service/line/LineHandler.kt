@@ -6,9 +6,14 @@ internal interface LineHandler {
     fun handle(line: String)
 
     fun parseBadges(value: String): List<Badge> {
-        return value.split(",").map {
+        return value.split(",").mapNotNull {
             val badgeValue = it.split("/")[0]
-            Badge.fromValue(badgeValue)
+
+            if (badgeValue.isBlank()) {
+                null
+            } else {
+                Badge.fromValue(badgeValue)
+            }
         }
     }
 }

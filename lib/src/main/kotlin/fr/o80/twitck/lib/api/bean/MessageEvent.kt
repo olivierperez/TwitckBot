@@ -5,8 +5,7 @@ import fr.o80.twitck.lib.api.service.Messenger
 data class MessageEvent(
     val messenger: Messenger,
     val channel: String,
-    val login: String,
-    val userId: String,
-    val badges: List<Badge>,
-    val message: String
+    val message: String,
+    val bits: Int,
+    val viewer: Viewer
 )

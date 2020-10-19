@@ -35,7 +35,7 @@ class PollCommands(
     }
 
     private fun handlePoll(messenger: Messenger, commandEvent: CommandEvent) {
-        if (commandEvent.badges.none { badge -> badge in privilegedBadges }) return
+        if (commandEvent.viewer.badges.none { badge -> badge in privilegedBadges }) return
 
         if (commandEvent.command.options.isNotEmpty()) {
             startPoll(messenger, commandEvent)
@@ -46,11 +46,11 @@ class PollCommands(
 
     private fun handleVote(commandEvent: CommandEvent) {
         val vote = commandEvent.command.options.joinToString(" ").toLowerCase()
-        val voteResult = currentPoll?.addVote(commandEvent.login, vote)
+        val voteResult = currentPoll?.addVote(commandEvent.viewer.login, vote)
 
         if (voteResult == Vote.NEW_VOTE && pointsForEachVote > 0) {
             extensionProvider.forEach(PointsManager::class) { pointsManager ->
-                pointsManager.addPoints(commandEvent.login, pointsForEachVote)
+                pointsManager.addPoints(commandEvent.viewer.login, pointsForEachVote)
             }
         }
     }

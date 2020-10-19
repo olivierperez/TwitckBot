@@ -29,7 +29,7 @@ object CodeReviewProduct : Product {
         val msg = commandEvent.command.options.skip(2).joinToString(" ")
 
         return PurchaseResult.WaitingValidation(
-            login = commandEvent.login,
+            login = commandEvent.viewer.login,
             code = "CodeReview ${level.code}",
             message = msg,
             price = level.price

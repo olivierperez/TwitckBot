@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.service.Messenger
@@ -19,25 +20,25 @@ class RewardsCommands(
             return commandEvent
 
         when (commandEvent.command.tag) {
-            "!claim" -> claim(messenger, commandEvent.login)
+            "!claim" -> claim(messenger, commandEvent.viewer)
         }
 
         return commandEvent
     }
 
-    private fun claim(messenger: Messenger, login: String) {
+    private fun claim(messenger: Messenger, viewer: Viewer) {
         if (claimedPoints == 0) return
 
-        claimTimeChecker.executeIfNotCooldown(login) {
+        claimTimeChecker.executeIfNotCooldown(viewer.login) {
             val ownedPoints = extensionProvider.provide(PointsManager::class)
                 .filter { it.channel == channel }
                 .onEach { pointsManager ->
-                    pointsManager.addPoints(login, claimedPoints)
+                    pointsManager.addPoints(viewer.login, claimedPoints)
                 }
-                .sumBy { pointsManager -> pointsManager.getPoints(login) }
+                .sumBy { pointsManager -> pointsManager.getPoints(viewer.login) }
 
             val message = messages.viewerJustClaimed
-                .replace("#USER#", login)
+                .replace("#USER#", viewer.displayName)
                 .replace("#NEW_POINTS#", claimedPoints.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())
 

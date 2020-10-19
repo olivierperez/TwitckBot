@@ -3,6 +3,7 @@ package fr.o80.twitck.lib.internal.service.line
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
@@ -41,11 +42,19 @@ internal class PrivMsgLineHandler(
                 }
             }
 
+            val viewer = Viewer(
+                login = user,
+                displayName = displayName,
+                badges = badges,
+                userId = userId,
+                color = color
+            )
             val command = commandParser.parse(msg)
+
             if (command != null) {
-                commandDispatcher.dispatch(CommandEvent(messenger, channel, user, userId, badges, command))
+                commandDispatcher.dispatch(CommandEvent(messenger, channel, command, bits, viewer))
             } else {
-                messageDispatcher.dispatch(MessageEvent(messenger, channel, user, userId, badges, msg))
+                messageDispatcher.dispatch(MessageEvent(messenger, channel, msg, bits, viewer))
             }
         }
     }

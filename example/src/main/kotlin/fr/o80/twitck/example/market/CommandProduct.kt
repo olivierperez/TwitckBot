@@ -26,13 +26,13 @@ object CommandProduct : Product {
         serviceLocator: ServiceLocator
     ): PurchaseResult {
         val msg = commandEvent.command.options.skip(1).joinToString(" ")
-        val commandTag = "!${commandEvent.login}"
+        val commandTag = "!${commandEvent.viewer.login}"
 
         serviceLocator.extensionProvider.forEach(RuntimeCommand::class) { runtimeCommand ->
             runtimeCommand.registerRuntimeCommand(commandTag, SCOPE_PERMANENT, msg)
         }
 
-        return PurchaseResult.Success("Yo ${commandEvent.login}, tu viens d'acheter la commande $commandTag")
+        return PurchaseResult.Success("Yo ${commandEvent.viewer.displayName}, tu viens d'acheter la commande $commandTag")
     }
 
 }

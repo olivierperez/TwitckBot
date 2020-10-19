@@ -60,9 +60,7 @@ class RuntimeCommand(
         messenger: Messenger,
         commandEvent: CommandEvent
     ) {
-        if (privilegedBadges.intersect(commandEvent.badges).isEmpty()) {
-            return
-        }
+        if (commandEvent.viewer.badges.none { badge -> badge in privilegedBadges }) return
 
         val command = commandEvent.command
         val scope: String = command.options[0]

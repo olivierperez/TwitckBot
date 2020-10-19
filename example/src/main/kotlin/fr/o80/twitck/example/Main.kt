@@ -271,14 +271,14 @@ class Main : CliktCommand() {
                     messenger.sendImmediately(botChannel, "Il n'y a pas encore d'aide")
                 }
                 join { messenger, join ->
-                    if (!join.login.equals(botName, true)) {
+                    if (!join.viewer.login.equals(botName, true)) {
                         messenger.sendImmediately(
                             join.channel,
-                            "Salut ${join.login} ! Que fais-tu ici ?"
+                            "Salut ${join.viewer.displayName} ! Que fais-tu ici ?"
                         )
                         messenger.sendImmediately(
                             hostChannel,
-                            "Heu... Il y a ${join.login} qui est venu chez moi, je fais quoi ?"
+                            "Heu... Il y a ${join.viewer.displayName} qui est venu chez moi, je fais quoi ?"
                         )
                     }
                 }

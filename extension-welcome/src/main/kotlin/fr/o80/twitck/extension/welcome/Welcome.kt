@@ -6,6 +6,7 @@ import fr.o80.twitck.lib.api.bean.Follower
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.JoinEvent
 import fr.o80.twitck.lib.api.bean.MessageEvent
+import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -32,68 +33,64 @@ class Welcome(
     }
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
-        handleNewViewer(commandEvent.channel, commandEvent.login, messenger)
+        handleNewViewer(commandEvent.channel, commandEvent.viewer, messenger)
         return commandEvent
     }
 
     fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
-        handleNewViewer(joinEvent.channel, joinEvent.login, messenger)
+        handleNewViewer(joinEvent.channel, joinEvent.viewer, messenger)
         return joinEvent
     }
 
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
-        handleNewViewer(messageEvent.channel, messageEvent.login, messenger)
+        handleNewViewer(messageEvent.channel, messageEvent.viewer, messenger)
         return messageEvent
     }
 
-    private fun handleNewViewer(channel: String, login: String, messenger: Messenger) {
+    private fun handleNewViewer(channel: String, viewer: Viewer, messenger: Messenger) {
         if (this.channel != channel)
             return
 
-        if (ignoredLogins.any { login.equals(it, true) }) {
+        if (ignoredLogins.any { viewer.login.equals(it, true) }) {
             return
         }
 
-        if (hostMessage != null && isHost(login)) {
-            welcomeHost(messenger, login, hostMessage)
+        if (hostMessage != null && isHost(viewer.login)) {
+            welcomeHost(channel, hostMessage, messenger)
             return
         }
 
-        welcomeTimeChecker.executeIfNotCooldown(login) {
-            welcomeViewer(channel, login, messenger)
+        welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
+            welcomeViewer(channel, viewer, messenger)
         }
     }
 
     private fun isHost(login: String) =
         login == hostName
 
-    private fun welcomeHost(messenger: Messenger, channel: String, message: String) {
+    private fun welcomeHost(channel: String, message: String, messenger: Messenger) {
         messenger.sendWhenAvailable(channel, message, Importance.LOW)
     }
 
-    private fun welcomeViewer(channel: String, login: String, messenger: Messenger) {
-        val randomMessage = pickMessage(login)
+    private fun welcomeViewer(channel: String, viewer: Viewer, messenger: Messenger) {
+        val randomMessage = pickMessage(viewer)
         messenger.sendWhenAvailable(channel, randomMessage, Importance.LOW)
     }
 
-    private fun pickMessage(login: String): String {
-        val follower = login.getFollowerOrNull()
+    private fun pickMessage(viewer: Viewer): String {
+        val follower = viewer.login.getFollowerOrNull()
         return if (follower != null) {
-            messagesForFollowers.random().formatFollower(follower)
+            messagesForFollowers.random()
+                .replace("#USER#", follower.user.displayName)
         } else {
-            messages.random().formatViewer(login)
+            messages.random()
+                .replace("#USER#", viewer.displayName)
         }
     }
 
     private fun String.getFollowerOrNull(): Follower? {
         return followers.firstOrNull { follower -> follower.user.name == this }
     }
-
-    private fun String.formatViewer(login: String): String =
-        this.replace("#USER#", login)
-
-    private fun String.formatFollower(follower: Follower): String =
-        this.replace("#USER#", follower.user.displayName)
 
     class Configuration {
 

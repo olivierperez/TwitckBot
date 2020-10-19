@@ -42,9 +42,9 @@ class Rewards(
     private fun rewardTalkativeViewers(messageEvent: MessageEvent) {
         if (rewardedPoints == 0) return
 
-        talkingTimeChecker.executeIfNotCooldown(messageEvent.login) {
+        talkingTimeChecker.executeIfNotCooldown(messageEvent.viewer.login) {
             extensionProvider.forEach(PointsManager::class) { points ->
-                points.addPoints(messageEvent.login, rewardedPoints)
+                points.addPoints(messageEvent.viewer.login, rewardedPoints)
             }
         }
     }

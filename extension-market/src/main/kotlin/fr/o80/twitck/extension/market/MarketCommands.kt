@@ -91,8 +91,8 @@ class MarketCommands(
         product: Product,
         price: Int
     ) {
-        if (points.consumePoints(commandEvent.login, price)) {
-            logger.info("${commandEvent.login} just spend $price points for ${product.name}")
+        if (points.consumePoints(commandEvent.viewer.login, price)) {
+            logger.info("${commandEvent.viewer.displayName} just spend $price points for ${product.name}")
 
             val purchaseResult = product.execute(messenger, commandEvent, logger, storage, serviceLocator)
             Do exhaustive when (purchaseResult) {
@@ -108,7 +108,7 @@ class MarketCommands(
         } else {
             messenger.sendImmediately(
                 channel,
-                messages.youDontHaveEnoughPoints.replace("#USER#", commandEvent.login)
+                messages.youDontHaveEnoughPoints.replace("#USER#", commandEvent.viewer.displayName)
             )
         }
     }
@@ -119,7 +119,7 @@ class MarketCommands(
         commandEvent: CommandEvent,
         product: Product
     ) {
-        logger.info("${commandEvent.login} just bought a ${product.name}!")
+        logger.info("${commandEvent.viewer.displayName} just bought a ${product.name}!")
         purchaseResult.message?.let { messenger.sendImmediately(channel, it) }
     }
 
@@ -130,9 +130,9 @@ class MarketCommands(
         product: Product,
         price: Int
     ) {
-        logger.info("${commandEvent.login} failed to buy ${product.name}!")
+        logger.info("${commandEvent.viewer.displayName} failed to buy ${product.name}!")
         messenger.sendImmediately(channel, purchaseResult.message)
-        points.addPoints(commandEvent.login, price)
+        points.addPoints(commandEvent.viewer.login, price)
     }
 
     private fun onBuyIsWaitingForValidation(
@@ -154,10 +154,10 @@ class MarketCommands(
 
             storage.putProductsInValidation(productsInValidation)
 
-            logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.login}")
+            logger.info("The purchase ${product.name} is waiting for validation ${commandEvent.viewer.displayName}")
             messenger.sendImmediately(
                 channel,
-                messages.yourPurchaseIsPending.replace("#USER#", commandEvent.login)
+                messages.yourPurchaseIsPending.replace("#USER#", commandEvent.viewer.displayName)
             )
         }
     }

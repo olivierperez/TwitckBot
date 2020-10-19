@@ -25,11 +25,11 @@ class ViewerPromotion(
         if (channel != messageEvent.channel)
             return messageEvent
 
-        if (messageEvent.login in ignoredLogins) {
+        if (messageEvent.viewer.login in ignoredLogins) {
             return messageEvent
         }
 
-        promotionTimeChecker.executeIfNotCooldown(messageEvent.login) {
+        promotionTimeChecker.executeIfNotCooldown(messageEvent.viewer.login) {
             promoteViewer(messenger, messageEvent)
         }
 
@@ -37,7 +37,7 @@ class ViewerPromotion(
     }
 
     private fun promoteViewer(messenger: Messenger, messageEvent: MessageEvent) {
-        val lastVideo = twitchApi.getVideos(messageEvent.userId, 1)
+        val lastVideo = twitchApi.getVideos(messageEvent.viewer.userId, 1)
             .takeIf { it.isNotEmpty() }
             ?.first()
             ?: return
@@ -47,7 +47,7 @@ class ViewerPromotion(
     }
 
     private fun String.formatViewer(messageEvent: MessageEvent, video: Video): String =
-        this.replace("#USER#", messageEvent.login)
+        this.replace("#USER#", messageEvent.viewer.displayName)
             .replace("#URL#", video.url)
             .replace("#GAME#", video.game)
 

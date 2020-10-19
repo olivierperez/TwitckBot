@@ -2,6 +2,7 @@ package fr.o80.twitck.lib.internal.service.line
 
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 
 internal class JoinLineHandler(
@@ -15,11 +16,19 @@ internal class JoinLineHandler(
             val user = matchResult.groupValues[1]
             val channel = matchResult.groupValues[2]
 
+            val viewer = Viewer(
+                login = user,
+                displayName = user,
+                listOf(),
+                "",
+                ""
+            )
+
             dispatcher.dispatch(
                 JoinEvent(
                     bot = bot,
                     channel = channel,
-                    login = user
+                    viewer = viewer
                 )
             )
         }
