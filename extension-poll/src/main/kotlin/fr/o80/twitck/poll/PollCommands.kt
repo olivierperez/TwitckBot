@@ -35,7 +35,7 @@ class PollCommands(
     }
 
     private fun handlePoll(messenger: Messenger, commandEvent: CommandEvent) {
-        if (commandEvent.viewer.badges.none { badge -> badge in privilegedBadges }) return
+        if (commandEvent.viewer hasNoPrivilegesOf privilegedBadges) return
 
         if (commandEvent.command.options.isNotEmpty()) {
             startPoll(messenger, commandEvent)

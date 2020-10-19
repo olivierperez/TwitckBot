@@ -6,4 +6,8 @@ data class Viewer(
     var badges : List<Badge>,
     var userId : String,
     var color : String
-)
+) {
+    infix fun hasNoPrivilegesOf(privilegedBadges: Array<out Badge>): Boolean {
+        return badges.none { badge -> badge in privilegedBadges }
+    }
+}

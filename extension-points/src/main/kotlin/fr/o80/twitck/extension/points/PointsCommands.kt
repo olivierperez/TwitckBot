@@ -32,7 +32,7 @@ class PointsCommands(
     }
 
     private fun handleAddCommand(commandEvent: CommandEvent) {
-        if (commandEvent.viewer.badges.none { badge -> badge in privilegedBadges }) return
+        if (commandEvent.viewer hasNoPrivilegesOf privilegedBadges) return
 
         val command = commandEvent.command
         if (command.options.size == 2) {
