@@ -123,7 +123,7 @@ class Main : CliktCommand() {
                 remind("Quelqu'un veut qu'on monte un discord ?")
                 remind("Olivier partage quelques bouts de code sur https://github.com/olivierperez")
                 remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
-                remind("Vous faites de l'Android ? nous aussi, et on le streame parfois")
+                remind("Vous faites de l'Android ? nous aussi, et ça se retrouve sur Youtube https://youtu.be/ig-_10msUUE")
                 remind("Le refactoring Kata c'est bon pour la santé, du coup on le pratique ici de temps en temps")
             }
             install(Welcome) {
