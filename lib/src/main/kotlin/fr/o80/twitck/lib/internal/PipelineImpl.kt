@@ -33,11 +33,11 @@ internal class PipelineImpl : Pipeline {
         whisperHandlers += whisperHandler
     }
 
-    override fun interceptFollowHandler(followsHandler: FollowsHandler) {
+    override fun interceptFollowEvent(followsHandler: FollowsHandler) {
         followsHandlers += followsHandler
     }
 
-    override fun interceptSubscriptionHandler(subscriptionsHandler: SubscriptionsHandler) {
+    override fun interceptSubscriptionEvent(subscriptionsHandler: SubscriptionsHandler) {
         subscriptionsHandlers += subscriptionsHandler
     }
 

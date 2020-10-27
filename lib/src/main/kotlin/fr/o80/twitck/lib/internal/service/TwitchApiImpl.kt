@@ -11,10 +11,12 @@ import fr.o80.twitck.lib.api.bean.ValidateResponse
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
-import java.net.URI
-import java.net.http.HttpClient
-import java.net.http.HttpRequest
-import java.net.http.HttpResponse
+import org.apache.http.client.HttpClient
+import org.apache.http.client.methods.HttpGet
+import org.apache.http.client.methods.HttpPost
+import org.apache.http.entity.StringEntity
+import org.apache.http.impl.client.HttpClients
+import org.apache.http.util.EntityUtils
 import java.util.Date
 
 class TwitchApiImpl(
@@ -31,7 +33,7 @@ class TwitchApiImpl(
         .add(Date::class.java, Rfc3339DateJsonAdapter().nullSafe())
         .build()
 
-    private val client: HttpClient = HttpClient.newHttpClient()
+    private val client: HttpClient = HttpClients.createDefault()
 
     // TODO OPZ Migrer vers helix => https://dev.twitch.tv/docs/authentication/#sending-user-access-and-app-access-tokens
     private val baseUrl: String = "https://api.twitch.tv/kraken"
@@ -60,62 +62,64 @@ class TwitchApiImpl(
     }
 
     private fun doRequest(url: String): String {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("$baseUrl$url"))
-            .header("Authorization", "OAuth $oauthToken")
-            .header("Accept", "application/vnd.twitchtv.v5+json")
-            .apply {
-                if (clientId != null) {
-                    header("Client-ID", clientId)
-                }
+        val request = HttpGet("$baseUrl$url").apply {
+            addHeader("Authorization", "OAuth $oauthToken")
+            addHeader("Accept", "application/vnd.twitchtv.v5+json")
+            if (clientId != null) {
+                addHeader("Client-ID", clientId)
             }
-            .build()
-
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body().also {
-            logger.debug("Response: $response")
         }
+
+        val response = client.execute(request)
+        val entity = response.entity
+        val body = EntityUtils.toString(entity)
+        logger.debug("Response: $body")
+
+        return body
     }
 
     override fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String {
         val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
 
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("https://api.twitch.tv/helix/webhooks/hub"))
-            .header("Client-ID", clientId)
-            .header("Authorization", "Bearer $oauthToken")
-            .header("Content-Type", "application/json")
-            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe", secret))
-            .build()
+        val request = HttpPost("https://api.twitch.tv/helix/webhooks/hub")
+            .apply {
+                addHeader("Client-ID", clientId)
+                addHeader("Authorization", "Bearer $oauthToken")
+                addHeader("Content-Type", "application/json")
+                val payload = buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe", secret)
+                entity = StringEntity(payload)
+            }
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        val response = client.execute(request)
+        return EntityUtils.toString(response.entity)
     }
 
     override fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long): String {
         val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
 
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("https://api.twitch.tv/helix/webhooks/hub"))
-            .header("Client-ID", clientId)
-            .header("Authorization", "Bearer $oauthToken")
-            .header("Content-Type", "application/json")
-            .POST(buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "unsubscribe", ""))
-            .build()
+        val request = HttpPost("https://api.twitch.tv/helix/webhooks/hub")
+            .apply {
+                addHeader("Client-ID", clientId)
+                addHeader("Authorization", "Bearer $oauthToken")
+                addHeader("Content-Type", "application/json")
+                val payload = buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "unsubscribe", "")
+                entity = StringEntity(payload)
+            }
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body()
+        val response = client.execute(request)
+        return EntityUtils.toString(response.entity)
     }
 
     override fun validate(): ValidateResponse {
-        val request = HttpRequest.newBuilder()
-            .uri(URI.create("https://id.twitch.tv/oauth2/validate"))
-            .header("Authorization", "Bearer $oauthToken")
-            .header("Content-Type", "application/json")
-            .build()
+        val request = HttpGet("https://id.twitch.tv/oauth2/validate")
+            .apply {
+                addHeader("Authorization", "Bearer $oauthToken")
+                addHeader("Content-Type", "application/json")
+            }
 
-        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-        return response.body().parse<ValidateResponse>().also { validateResponse ->
+        val response = client.execute(request)
+        val body = EntityUtils.toString(response.entity)
+        return body.parse<ValidateResponse>().also { validateResponse ->
             clientId = validateResponse.clientId
         }
     }
@@ -130,8 +134,8 @@ class TwitchApiImpl(
         leaseSeconds: Long,
         mode: String,
         secret: String
-    ): HttpRequest.BodyPublisher {
-        return HttpRequest.BodyPublishers.ofString("""
+    ): String {
+        return """
                 {
                     "hub.callback": "$callbackUrl",
                     "hub.mode": "$mode",
@@ -139,7 +143,7 @@ class TwitchApiImpl(
                     "hub.lease_seconds": $leaseSeconds,
                     "hub.secret": "$secret"
                 }
-            """.trimIndent())
+            """.trimIndent()
     }
 }
 

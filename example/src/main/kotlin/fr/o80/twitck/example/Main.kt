@@ -8,6 +8,7 @@ import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Presence
+import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
@@ -69,6 +70,11 @@ class Main : CliktCommand() {
         println("Start...")
         // TODO CamouilleLaFrippouille -> répondre à quelques questions, genre : pourquoi tu t'appelles comme ça ?
         return twitckBot(oauthToken, hostName) {
+//            --AclExtension--
+//            install(CommandAcl) {
+//                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
+//                on("!points_give", Badge.FOUNDER)
+//            }
             install(StandardOverlay) {
             }
             install(Storage) {
@@ -78,6 +84,9 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
                 registerCommand("!language", "Ici on fait du Kotlin, best language ever")
+            }
+            install(StatsExtension) {
+                channel(hostChannel)
             }
             install(Points) {
                 channel(hostChannel)
@@ -114,6 +123,9 @@ class Main : CliktCommand() {
                 product(KotlinProduct)
                 product(CompareLanguageProduct)
                 // TODO idée CamouilleLaFripouille 500 codes source => assistance UML (15 min)
+                // TODO idée GiftSub !ShoutOut pour mettre en avant un autre viewer
+                // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
+                // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
             }
             install(Repeat) {
                 channel(hostChannel)

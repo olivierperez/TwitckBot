@@ -168,8 +168,8 @@ class Channel(
                 .also { channel ->
                     pipeline.interceptJoinEvent(channel::interceptJoinEvent)
                     pipeline.interceptCommandEvent(channel::interceptCommandEvent)
-                    pipeline.interceptFollowHandler(channel::interceptFollowEvent)
-                    pipeline.interceptSubscriptionHandler(channel::interceptSubscriptionEvent)
+                    pipeline.interceptFollowEvent(channel::interceptFollowEvent)
+                    pipeline.interceptSubscriptionEvent(channel::interceptSubscriptionEvent)
                     pipeline.requestChannel(channel.channel)
                 }
         }
