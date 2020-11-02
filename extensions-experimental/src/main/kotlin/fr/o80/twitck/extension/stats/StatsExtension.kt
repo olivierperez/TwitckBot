@@ -19,7 +19,8 @@ class StatsExtension(
 ) : Stat {
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
-        statsData.increment("stats", "command:${commandEvent.command.tag.removePrefix("!")}")
+        val commandName = commandEvent.command.tag.removePrefix("!")
+        statsData.increment("stats", "command", "command" to commandName)
         return commandEvent
     }
 
@@ -34,9 +35,14 @@ class StatsExtension(
     }
 
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
-        statsData.increment("stats", "bits", messageEvent.bits)
+        statsData.increment("stats", "bits", "count" to messageEvent.bits)
+        statsData.maximum("stats", "bits", messageEvent.bits)
         statsData.increment("stats", "messages")
-        statsData.increment("stats", "words", messageEvent.message.split("\\s+".toRegex()).count())
+
+        val wordsCount = messageEvent.message.split("\\s+".toRegex()).count()
+        statsData.increment("stats", "words", wordsCount)
+        statsData.minimum("stats", "words", wordsCount)
+        statsData.maximum("stats", "words", wordsCount)
         return messageEvent
     }
 

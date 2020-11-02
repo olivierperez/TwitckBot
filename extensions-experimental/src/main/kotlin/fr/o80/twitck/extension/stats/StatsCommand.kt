@@ -25,7 +25,10 @@ class StatsCommand(
         val stateName = commandEvent.command.options[0]
         val stat = statsData.get("stats", stateName)
         if (stat != null) {
-            messenger.sendImmediately(commandEvent.channel, "Il y a eu $stat $stateName")
+            val minMsg = stat.takeIf { it.min < Long.MAX_VALUE }?.let { "min: ${it.min}" }
+            val maxMsg = stat.takeIf { it.max > Long.MIN_VALUE }?.let { "max: ${it.max}" }
+            val extremesMsg = if (minMsg != null && maxMsg != null) "[$minMsg, $maxMsg]" else ""
+            messenger.sendImmediately(commandEvent.channel, "Il y a eu ${stat.count} $stateName $extremesMsg")
         } else {
             messenger.sendImmediately(commandEvent.channel, "Aucune statistique pour le moment")
         }
