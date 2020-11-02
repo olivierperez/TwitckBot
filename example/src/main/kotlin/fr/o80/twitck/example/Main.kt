@@ -132,7 +132,7 @@ class Main : CliktCommand() {
                 interval(Duration.ofMinutes(5))
                 remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
                 remind("Olivier tweet peu, mais bien https://twitter.com/olivierperez")
-                remind("Quelqu'un veut qu'on monte un discord ?")
+                remind("On se retrouve sur discord en dehors des streams ? https://discord.gg/RypEkZVg")
                 remind("Olivier partage quelques bouts de code sur https://github.com/olivierperez")
                 remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
                 remind("Vous faites de l'Android ? nous aussi, et ça se retrouve sur Youtube https://youtu.be/ig-_10msUUE")

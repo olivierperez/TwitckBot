@@ -56,7 +56,9 @@ class Welcome(
         }
 
         if (hostMessage != null && isHost(viewer.login)) {
-            welcomeHost(channel, hostMessage, messenger)
+            welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
+                welcomeHost(channel, hostMessage, messenger)
+            }
             return
         }
 
