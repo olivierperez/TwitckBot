@@ -1,11 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.FollowsEvent
-import fr.o80.twitck.lib.api.bean.JoinEvent
-import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.*
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.extension.Stat
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -20,55 +16,65 @@ class StatsExtension(
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         val commandName = commandEvent.command.tag.removePrefix("!")
-        statsData.increment("stats", "command", "command" to commandName)
+        statsData.hit(STATS_NAMESPACE, "command", mapOf("command" to commandName))
         return commandEvent
     }
 
     fun interceptFollowEvent(messenger: Messenger, followsEvent: FollowsEvent): FollowsEvent {
-        statsData.increment("stats", "follows")
+        statsData.hit(STATS_NAMESPACE, "follows")
         return followsEvent
     }
 
     fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
-        statsData.increment("stats", "joins")
+        statsData.hit(STATS_NAMESPACE, "joins")
         return joinEvent
     }
 
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
-        statsData.increment("stats", "bits", "count" to messageEvent.bits)
-        statsData.maximum("stats", "bits", messageEvent.bits)
-        statsData.increment("stats", "messages")
+        statsData.hit(
+            STATS_NAMESPACE,
+            "bits",
+            mapOf(
+                STAT_INFO_COUNT to messageEvent.bits,
+                STAT_INFO_VIEWER to messageEvent.viewer.login
+            )
+
+        )
 
         val wordsCount = messageEvent.message.split("\\s+".toRegex()).count()
-        statsData.increment("stats", "words", wordsCount)
-        statsData.minimum("stats", "words", wordsCount)
-        statsData.maximum("stats", "words", wordsCount)
+        statsData.hit(
+            STATS_NAMESPACE,
+            "messages",
+            mapOf(
+                STAT_INFO_SIZE to messageEvent.message.length,
+                STAT_INFO_COUNT to wordsCount
+            )
+        )
+
         return messageEvent
     }
 
-    fun interceptSubscriptionEvent(messenger: Messenger, subscriptionEvent: SubscriptionEvent): SubscriptionEvent {
-        statsData.increment("stats", "subscriptions")
+    fun interceptSubscriptionEvent(
+        messenger: Messenger,
+        subscriptionEvent: SubscriptionEvent
+    ): SubscriptionEvent {
+        statsData.hit(
+            STATS_NAMESPACE, "subscriptions"
+        )
         return subscriptionEvent
     }
 
     fun interceptWhisperEvent(messenger: Messenger, whisperEvent: WhisperEvent): WhisperEvent {
-        statsData.increment("stats", "whispers")
+        statsData.hit(
+            STATS_NAMESPACE, "whispers",
+            mapOf(STAT_INFO_COUNT to 1)
+        )
         return whisperEvent
     }
 
-    override fun increment(namespace: String, key: String, count: Long) {
-        if (namespace == "stats") return
-        statsData.increment(namespace, key, count)
-    }
-
-    override fun maximum(namespace: String, key: String, value: Long) {
-        if (namespace == "stats") return
-        statsData.maximum(namespace, key, value)
-    }
-
-    override fun minimum(namespace: String, key: String, value: Long) {
-        if (namespace == "stats") return
-        statsData.minimum(namespace, key, value)
+    override fun hit(namespace: String, key: String, extra: Map<String, Any>) {
+        if (namespace == STATS_NAMESPACE) return
+        statsData.hit(namespace, key, extra)
     }
 
     class Configuration {
