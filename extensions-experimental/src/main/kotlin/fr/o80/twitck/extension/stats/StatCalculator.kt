@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 class StatCalculator(
-    private val extras : List<Extra>
+    private val extras: List<Extra>
 ) {
 
     fun count(): Int {
@@ -31,4 +31,12 @@ class StatCalculator(
             info.sumOf { it[infoName] as Int } / info.size.toFloat()
         }
     }
+
+    fun countBy(infoName: String): Map<Any, Int> {
+        return extras
+            .filter { hitExtra -> hitExtra.containsKey(infoName) }
+            .groupBy { hitExtra -> hitExtra.getValue(infoName) }
+            .mapValues { (_, value) -> value.size }
+    }
+
 }

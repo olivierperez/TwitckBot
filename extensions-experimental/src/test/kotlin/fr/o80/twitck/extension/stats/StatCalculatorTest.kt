@@ -9,15 +9,19 @@ internal class StatCalculatorTest {
     private val calculator = StatCalculator(
         listOf(
             mapOf(
+                "command" to "A",
                 "toto" to 30
             ),
             mapOf(
+                "command" to "A",
                 "toto" to 10
             ),
             mapOf(
+                "command" to "B",
                 "toto" to 10
             ),
             mapOf(
+                "command" to "C",
                 "toto" to 0
             ),
             mapOf(
@@ -50,6 +54,15 @@ internal class StatCalculatorTest {
         assertNull(calculator.min("nothing"))
         assertNull(calculator.max("nothing"))
         assertNull(calculator.avg("nothing"))
+    }
+
+    @Test
+    fun `should count by Command`() {
+        val countByCommand = calculator.countBy("command")
+        assertEquals(2, countByCommand["A"])
+        assertEquals(1, countByCommand["B"])
+        assertEquals(1, countByCommand["C"])
+        assertNull(countByCommand["Non used command"])
     }
 
 }

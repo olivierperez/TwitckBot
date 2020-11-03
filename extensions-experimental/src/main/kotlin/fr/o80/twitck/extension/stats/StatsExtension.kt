@@ -15,8 +15,12 @@ class StatsExtension(
 ) : Stat {
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
-        val commandName = commandEvent.command.tag.removePrefix("!")
-        statsData.hit(STATS_NAMESPACE, "command", mapOf("command" to commandName))
+        statsData.hit(
+            STATS_NAMESPACE, "commands", mapOf(
+                "command" to commandEvent.command.tag.removePrefix("!"),
+                STAT_INFO_VIEWER to commandEvent.viewer.login
+            )
+        )
         return commandEvent
     }
 
@@ -41,13 +45,12 @@ class StatsExtension(
 
         )
 
-        val wordsCount = messageEvent.message.split("\\s+".toRegex()).count()
         statsData.hit(
             STATS_NAMESPACE,
             "messages",
             mapOf(
                 STAT_INFO_SIZE to messageEvent.message.length,
-                STAT_INFO_COUNT to wordsCount
+                STAT_INFO_COUNT to messageEvent.message.split("\\s+".toRegex()).count()
             )
         )
 
