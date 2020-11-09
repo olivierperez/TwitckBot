@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension.sound
 
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.service.Messenger
 
