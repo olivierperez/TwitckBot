@@ -13,6 +13,10 @@ class SoundPlayer {
         play("audio/yata.wav", 6f)
     }
 
+    fun playScreen() {
+        play("audio/ton_ecran.wav", 6f)
+    }
+
     private fun play(fileName: String, masterGain: Float) {
         val clip = AudioSystem.getClip()
         val resourceAsStream = javaClass.classLoader.getResourceAsStream(fileName)

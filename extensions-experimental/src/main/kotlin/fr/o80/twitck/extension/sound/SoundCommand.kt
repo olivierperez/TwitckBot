@@ -15,6 +15,7 @@ class SoundCommand(
         when (commandEvent.command.tag) {
             "!youpi" -> soundPlayer.playYoupi()
             "!yata" -> soundPlayer.playYata()
+            "!screen" -> soundPlayer.playScreen()
         }
 
         return commandEvent
