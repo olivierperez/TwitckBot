@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.api.bean.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -121,6 +122,7 @@ class MarketCommands(
     ) {
         logger.info("${commandEvent.viewer.displayName} just bought a ${product.name}!")
         purchaseResult.message?.let { messenger.sendImmediately(channel, it) }
+        extensionProvider.forEach(SoundExtension::class) { sound -> sound.playYoupi() }
     }
 
     private fun onBuyFailed(

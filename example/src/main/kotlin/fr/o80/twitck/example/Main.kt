@@ -8,7 +8,6 @@ import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Presence
-import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
@@ -17,6 +16,8 @@ import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
+import fr.o80.twitck.extension.sound.DefaultSoundExtension
+import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.extension.whisper.Whisper
@@ -76,6 +77,8 @@ class Main : CliktCommand() {
 //                on("!points_give", Badge.FOUNDER)
 //            }
             install(StandardOverlay) {
+            }
+            install(DefaultSoundExtension) {
             }
             install(Storage) {
                 output(File(".storage/"))
