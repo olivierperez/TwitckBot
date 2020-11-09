@@ -10,6 +10,7 @@ import fr.o80.twitck.lib.api.bean.subscription.Notification
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.bean.subscription.UnknownType
 import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionData
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -30,7 +31,8 @@ class Channel(
     private val subNotificationsCallbacks: Iterable<SubNotificationsEventCallback>,
     private val unknownSubCallbacks: Iterable<UnknownSubEventCallback>,
     private val commandCallbacks: Iterable<Pair<String, CommandCallback>>,
-    private val logger: Logger
+    private val logger: Logger,
+    private val extensionProvider: ExtensionProvider
 ) {
 
     fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
@@ -55,7 +57,7 @@ class Channel(
         logger.debug("New followers intercepted: $newFollowers")
         followCallbacks.forEach { callback ->
             logger.debug("New followers callback called: $callback")
-            callback(messenger, newFollowers)
+            callback(messenger, newFollowers, extensionProvider)
         }
 
         return followsEvent
@@ -151,7 +153,8 @@ class Channel(
                 subNotificationsCallbacks = subNotificationsCallbacks,
                 unknownSubCallbacks = unknownSubCallbacks,
                 commandCallbacks = commandCallbacks,
-                logger = serviceLocator.loggerFactory.getLogger(Channel::class)
+                logger = serviceLocator.loggerFactory.getLogger(Channel::class),
+                extensionProvider = serviceLocator.extensionProvider
             )
         }
     }
@@ -188,7 +191,8 @@ typealias JoinCallback = (
 
 typealias FollowCallback = (
     messenger: Messenger,
-    newFollowers: List<NewFollower>
+    newFollowers: List<NewFollower>,
+    extensionProvider: ExtensionProvider
 ) -> Unit
 
 typealias NewSubsEventCallback = (

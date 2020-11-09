@@ -25,6 +25,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.Importance
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.StandardOverlay
 import fr.o80.twitck.poll.Poll
@@ -227,11 +228,11 @@ class Main : CliktCommand() {
             }
             install(Channel) {
                 channel(hostChannel)
-                follow { messenger, newFollowers ->
+                follow { messenger, newFollowers, extensionProvider ->
                     if (newFollowers.size == 1) {
                         messenger.sendImmediately(
                             hostChannel,
-                            "Merci ${newFollowers[0].fromName} pour ton follow!",
+                            "Merci ${newFollowers[0].fromName} pour ton follow !",
                             CoolDown(Duration.ofHours(1))
                         )
                     } else {
@@ -242,13 +243,16 @@ class Main : CliktCommand() {
                             CoolDown(Duration.ofHours(1))
                         )
                     }
+                    extensionProvider.forEach(SoundExtension::class) { sound ->
+                        sound.playYoupi()
+                    }
                 }
                 newSubscriptions { messenger, events ->
                     events.forEach { subscription ->
                         if (subscription.isGift) {
                             messenger.sendWhenAvailable(
                                 hostChannel,
-                                "Merci ${subscription.gifterName} pour le cadeau à ${subscription.userName}!",
+                                "Merci ${subscription.gifterName} pour le cadeau à ${subscription.userName} !",
                                 Importance.HIGH
                             )
                         } else {
