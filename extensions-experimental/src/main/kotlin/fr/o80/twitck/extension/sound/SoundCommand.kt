@@ -9,9 +9,6 @@ class SoundCommand(
 ) {
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
-        if (commandEvent.viewer hasNoPrivilegesOf arrayOf(Badge.BROADCASTER, Badge.VIP))
-            return commandEvent
-
         when (commandEvent.command.tag) {
             "!youpi" -> soundPlayer.playYoupi()
             "!yata" -> soundPlayer.playYata()
