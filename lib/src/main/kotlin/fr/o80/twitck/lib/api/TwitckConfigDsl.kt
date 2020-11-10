@@ -62,17 +62,11 @@ class TwitckConfigurator(
         extensions += installed
     }
 
-    fun build(): TwitckConfiguration {
+    internal fun build(): TwitckConfiguration {
         return TwitckConfiguration(
             oauthToken = oauthToken,
             hostName = hostName,
-            requestedChannels = pipeline.requestedChannels,
-            joinHandlers = pipeline.joinHandlers,
-            messageHandlers = pipeline.messageHandlers,
-            commandHandlers = pipeline.commandHandlers,
-            whisperHandlers = pipeline.whisperHandlers,
-            followsHandlers = pipeline.followsHandlers,
-            subscriptionsHandlers = pipeline.subscriptionsHandlers,
+            pipeline = pipeline,
             serviceLocator = serviceLocator
         )
     }

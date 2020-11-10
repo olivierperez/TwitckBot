@@ -1,22 +1,12 @@
 package fr.o80.twitck.lib.api.bean
 
-import fr.o80.twitck.lib.api.handler.CommandHandler
-import fr.o80.twitck.lib.api.handler.FollowsHandler
-import fr.o80.twitck.lib.api.handler.JoinHandler
-import fr.o80.twitck.lib.api.handler.MessageHandler
-import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
-import fr.o80.twitck.lib.api.handler.WhisperHandler
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.internal.PipelineProvider
 
-class TwitckConfiguration(
+internal class TwitckConfiguration(
     val oauthToken: String,
     val hostName: String,
-    val requestedChannels: Iterable<String>,
-    val joinHandlers: List<JoinHandler>,
-    val messageHandlers: List<MessageHandler>,
-    val commandHandlers: List<CommandHandler>,
-    val whisperHandlers: List<WhisperHandler>,
-    val followsHandlers: List<FollowsHandler>,
-    val subscriptionsHandlers: List<SubscriptionsHandler>,
+    pipeline: PipelineProvider,
     serviceLocator: ServiceLocator
-) : ServiceLocator by serviceLocator
+) : ServiceLocator by serviceLocator,
+    PipelineProvider by pipeline
