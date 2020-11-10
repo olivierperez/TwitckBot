@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
 import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
@@ -32,7 +33,7 @@ class TwitckConfigurator(
     private val pipeline = PipelineImpl()
     private val loggerFactory = Slf4jLoggerFactory()
 
-    private val serviceLocator: ServiceLocator = ServiceLocator(
+    private val serviceLocator: ServiceLocator = ServiceLocatorImpl(
         extensionProvider = object : ExtensionProvider {
             override fun <T : Any> first(extensionInterface: KClass<T>): T =
                 extensions.first { extensionInterface.isInstance(it) }

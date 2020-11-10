@@ -18,5 +18,5 @@ class TwitckConfiguration(
     val whisperHandlers: List<WhisperHandler>,
     val followsHandlers: List<FollowsHandler>,
     val subscriptionsHandlers: List<SubscriptionsHandler>,
-    val serviceLocator: ServiceLocator
-)
+    serviceLocator: ServiceLocator
+) : ServiceLocator by serviceLocator

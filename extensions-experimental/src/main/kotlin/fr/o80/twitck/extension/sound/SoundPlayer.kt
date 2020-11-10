@@ -1,20 +1,35 @@
 package fr.o80.twitck.extension.sound
 
+import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.internal.service.CoolDownManager
+import java.time.Duration
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
 
-class SoundPlayer {
+private const val COOL_DOWN_NAMESPACE = "sound"
+
+class SoundPlayer(
+    private val coolDownManager: CoolDownManager
+) {
+
+    private val genericCoolDown = CoolDown(Duration.ofSeconds(10))
 
     fun playYoupi() {
-        play("audio/youpi.wav", 6f)
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "youpi", genericCoolDown) {
+            play("audio/youpi.wav", 6f)
+        }
     }
 
     fun playYata() {
-        play("audio/yata.wav", 6f)
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
+            play("audio/yata.wav", 6f)
+        }
     }
 
     fun playScreen() {
-        play("audio/ton_ecran.wav", 6f)
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "ton_ecran", genericCoolDown) {
+            play("audio/ton_ecran.wav", 6f)
+        }
     }
 
     private fun play(fileName: String, masterGain: Float) {

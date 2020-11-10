@@ -4,14 +4,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.internal.handler.AutoJoiner
-import fr.o80.twitck.lib.internal.handler.CommandDispatcher
-import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
-import fr.o80.twitck.lib.internal.handler.JoinDispatcher
-import fr.o80.twitck.lib.internal.handler.MessageDispatcher
-import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
-import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
-import fr.o80.twitck.lib.internal.service.CoolDownManager
+import fr.o80.twitck.lib.internal.handler.*
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
 import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
@@ -32,16 +25,19 @@ internal class TwitckBotImpl(
 
     private val ping = Ping(this)
 
-    private val messenger: Messenger = MessengerImpl(this, coolDownManager = CoolDownManager())
+    private val messenger: Messenger = MessengerImpl(
+        this,
+        configuration.coolDownManager
+    )
 
     private val privMsgLineHandler = PrivMsgLineHandler(
         messenger,
-        configuration.serviceLocator.commandParser,
+        configuration.commandParser,
         MessageDispatcher(messenger, configuration.messageHandlers),
         CommandDispatcher(messenger, configuration.commandHandlers)
     )
 
-    private val hostUserId: String = configuration.serviceLocator.twitchApi.getUser(configuration.hostName).id
+    private val hostUserId: String = configuration.twitchApi.getUser(configuration.hostName).id
 
     private val joinLineHandler =
         JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
@@ -49,25 +45,30 @@ internal class TwitckBotImpl(
     private val whisperLineHandler =
         WhisperLineHandler(this, WhisperDispatcher(messenger, configuration.whisperHandlers))
 
-    private val autoJoiner = AutoJoiner(this, configuration.requestedChannels, configuration.serviceLocator.loggerFactory)
+    private val autoJoiner =
+        AutoJoiner(this, configuration.requestedChannels, configuration.loggerFactory)
 
-    private val lineInterpreter = LineInterpreter(privMsgLineHandler, joinLineHandler, whisperLineHandler)
+    private val lineInterpreter =
+        LineInterpreter(privMsgLineHandler, joinLineHandler, whisperLineHandler)
 
-    private val logger: Logger = configuration.serviceLocator.loggerFactory.getLogger(TwitckBotImpl::class)
+    private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
     private val topicManager = TopicManager(
         userId = hostUserId,
-        api = configuration.serviceLocator.twitchApi,
+        api = configuration.twitchApi,
         // TODO OPZ BotHusky ne devrait pas se trouver dans la lib
         ngrokTunnel = NgrokTunnel("BotHusky", 8080),
         secret = SecretHolder.secret,
         webhooksServer = WebhooksServer(
             followsDispatcher = FollowsDispatcher(messenger, configuration.followsHandlers),
-            subscriptionsDispatcher = SubscriptionsDispatcher(messenger, configuration.subscriptionsHandlers),
+            subscriptionsDispatcher = SubscriptionsDispatcher(
+                messenger,
+                configuration.subscriptionsHandlers
+            ),
             secret = SecretHolder.secret,
-            loggerFactory = configuration.serviceLocator.loggerFactory
+            loggerFactory = configuration.loggerFactory
         ),
-        loggerFactory = configuration.serviceLocator.loggerFactory
+        loggerFactory = configuration.loggerFactory
     )
 
     override fun connectToServer() {

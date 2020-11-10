@@ -14,11 +14,11 @@ internal class CoolDownManagerTest {
     fun `should remember cool downs`() {
         val coolDown = CoolDown(Duration.ofMillis(1000))
         val message = "Le marché c'est ça"
-        coolDownManager.startCoolDown(message, coolDown)
+        coolDownManager.startCoolDown("test", message, coolDown)
 
-        assertTrue(coolDownManager.isCoolingDown(message))
+        assertTrue(coolDownManager.isCoolingDown("test", message))
         Thread.sleep(2000)
-        assertFalse(coolDownManager.isCoolingDown(message))
+        assertFalse(coolDownManager.isCoolingDown("test", message))
     }
 
 }

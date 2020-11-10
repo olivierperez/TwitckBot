@@ -23,8 +23,8 @@ class DefaultSoundExtension(
         @DslMarker
         private annotation class Dsl
 
-        fun build(): DefaultSoundExtension {
-            val soundPlayer = SoundPlayer()
+        fun build(serviceLocator: ServiceLocator): DefaultSoundExtension {
+            val soundPlayer = SoundPlayer(serviceLocator.coolDownManager)
             val soundCommand = SoundCommand(soundPlayer)
             return DefaultSoundExtension(soundCommand, soundPlayer)
         }
@@ -38,7 +38,7 @@ class DefaultSoundExtension(
         ): DefaultSoundExtension {
             return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { sound ->
                     pipeline.interceptCommandEvent(sound.soundCommand::interceptCommandEvent)
                 }

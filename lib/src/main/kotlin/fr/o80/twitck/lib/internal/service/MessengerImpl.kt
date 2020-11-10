@@ -8,6 +8,8 @@ import fr.o80.twitck.lib.api.service.Messenger
 import java.time.Duration
 import java.util.concurrent.PriorityBlockingQueue
 
+private const val COOL_DOWN_NAMESPACE = "messenger"
+
 class MessengerImpl(
     private val bot: TwitckBot,
     private val coolDownManager: CoolDownManager,
@@ -30,15 +32,15 @@ class MessengerImpl(
     }
 
     override fun sendImmediately(channel: String, content: String, coolDown: CoolDown?) {
-        if (coolDownManager.isCoolingDown(content)) return
-        coolDownManager.startCoolDown(content, coolDown)
+        if (coolDownManager.isCoolingDown(COOL_DOWN_NAMESPACE, content)) return
+        coolDownManager.startCoolDown(COOL_DOWN_NAMESPACE, content, coolDown)
 
         bot.send(channel, content)
     }
 
     override fun sendWhenAvailable(channel: String, content: String, importance: Importance, coolDown: CoolDown?) {
-        if (coolDownManager.isCoolingDown(content)) return
-        coolDownManager.startCoolDown(content, coolDown)
+        if (coolDownManager.isCoolingDown(COOL_DOWN_NAMESPACE, content)) return
+        coolDownManager.startCoolDown(COOL_DOWN_NAMESPACE, content, coolDown)
 
         messagesToSend.offer(PostponedMessage(channel, content, importance))
     }
