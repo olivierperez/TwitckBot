@@ -27,7 +27,7 @@ class SoundPlayer(
     }
 
     fun playScreen() {
-        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "ton_ecran", genericCoolDown) {
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
             play("audio/ton_ecran.wav", 6f)
         }
     }

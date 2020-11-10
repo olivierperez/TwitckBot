@@ -16,6 +16,7 @@ import fr.o80.twitck.lib.internal.service.topic.SecretHolder
 import fr.o80.twitck.lib.internal.service.topic.TopicManager
 import fr.o80.twitck.lib.internal.service.topic.WebhooksServer
 import org.jibble.pircbot.PircBot
+import kotlin.system.exitProcess
 
 internal class TwitckBotImpl(
     private val configuration: TwitckConfiguration
@@ -72,27 +73,32 @@ internal class TwitckBotImpl(
     )
 
     override fun connectToServer() {
-        logger.info("Attempting to connect to irc.twitch.tv...")
+        try {
+            logger.info("Attempting to connect to irc.twitch.tv...")
 
-        connect(HOST, PORT, "oauth:${configuration.oauthToken}")
+            connect(HOST, PORT, "oauth:${configuration.oauthToken}")
 
-        logger.info("Requesting twitch membership capability for NAMES/JOIN/PART/MODE messages...")
-        sendRawLine(SERVER_MEMREQ)
+            logger.info("Requesting twitch membership capability for NAMES/JOIN/PART/MODE messages...")
+            sendRawLine(SERVER_MEMREQ)
 
-        logger.info("Requesting twitch commands capability for NOTICE/HOSTTARGET/CLEARCHAT/USERSTATE messages... ")
-        sendRawLine(SERVER_CMDREQ)
+            logger.info("Requesting twitch commands capability for NOTICE/HOSTTARGET/CLEARCHAT/USERSTATE messages... ")
+            sendRawLine(SERVER_CMDREQ)
 
-        logger.info("Requesting twitch tags capability for PRIVMSG/USERSTATE/GLOBALUSERSTATE messages... ")
-        sendRawLine(SERVER_TAGREG)
+            logger.info("Requesting twitch tags capability for PRIVMSG/USERSTATE/GLOBALUSERSTATE messages... ")
+            sendRawLine(SERVER_TAGREG)
 
-        while (!initializer.initialized) {
-            Thread.sleep(1000)
-            if (!initializer.initialized) logger.debug("Not yet initialized")
+            while (!initializer.initialized) {
+                Thread.sleep(1000)
+                if (!initializer.initialized) logger.debug("Not yet initialized")
+            }
+
+            autoJoiner.join()
+
+            topicManager.subscribe()
+        } catch (e: Exception) {
+            logger.error("Something gone wrong at startup", e)
+            exitProcess(-1)
         }
-
-        autoJoiner.join()
-
-        topicManager.subscribe()
     }
 
     override fun join(channel: String) {

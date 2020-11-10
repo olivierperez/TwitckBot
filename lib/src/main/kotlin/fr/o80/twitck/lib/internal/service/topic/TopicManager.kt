@@ -15,10 +15,9 @@ class TopicManager(
     private val logger = loggerFactory.getLogger(TopicManager::class)
 
     fun subscribe() {
-        // TODO OPZ Kill du bot si ngrok n'est pas démarré
-        val callbackUrl = ngrokTunnel.getOrOpenTunnel()
-        webhooksServer.start()
-        subscribeToTopics(callbackUrl)
+            val callbackUrl = ngrokTunnel.getOrOpenTunnel()
+            webhooksServer.start()
+            subscribeToTopics(callbackUrl)
     }
 
     private fun subscribeToTopics(callbackUrl: String) {

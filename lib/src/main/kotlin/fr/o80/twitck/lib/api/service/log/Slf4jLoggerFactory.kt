@@ -38,7 +38,7 @@ private class Slf4jLoggerAdapter(name: String) : Logger {
         slf4jLogger.info(message)
     }
 
-    override fun error(message: String) {
-        slf4jLogger.error(message)
+    override fun error(message: String, throwable: Throwable?) {
+        slf4jLogger.error(message, throwable)
     }
 }
