@@ -72,9 +72,7 @@ class TwitckConfigurator(
             whisperHandlers = pipeline.whisperHandlers,
             followsHandlers = pipeline.followsHandlers,
             subscriptionsHandlers = pipeline.subscriptionsHandlers,
-            loggerFactory = loggerFactory,
-            commandParser = serviceLocator.commandParser,
-            twitchApi = serviceLocator.twitchApi
+            serviceLocator = serviceLocator
         )
     }
 

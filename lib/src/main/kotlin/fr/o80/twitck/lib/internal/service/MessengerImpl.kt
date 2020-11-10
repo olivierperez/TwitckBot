@@ -6,19 +6,17 @@ import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.PostponedMessage
 import fr.o80.twitck.lib.api.service.Messenger
 import java.time.Duration
-import java.time.LocalDateTime
 import java.util.concurrent.PriorityBlockingQueue
 
 class MessengerImpl(
     private val bot: TwitckBot,
+    private val coolDownManager: CoolDownManager,
     private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ) : Messenger {
 
     private val messagesToSend: PriorityBlockingQueue<PostponedMessage> = PriorityBlockingQueue(11, PostponedMessageComparator)
 
     private var interrupted: Boolean = false
-
-    private val coolDowns: MutableMap<String, LocalDateTime> = mutableMapOf()
 
     init {
         Thread {
@@ -32,15 +30,15 @@ class MessengerImpl(
     }
 
     override fun sendImmediately(channel: String, content: String, coolDown: CoolDown?) {
-        if (isCoolingDown(content)) return
-        startCoolDown(content, coolDown)
+        if (coolDownManager.isCoolingDown(content)) return
+        coolDownManager.startCoolDown(content, coolDown)
 
         bot.send(channel, content)
     }
 
     override fun sendWhenAvailable(channel: String, content: String, importance: Importance, coolDown: CoolDown?) {
-        if (isCoolingDown(content)) return
-        startCoolDown(content, coolDown)
+        if (coolDownManager.isCoolingDown(content)) return
+        coolDownManager.startCoolDown(content, coolDown)
 
         messagesToSend.offer(PostponedMessage(channel, content, importance))
     }
@@ -55,17 +53,6 @@ class MessengerImpl(
 
     fun interrupt() {
         interrupted = true
-    }
-
-    internal fun startCoolDown(content: String, coolDown: CoolDown?) {
-        coolDown?.duration?.let { duration ->
-            coolDowns[content] = LocalDateTime.now() + duration
-        }
-    }
-
-    internal fun isCoolingDown(content: String): Boolean {
-        val expiry = coolDowns[content]
-        return expiry != null && LocalDateTime.now().isBefore(expiry)
     }
 
 }

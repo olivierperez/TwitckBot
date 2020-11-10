@@ -6,9 +6,7 @@ import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.handler.MessageHandler
 import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
-import fr.o80.twitck.lib.api.service.CommandParser
-import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.log.LoggerFactory
+import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class TwitckConfiguration(
     val oauthToken: String,
@@ -20,7 +18,5 @@ class TwitckConfiguration(
     val whisperHandlers: List<WhisperHandler>,
     val followsHandlers: List<FollowsHandler>,
     val subscriptionsHandlers: List<SubscriptionsHandler>,
-    val loggerFactory: LoggerFactory,
-    val commandParser: CommandParser,
-    val twitchApi: TwitchApi
+    val serviceLocator: ServiceLocator
 )

@@ -9,8 +9,6 @@ import java.time.Duration
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 
 class MessengerImplTest {
@@ -23,6 +21,7 @@ class MessengerImplTest {
     fun setup() {
         messenger = MessengerImpl(
             bot = bot,
+            coolDownManager = CoolDownManager(),
             intervalBetweenPostponed = Duration.ofMillis(250)
         )
     }
@@ -81,17 +80,6 @@ class MessengerImplTest {
         verify(exactly = 1) { bot.send("chan", "HIGH 1") }
         Thread.sleep(250 + 20)
         verify(exactly = 1) { bot.send("chan", "HIGH 2") }
-    }
-
-    @Test
-    fun `should remember cool downs`() {
-        val coolDown = CoolDown(Duration.ofMillis(1000))
-        val message = "Le marché c'est ça"
-        messenger.startCoolDown(message, coolDown)
-
-        assertTrue(messenger.isCoolingDown(message))
-        Thread.sleep(2000)
-        assertFalse(messenger.isCoolingDown(message))
     }
 
     @Test
