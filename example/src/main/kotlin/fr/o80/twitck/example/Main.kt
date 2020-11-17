@@ -154,11 +154,11 @@ class Main : CliktCommand() {
                 messageForViewer("#USER# vient de finir sa lecture des internets mondiaux.")
                 messageForViewer("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
                 messageForViewer("#USER# a presque DL tout Wikipedia")
-                messageForFollower("Yo #USER# t'es le meilleur des internets mondiaux!")
+                messageForFollower("Yo #USER# la meilleure personne des internets mondiaux!")
                 messageForFollower("Prière d'accueillir #USER# comme il se doit.")
-                messageForFollower("Oh ! Mais ne serait-ce pas le célèbre #USER# qui se joint à nous ?")
-                messageForFollower("#USER# !! Mon préféré !")
-                messageForFollower("Faites place au prince #USER# !")
+                messageForFollower("Oh ! Mais ne serait-ce pas notre célèbre #USER# qui se joint à nous ?")
+                messageForFollower("OMG ! c'est #USER# !!")
+                messageForFollower("Faites place à sa majesté #USER# !")
             }
             install(ViewerPromotion) {
                 channel(hostChannel)
