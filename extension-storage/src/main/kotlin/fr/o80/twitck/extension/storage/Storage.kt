@@ -27,6 +27,12 @@ class Storage(
         }
     }
 
+    override fun hasUserInfo(login: String): Boolean {
+        logger.trace("Check if user info exists $login")
+        val userFile = getUserFile(login)
+        return userFile.isFile
+    }
+
     override fun putUserInfo(login: String, namespace: String, key: String, value: String) {
         logger.trace("Putting user info into $login [$namespace//$key] => $value")
         with(getOrCreateUser(login)) {

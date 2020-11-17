@@ -127,7 +127,6 @@ class Main : CliktCommand() {
                 product(KotlinProduct)
                 product(CompareLanguageProduct)
                 // TODO idée CamouilleLaFripouille 500 codes source => assistance UML (15 min)
-                // TODO idée GiftSub !ShoutOut pour mettre en avant un autre viewer
                 // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
                 // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
             }
@@ -157,7 +156,7 @@ class Main : CliktCommand() {
                 messageForFollower("Yo #USER# la meilleure personne des internets mondiaux!")
                 messageForFollower("Prière d'accueillir #USER# comme il se doit.")
                 messageForFollower("Oh ! Mais ne serait-ce pas notre célèbre #USER# qui se joint à nous ?")
-                messageForFollower("OMG ! c'est #USER# !!")
+                messageForFollower("OMG ! mais c'est #USER# !!")
                 messageForFollower("Faites place à sa majesté #USER# !")
             }
             install(ViewerPromotion) {

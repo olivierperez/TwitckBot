@@ -1,6 +1,7 @@
 package fr.o80.twitck.lib.api.extension
 
 interface StorageExtension {
+    fun hasUserInfo(login: String): Boolean
     fun putUserInfo(login: String, namespace: String, key: String, value: String)
     fun getUserInfo(login: String, namespace: String, key: String): String?
 
