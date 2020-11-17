@@ -13,6 +13,7 @@ internal interface PipelineProvider {
     val messageHandlers: MutableList<MessageHandler>
     val commandHandlers: MutableList<CommandHandler>
     val whisperHandlers: MutableList<WhisperHandler>
+    val whisperCommandHandlers: MutableList<CommandHandler>
     val followsHandlers: MutableList<FollowsHandler>
     val subscriptionsHandlers: MutableList<SubscriptionsHandler>
     val requestedChannels: MutableSet<String>
@@ -23,6 +24,7 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
     override val messageHandlers: MutableList<MessageHandler> = mutableListOf()
     override val commandHandlers: MutableList<CommandHandler> = mutableListOf()
     override val whisperHandlers: MutableList<WhisperHandler> = mutableListOf()
+    override val whisperCommandHandlers: MutableList<CommandHandler> = mutableListOf()
     override val followsHandlers: MutableList<FollowsHandler> = mutableListOf()
     override val subscriptionsHandlers: MutableList<SubscriptionsHandler> = mutableListOf()
     override val requestedChannels: MutableSet<String> = mutableSetOf()
@@ -41,6 +43,10 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
 
     override fun interceptWhisperEvent(whisperHandler: WhisperHandler) {
         whisperHandlers += whisperHandler
+    }
+
+    override fun interceptWhisperCommandEvent(commandHandler: CommandHandler) {
+        whisperCommandHandlers += commandHandler
     }
 
     override fun interceptFollowEvent(followsHandler: FollowsHandler) {

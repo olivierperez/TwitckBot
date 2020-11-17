@@ -12,8 +12,8 @@ interface Pipeline {
     fun interceptMessageEvent(messageHandler: MessageHandler)
     fun interceptCommandEvent(commandHandler: CommandHandler)
     fun interceptWhisperEvent(whisperHandler: WhisperHandler)
+    fun interceptWhisperCommandEvent(commandHandler: CommandHandler)
     fun interceptFollowEvent(followsHandler: FollowsHandler)
     fun interceptSubscriptionEvent(subscriptionsHandler: SubscriptionsHandler)
     fun requestChannel(channel: String)
 }
-

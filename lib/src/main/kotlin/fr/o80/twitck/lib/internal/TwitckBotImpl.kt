@@ -44,7 +44,12 @@ internal class TwitckBotImpl(
         JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
 
     private val whisperLineHandler =
-        WhisperLineHandler(this, WhisperDispatcher(messenger, configuration.whisperHandlers))
+        WhisperLineHandler(
+            messenger,
+            configuration.commandParser,
+            WhisperDispatcher(messenger, configuration.whisperHandlers),
+            WhisperCommandDispatcher(messenger, configuration.whisperCommandHandlers)
+        )
 
     private val autoJoiner =
         AutoJoiner(this, configuration.requestedChannels, configuration.loggerFactory)
