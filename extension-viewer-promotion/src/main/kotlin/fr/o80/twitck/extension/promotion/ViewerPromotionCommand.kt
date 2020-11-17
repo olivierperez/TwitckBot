@@ -58,7 +58,7 @@ class ViewerPromotionCommand(
                 messenger.sendImmediately(
                     channel,
                     message,
-                    CoolDown(Duration.ofSeconds(10))
+                    CoolDown(Duration.ofSeconds(60))
                 )
             }
         }
