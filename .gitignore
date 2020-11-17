@@ -2,3 +2,4 @@
 .gradle/
 .storage/
 build/
+logs/

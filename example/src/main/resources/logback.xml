@@ -5,10 +5,22 @@
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <timestamp key="bySecond" datePattern="yyyyMMdd"/>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/log-${bySecond}.txt</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <root level="TRACE">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
     </root>
 
     <logger name="NETWORK" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="fr.o80.twitck.overlay" level="DEBUG"/>
 </configuration>
