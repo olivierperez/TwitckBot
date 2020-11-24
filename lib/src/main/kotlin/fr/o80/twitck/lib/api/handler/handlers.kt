@@ -1,16 +1,13 @@
 package fr.o80.twitck.lib.api.handler
 
-import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.FollowsEvent
-import fr.o80.twitck.lib.api.bean.JoinEvent
-import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.*
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.service.Messenger
 
+typealias CommandHandler = (messenger: Messenger, commandEvent: CommandEvent) -> CommandEvent
+typealias FollowsHandler = (messenger: Messenger, follows: FollowsEvent) -> FollowsEvent
 typealias JoinHandler = (messenger: Messenger, joinEvent: JoinEvent) -> JoinEvent
 typealias MessageHandler = (messenger: Messenger, messageEvent: MessageEvent) -> MessageEvent
-typealias CommandHandler = (messenger: Messenger, commandEvent: CommandEvent) -> CommandEvent
-typealias WhisperHandler = (messenger: Messenger, whisper: WhisperEvent) -> Unit
-typealias FollowsHandler = (messenger: Messenger, follows: FollowsEvent) -> FollowsEvent
+typealias RaidHandler = (messenger: Messenger, raid: RaidEvent) -> RaidEvent
 typealias SubscriptionsHandler = (messenger: Messenger, follow: SubscriptionEvent) -> SubscriptionEvent
+typealias WhisperHandler = (messenger: Messenger, whisper: WhisperEvent) -> Unit

@@ -148,7 +148,12 @@ class RuntimeCommand(
                 .build(serviceLocator)
                 .also { runtimeCommand ->
                     pipeline.requestChannel(runtimeCommand.channel)
-                    pipeline.interceptCommandEvent(runtimeCommand::interceptCommandEvent)
+                    pipeline.interceptCommandEvent { messenger, commandEvent ->
+                        runtimeCommand.interceptCommandEvent(
+                            messenger,
+                            commandEvent
+                        )
+                    }
                     runtimeCommand.onInstallationFinished()
                 }
         }

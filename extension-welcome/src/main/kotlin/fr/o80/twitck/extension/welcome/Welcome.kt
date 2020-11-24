@@ -1,12 +1,7 @@
 package fr.o80.twitck.extension.welcome
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.Follower
-import fr.o80.twitck.lib.api.bean.Importance
-import fr.o80.twitck.lib.api.bean.JoinEvent
-import fr.o80.twitck.lib.api.bean.MessageEvent
-import fr.o80.twitck.lib.api.bean.Viewer
+import fr.o80.twitck.lib.api.bean.*
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -47,6 +42,12 @@ class Welcome(
         return messageEvent
     }
 
+    fun interceptRaidEvent(messenger: Messenger, raidEvent: RaidEvent): RaidEvent {
+        handleNewViewer(raidEvent.channel, raidEvent.viewer, messenger)
+        thanksForRaiding(raidEvent, messenger)
+        return raidEvent
+    }
+
     private fun handleNewViewer(channel: String, viewer: Viewer, messenger: Messenger) {
         if (this.channel != channel)
             return
@@ -65,6 +66,13 @@ class Welcome(
         welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
             welcomeViewer(channel, viewer, messenger)
         }
+    }
+
+    private fun thanksForRaiding(raidEvent: RaidEvent, messenger: Messenger) {
+        messenger.sendImmediately(
+            raidEvent.channel,
+            "Oh ! Merci beaucoup à ${raidEvent.msgDisplayName} et ses ${raidEvent.msgViewerCount} amis pour votre raid !"
+        )
     }
 
     private fun isHost(login: String) =
@@ -180,9 +188,18 @@ class Welcome(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { welcome ->
-                    pipeline.interceptCommandEvent(welcome::interceptCommandEvent)
-                    pipeline.interceptJoinEvent(welcome::interceptJoinEvent)
-                    pipeline.interceptMessageEvent(welcome::interceptMessageEvent)
+                    pipeline.interceptCommandEvent { messenger, commandEvent ->
+                        welcome.interceptCommandEvent(messenger, commandEvent)
+                    }
+                    pipeline.interceptJoinEvent { messenger, joinEvent ->
+                        welcome.interceptJoinEvent(messenger, joinEvent)
+                    }
+                    pipeline.interceptMessageEvent { messenger, messageEvent ->
+                        welcome.interceptMessageEvent(messenger, messageEvent)
+                    }
+                    pipeline.interceptRaidEvent { messenger, raid ->
+                        welcome.interceptRaidEvent(messenger, raid)
+                    }
                     pipeline.requestChannel(welcome.channel)
                 }
         }

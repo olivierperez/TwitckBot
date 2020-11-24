@@ -23,7 +23,10 @@ class ViewerPromotionCommand(
         return commandEvent
     }
 
-    fun interceptWhisperCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
+    fun interceptWhisperCommandEvent(
+        messenger: Messenger,
+        commandEvent: CommandEvent
+    ): CommandEvent {
         when (commandEvent.command.tag) {
             SHOUT_OUT_COMMAND -> shoutOut(commandEvent, messenger)
         }
@@ -32,7 +35,10 @@ class ViewerPromotionCommand(
 
     private fun recordShoutOut(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.size < 2) {
-            messenger.sendImmediately(commandEvent.channel, "usage: $SHOUT_OUT_COMMAND <login> <message>")
+            messenger.sendImmediately(
+                commandEvent.channel,
+                "usage: $SHOUT_OUT_COMMAND <login> <message>"
+            )
             return
         }
         val login = commandEvent.command.options[0]
