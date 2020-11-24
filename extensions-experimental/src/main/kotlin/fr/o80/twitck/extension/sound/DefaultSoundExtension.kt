@@ -8,7 +8,7 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 class DefaultSoundExtension(
     private val soundCommand: SoundCommand,
     private val soundPlayer: SoundPlayer,
-): SoundExtension {
+) : SoundExtension {
 
     override fun playYata() {
         soundPlayer.playYata()
@@ -24,7 +24,8 @@ class DefaultSoundExtension(
         private annotation class Dsl
 
         fun build(serviceLocator: ServiceLocator): DefaultSoundExtension {
-            val soundPlayer = SoundPlayer(serviceLocator.coolDownManager)
+            val logger = serviceLocator.loggerFactory.getLogger(DefaultSoundExtension::class)
+            val soundPlayer = SoundPlayer(serviceLocator.coolDownManager, logger)
             val soundCommand = SoundCommand(soundPlayer)
             return DefaultSoundExtension(soundCommand, soundPlayer)
         }
@@ -40,7 +41,9 @@ class DefaultSoundExtension(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { sound ->
-                    pipeline.interceptCommandEvent(sound.soundCommand::interceptCommandEvent)
+                    pipeline.interceptCommandEvent { _, commandEvent ->
+                        sound.soundCommand.interceptCommandEvent(commandEvent)
+                    }
                 }
         }
     }

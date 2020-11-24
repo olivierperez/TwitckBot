@@ -1,7 +1,9 @@
 package fr.o80.twitck.extension.sound
 
 import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.service.CoolDownManager
+import java.io.BufferedInputStream
 import java.time.Duration
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
@@ -9,7 +11,8 @@ import javax.sound.sampled.FloatControl
 private const val COOL_DOWN_NAMESPACE = "sound"
 
 class SoundPlayer(
-    private val coolDownManager: CoolDownManager
+    private val coolDownManager: CoolDownManager,
+    private val logger: Logger
 ) {
 
     private val genericCoolDown = CoolDown(Duration.ofSeconds(10))
@@ -33,13 +36,18 @@ class SoundPlayer(
     }
 
     private fun play(fileName: String, masterGain: Float) {
-        val clip = AudioSystem.getClip()
-        val resourceAsStream = javaClass.classLoader.getResourceAsStream(fileName)
-        val audioInputStream = AudioSystem.getAudioInputStream(resourceAsStream)
-        clip.open(audioInputStream)
-        val masterGainControl = clip.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
-        masterGainControl.value = masterGain
-        clip.start()
+        try {
+            val clip = AudioSystem.getClip()
+            val resourceAsStream = javaClass.classLoader.getResourceAsStream(fileName)
+            val bufferedAudioStream = BufferedInputStream(resourceAsStream)
+            val audioInputStream = AudioSystem.getAudioInputStream(bufferedAudioStream)
+            clip.open(audioInputStream)
+            val masterGainControl = clip.getControl(FloatControl.Type.MASTER_GAIN) as FloatControl
+            masterGainControl.value = masterGain
+            clip.start()
+        } catch (e: Exception) {
+            logger.error("Something gone wrong while playing $fileName", e)
+        }
     }
 
 }
