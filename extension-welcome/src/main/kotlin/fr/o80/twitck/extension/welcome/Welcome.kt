@@ -17,9 +17,13 @@ class Welcome(
     private val messages: Collection<String>,
     private val hostName: String,
     private val hostMessage: String?,
+    private val ignoredLogins: MutableList<String>,
+    private var reactToJoins: Boolean,
+    private var reactToMessages: Boolean,
+    private var reactToCommands: Boolean,
+    private var reactToRaids: Boolean,
     private val welcomeTimeChecker: TimeChecker,
-    private val twitchApi: TwitchApi,
-    private val ignoredLogins: MutableList<String>
+    private val twitchApi: TwitchApi
 ) {
 
     private val followers: List<Follower> by lazy {
@@ -119,6 +123,11 @@ class Welcome(
 
         private var welcomeInterval: Duration = Duration.ofHours(12)
 
+        private var reactToJoins: Boolean = true
+        private var reactToMessages: Boolean = true
+        private var reactToCommands: Boolean = true
+        private var reactToRaids: Boolean = true
+
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
@@ -143,6 +152,19 @@ class Welcome(
         @Dsl
         fun ignore(vararg logins: String) {
             ignoredLogins.addAll(logins)
+        }
+
+        @Dsl
+        fun reactTo(
+            joins: Boolean = false,
+            messages: Boolean = false,
+            commands: Boolean = false,
+            raids: Boolean = false
+        ) {
+            reactToJoins = joins
+            reactToMessages = messages
+            reactToCommands = commands
+            reactToRaids = raids
         }
 
         @Dsl
@@ -171,9 +193,13 @@ class Welcome(
                 messages = messages,
                 hostName = hostName,
                 hostMessage = hostMessage,
+                ignoredLogins = ignoredLogins,
+                reactToJoins = reactToJoins,
+                reactToMessages = reactToMessages,
+                reactToCommands = reactToCommands,
+                reactToRaids = reactToRaids,
                 welcomeTimeChecker = welcomeTimeChecker,
-                twitchApi = serviceLocator.twitchApi,
-                ignoredLogins = ignoredLogins
+                twitchApi = serviceLocator.twitchApi
             )
         }
     }
@@ -188,17 +214,26 @@ class Welcome(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { welcome ->
-                    pipeline.interceptCommandEvent { messenger, commandEvent ->
-                        welcome.interceptCommandEvent(messenger, commandEvent)
+
+                    if (welcome.reactToCommands) {
+                        pipeline.interceptCommandEvent { messenger, commandEvent ->
+                            welcome.interceptCommandEvent(messenger, commandEvent)
+                        }
                     }
-                    pipeline.interceptJoinEvent { messenger, joinEvent ->
-                        welcome.interceptJoinEvent(messenger, joinEvent)
+                    if (welcome.reactToJoins) {
+                        pipeline.interceptJoinEvent { messenger, joinEvent ->
+                            welcome.interceptJoinEvent(messenger, joinEvent)
+                        }
                     }
-                    pipeline.interceptMessageEvent { messenger, messageEvent ->
-                        welcome.interceptMessageEvent(messenger, messageEvent)
+                    if (welcome.reactToMessages) {
+                        pipeline.interceptMessageEvent { messenger, messageEvent ->
+                            welcome.interceptMessageEvent(messenger, messageEvent)
+                        }
                     }
-                    pipeline.interceptRaidEvent { messenger, raid ->
-                        welcome.interceptRaidEvent(messenger, raid)
+                    if (welcome.reactToRaids) {
+                        pipeline.interceptRaidEvent { messenger, raid ->
+                            welcome.interceptRaidEvent(messenger, raid)
+                        }
                     }
                     pipeline.requestChannel(welcome.channel)
                 }

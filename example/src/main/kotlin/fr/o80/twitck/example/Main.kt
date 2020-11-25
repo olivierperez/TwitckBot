@@ -132,7 +132,7 @@ class Main : CliktCommand() {
             }
             install(Repeat) {
                 channel(hostChannel)
-                interval(Duration.ofMinutes(10))
+                interval(Duration.ofMinutes(15))
                 remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
                 remind("Olivier tweet peu, mais bien https://twitter.com/olivierperez")
                 remind("On se retrouve sur discord en dehors des streams ? https://discord.gg/S4HxU2YfaT")
@@ -145,6 +145,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
                 ignore(botName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
+                reactTo(joins = false, messages = true, commands = true, raids = true)
                 welcomeInterval(Duration.ofHours(2))
                 messageForViewer("Compilation de #USER# impossible, trop de bugs.")
                 messageForViewer("Décompilation de #USER# en cours...")
