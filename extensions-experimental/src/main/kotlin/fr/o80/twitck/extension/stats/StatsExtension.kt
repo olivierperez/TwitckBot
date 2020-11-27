@@ -17,7 +17,7 @@ class StatsExtension(
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         statsData.hit(
             STATS_NAMESPACE, "commands", mapOf(
-                "command" to commandEvent.command.tag.removePrefix("!"),
+                STAT_INFO_COMMAND to commandEvent.command.tag.removePrefix("!"),
                 STAT_INFO_VIEWER to commandEvent.viewer.login
             )
         )
