@@ -1,9 +1,9 @@
 package fr.o80.twitck.extension.channel
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.CommandEvent
-import fr.o80.twitck.lib.api.bean.FollowsEvent
-import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.FollowsEvent
+import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.bean.NewFollower
 import fr.o80.twitck.lib.api.bean.subscription.NewSubscription
 import fr.o80.twitck.lib.api.bean.subscription.Notification

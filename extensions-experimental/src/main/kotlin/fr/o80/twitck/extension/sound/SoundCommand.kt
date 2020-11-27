@@ -1,6 +1,6 @@
 package fr.o80.twitck.extension.sound
 
-import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 
 class SoundCommand(
     private val soundPlayer: SoundPlayer

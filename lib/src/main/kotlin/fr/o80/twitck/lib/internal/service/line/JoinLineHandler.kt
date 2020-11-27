@@ -1,7 +1,7 @@
 package fr.o80.twitck.lib.internal.service.line
 
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 

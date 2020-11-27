@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.whisper
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator

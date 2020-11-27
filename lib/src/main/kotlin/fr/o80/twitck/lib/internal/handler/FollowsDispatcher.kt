@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.internal.handler
 
-import fr.o80.twitck.lib.api.bean.FollowsEvent
+import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.handler.FollowsHandler
 import fr.o80.twitck.lib.api.service.Messenger
 

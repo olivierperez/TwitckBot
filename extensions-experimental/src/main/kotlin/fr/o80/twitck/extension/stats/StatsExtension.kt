@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.*
+import fr.o80.twitck.lib.api.bean.event.*
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.extension.Stat
 import fr.o80.twitck.lib.api.extension.TwitckExtension

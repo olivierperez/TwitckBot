@@ -1,6 +1,6 @@
 package fr.o80.twitck.extension.market
 
-import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -15,11 +15,11 @@ interface Product {
     ): Int?
 
     fun execute(
-        messenger: Messenger,
-        commandEvent: CommandEvent,
-        logger: Logger,
-        storageExtension: StorageExtension,
-        serviceLocator: ServiceLocator
+            messenger: Messenger,
+            commandEvent: CommandEvent,
+            logger: Logger,
+            storageExtension: StorageExtension,
+            serviceLocator: ServiceLocator
     ): PurchaseResult
 }
 

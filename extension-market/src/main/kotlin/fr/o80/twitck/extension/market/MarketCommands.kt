@@ -3,7 +3,7 @@ package fr.o80.twitck.extension.market
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsManager
@@ -87,10 +87,10 @@ class MarketCommands(
     }
 
     private fun doBuy(
-        messenger: Messenger,
-        commandEvent: CommandEvent,
-        product: Product,
-        price: Int
+            messenger: Messenger,
+            commandEvent: CommandEvent,
+            product: Product,
+            price: Int
     ) {
         if (points.consumePoints(commandEvent.viewer.login, price)) {
             logger.info("${commandEvent.viewer.displayName} just spend $price points for ${product.name}")
@@ -115,10 +115,10 @@ class MarketCommands(
     }
 
     private fun onBuySucceeded(
-        messenger: Messenger,
-        purchaseResult: PurchaseResult.Success,
-        commandEvent: CommandEvent,
-        product: Product
+            messenger: Messenger,
+            purchaseResult: PurchaseResult.Success,
+            commandEvent: CommandEvent,
+            product: Product
     ) {
         logger.info("${commandEvent.viewer.displayName} just bought a ${product.name}!")
         purchaseResult.message?.let { messenger.sendImmediately(channel, it) }
@@ -126,11 +126,11 @@ class MarketCommands(
     }
 
     private fun onBuyFailed(
-        messenger: Messenger,
-        purchaseResult: PurchaseResult.Fail,
-        commandEvent: CommandEvent,
-        product: Product,
-        price: Int
+            messenger: Messenger,
+            purchaseResult: PurchaseResult.Fail,
+            commandEvent: CommandEvent,
+            product: Product,
+            price: Int
     ) {
         logger.info("${commandEvent.viewer.displayName} failed to buy ${product.name}!")
         messenger.sendImmediately(channel, purchaseResult.message)
@@ -138,10 +138,10 @@ class MarketCommands(
     }
 
     private fun onBuyIsWaitingForValidation(
-        messenger: Messenger,
-        purchaseResult: PurchaseResult.WaitingValidation,
-        commandEvent: CommandEvent,
-        product: Product
+            messenger: Messenger,
+            purchaseResult: PurchaseResult.WaitingValidation,
+            commandEvent: CommandEvent,
+            product: Product
     ) {
         synchronized(lockWaitingForValidation) {
             val productsInValidation = storage.getOrCreateProductsInValidation()

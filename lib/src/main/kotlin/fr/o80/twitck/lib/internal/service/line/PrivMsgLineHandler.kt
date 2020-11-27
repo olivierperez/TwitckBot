@@ -1,6 +1,9 @@
 package fr.o80.twitck.lib.internal.service.line
 
 import fr.o80.twitck.lib.api.bean.*
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.bean.event.RaidEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher

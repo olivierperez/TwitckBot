@@ -1,9 +1,9 @@
 package fr.o80.twitck.lib.internal.service.line
 
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.Viewer
-import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.internal.handler.WhisperCommandDispatcher

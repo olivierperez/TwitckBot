@@ -2,7 +2,7 @@ package fr.o80.twitck.lib.internal.service.topic
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import fr.o80.twitck.lib.api.bean.FollowsEvent
+import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.NewFollowers
 import fr.o80.twitck.lib.api.bean.StreamsChanged
 import fr.o80.twitck.lib.api.bean.subscription.NewSubscription

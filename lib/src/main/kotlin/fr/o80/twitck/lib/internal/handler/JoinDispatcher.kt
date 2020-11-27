@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.internal.handler
 
-import fr.o80.twitck.lib.api.bean.JoinEvent
+import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.service.Messenger
 

@@ -1,6 +1,6 @@
 package fr.o80.twitck.extension.stats
 
-import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.service.Messenger
 
 class StatsCommand(

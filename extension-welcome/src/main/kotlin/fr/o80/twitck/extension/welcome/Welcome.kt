@@ -2,6 +2,10 @@ package fr.o80.twitck.extension.welcome
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.*
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.JoinEvent
+import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.bean.event.RaidEvent
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension

@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.internal.handler
 
-import fr.o80.twitck.lib.api.bean.WhisperEvent
+import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.handler.WhisperHandler
 import fr.o80.twitck.lib.api.service.Messenger
 
