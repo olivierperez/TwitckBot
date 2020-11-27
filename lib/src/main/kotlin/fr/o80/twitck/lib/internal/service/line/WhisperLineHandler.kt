@@ -64,8 +64,7 @@ internal class WhisperLineHandler(
                 whisperDispatcher.dispatch(
                     WhisperEvent(
                         destination = destination,
-                        login = user,// TODO OPZ Passer le viewer
-                        userId = userId,
+                        viewer = viewer,
                         message = message
                     )
                 )
