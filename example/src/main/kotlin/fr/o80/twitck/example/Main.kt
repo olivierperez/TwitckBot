@@ -96,6 +96,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
                 messages(
+                    destinationViewerDoesNotExist = "Le destinataire n'existe pas",
                     pointsTransferred = "Codes source transferés de #FROM# à #TO#",
                     noPointsEnough = "Les huissiers sont en route vers #FROM#",
                     viewHasNoPoints = "#USER# possède 0 code source",

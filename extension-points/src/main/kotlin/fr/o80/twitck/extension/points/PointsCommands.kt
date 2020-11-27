@@ -2,6 +2,7 @@ package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CommandEvent
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.sanitizeLogin
@@ -12,7 +13,8 @@ class PointsCommands(
     private val privilegedBadges: Array<out Badge>,
     private val bank: PointsBank,
     private val message: Messages,
-    private val logger: Logger
+    private val logger: Logger,
+    private val storage: StorageExtension
 ) {
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
@@ -46,7 +48,6 @@ class PointsCommands(
         }
     }
 
-    // TODO OPZ Vérifier si le viewer de destination existe (toto VS toot)
     private fun handleGiveCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size == 2) {
@@ -57,6 +58,10 @@ class PointsCommands(
 
             if (toLogin == fromLogin) return
             if (points == null) return
+            if (!storage.hasUserInfo(toLogin)) {
+                messenger.sendImmediately(commandEvent.channel, message.destinationViewerDoesNotExist)
+                return
+            }
 
             val transferSucceeded = bank.transferPoints(fromLogin, toLogin, points)
             val msg = if (transferSucceeded) {

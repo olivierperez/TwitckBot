@@ -2,11 +2,7 @@ package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
-import fr.o80.twitck.lib.api.extension.Overlay
-import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.extension.*
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Points(
@@ -65,13 +61,14 @@ class Points(
 
         @Dsl
         fun messages(
+            destinationViewerDoesNotExist: String,
             pointsTransferred: String,
             noPointsEnough: String,
             viewHasNoPoints: String,
             viewHasPoints: String,
             points: String,
         ) {
-            messages = Messages(pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints, points)
+            messages = Messages(destinationViewerDoesNotExist, pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints, points)
         }
 
         fun build(serviceLocator: ServiceLocator): Points {
@@ -79,10 +76,11 @@ class Points(
                 ?: throw IllegalStateException("Channel must be set for the extension ${Points::class.simpleName}")
             val privilegedBadges = badges
                 ?: arrayOf(Badge.BROADCASTER)
-            val bank = PointsBank(serviceLocator.extensionProvider)
             val theMessages = messages
                 ?: throw IllegalStateException("Messages must be set for the extension ${Points::class.simpleName}")
 
+            val bank = PointsBank(serviceLocator.extensionProvider)
+            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
             val logger = serviceLocator.loggerFactory.getLogger(Points::class)
 
             val pointsCommands = PointsCommands(
@@ -90,7 +88,8 @@ class Points(
                 privilegedBadges,
                 bank,
                 theMessages,
-                logger
+                logger,
+                storage
             )
             return Points(
                 channelName,
