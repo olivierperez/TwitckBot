@@ -17,6 +17,18 @@ class SoundPlayer(
 
     private val genericCoolDown = CoolDown(Duration.ofSeconds(10))
 
+    fun playRaid() {
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "raid", genericCoolDown) {
+            play("audio/raid.wav", 6f)
+        }
+    }
+
+    fun playScreen() {
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
+            play("audio/ton_ecran.wav", 6f)
+        }
+    }
+
     fun playYoupi() {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "youpi", genericCoolDown) {
             play("audio/youpi.wav", 6f)
@@ -26,12 +38,6 @@ class SoundPlayer(
     fun playYata() {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
             play("audio/yata.wav", 6f)
-        }
-    }
-
-    fun playScreen() {
-        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
-            play("audio/ton_ecran.wav", 6f)
         }
     }
 

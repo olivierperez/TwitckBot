@@ -10,6 +10,10 @@ class DefaultSoundExtension(
     private val soundPlayer: SoundPlayer,
 ) : SoundExtension {
 
+    override fun playRaid() {
+        soundPlayer.playRaid()
+    }
+
     override fun playYata() {
         soundPlayer.playYata()
     }

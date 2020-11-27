@@ -2,6 +2,7 @@ package fr.o80.twitck.extension.welcome
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.*
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -23,7 +24,8 @@ class Welcome(
     private var reactToCommands: Boolean,
     private var reactToRaids: Boolean,
     private val welcomeTimeChecker: TimeChecker,
-    private val twitchApi: TwitchApi
+    private val twitchApi: TwitchApi,
+    private val sound: SoundExtension
 ) {
 
     private val followers: List<Follower> by lazy {
@@ -49,6 +51,7 @@ class Welcome(
     fun interceptRaidEvent(messenger: Messenger, raidEvent: RaidEvent): RaidEvent {
         handleNewViewer(raidEvent.channel, raidEvent.viewer, messenger)
         thanksForRaiding(raidEvent, messenger)
+        sound.playRaid()
         return raidEvent
     }
 
@@ -179,6 +182,7 @@ class Welcome(
                 ?: throw IllegalStateException("Host name must be set for the extension ${Welcome::class.simpleName}")
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            val sound = serviceLocator.extensionProvider.first(SoundExtension::class)
 
             val welcomeTimeChecker = StorageFlagTimeChecker(
                 storage = storage,
@@ -199,7 +203,8 @@ class Welcome(
                 reactToCommands = reactToCommands,
                 reactToRaids = reactToRaids,
                 welcomeTimeChecker = welcomeTimeChecker,
-                twitchApi = serviceLocator.twitchApi
+                twitchApi = serviceLocator.twitchApi,
+                sound = sound
             )
         }
     }
