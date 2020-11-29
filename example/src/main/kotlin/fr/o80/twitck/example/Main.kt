@@ -27,7 +27,7 @@ import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.twitckBot
-import fr.o80.twitck.overlay.StandardOverlay
+import fr.o80.twitck.overlay.LwjglOverlay
 import fr.o80.twitck.poll.Poll
 import java.io.File
 import java.time.Duration
@@ -77,7 +77,8 @@ class Main : CliktCommand() {
 //                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
 //                on("!points_give", Badge.FOUNDER)
 //            }
-            install(StandardOverlay) {
+            install(LwjglOverlay) {
+                informationText("On partage le stream avec @Infrazfull des fois")
             }
             install(DefaultSoundExtension) {
             }
@@ -139,6 +140,7 @@ class Main : CliktCommand() {
                 remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
                 remind("Vous faites de l'Android ? nous aussi, et ça se retrouve sur Youtube https://youtu.be/ig-_10msUUE")
                 remind("Le refactoring Kata c'est bon pour la santé, du coup on le pratique ici de temps en temps")
+                remind("On partage le stream avec @Infrazfull des fois")
             }
             install(Welcome) {
                 channel(hostChannel)

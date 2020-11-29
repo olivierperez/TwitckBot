@@ -1,6 +1,9 @@
 package fr.o80.twitck.overlay.graphics
 
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.overlay.graphics.ext.Draw
+import fr.o80.twitck.overlay.graphics.ext.Vertex3f
+import fr.o80.twitck.overlay.graphics.ext.draw
 import fr.o80.twitck.overlay.graphics.renderer.Renderer
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
@@ -15,6 +18,7 @@ class OverlayWindow(
     private val title: String,
     private val width: Int,
     private val height: Int,
+    private val bgColor: Vertex3f,
     private val updatesPerSecond: Int,
     private val logger: Logger
 ) : Runnable {
@@ -134,6 +138,9 @@ class OverlayWindow(
     }
 
     private fun executeRenders() {
+        draw {
+            clear(bgColor.x, bgColor.y, bgColor.z)
+        }
         renderers.forEach { it.render() }
     }
 

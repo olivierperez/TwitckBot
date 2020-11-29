@@ -101,6 +101,16 @@ object Draw {
         line(x1, y2, x1, y1)
     }
 
+    @Drawer
+    fun quad(x1: Float, y1: Float, x2: Float, y2: Float) {
+        quad(
+            Vertex3f(x1, y1, 0f),
+            Vertex3f(x2, y1, 0f),
+            Vertex3f(x2, y2, 0f),
+            Vertex3f(x1, y2, 0f),
+        )
+    }
+
 }
 
 // Vertex 3

@@ -1,11 +1,14 @@
 package fr.o80.twitck.overlay.graphics.renderer
 
+import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import java.time.Duration
 import java.time.Instant
 
 class InformationRenderer(
+    private val top: Int,
+    private val left: Int,
     private val width: Int,
     private val height: Int,
     private val bgColor: Vertex3f,
@@ -14,7 +17,8 @@ class InformationRenderer(
     private val textRenderer: TextRenderer = TextRenderer("fonts/Roboto-Light.ttf")
 ) : Renderer {
 
-    private var texts: List<String> = emptyList()
+
+    private var informationText: String? = null
 
     private var alert: Alert? = null
 
@@ -29,27 +33,31 @@ class InformationRenderer(
     }
 
     override fun render() {
+        val message = alert?.text ?: informationText
+        message?.let { text -> renderMessage(text) }
+    }
+
+    private fun renderMessage(text: String) {
         draw {
-            clear(bgColor.x, bgColor.y, bgColor.z)
-            lineWidth(1f)
+            pushed {
+                translate(left.toFloat(), top.toFloat(), 0f)
 
-            color(borderColor.x, borderColor.y, borderColor.z)
-            rect(0f, 0f, width.toFloat(), height.toFloat())
+                color(bgColor.x, bgColor.y, bgColor.z)
+                quad(0f, 0f, width.toFloat(), height.toFloat())
 
-            color(textColor.x, textColor.y, textColor.z)
+                lineWidth(2f)
+                color(borderColor.x, borderColor.y, borderColor.z)
+                rect(0f, 0f, width.toFloat(), height.toFloat())
 
-            with(alert) {
-                if (this != null) {
-                    textRenderer.render(this.text)
-                } else {
-                    textRenderer.render(texts.joinToString("\n"))
-                }
+                color(textColor.x, textColor.y, textColor.z)
+
+                textRenderer.render(text)
             }
         }
     }
 
-    fun updateTexts(texts: List<String>) {
-        this.texts = texts
+    fun setText(text: String?) {
+        this.informationText = text
     }
 
     fun popAlert(text: String, duration: Duration) {
