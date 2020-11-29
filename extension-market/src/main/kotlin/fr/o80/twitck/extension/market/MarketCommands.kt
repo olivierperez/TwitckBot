@@ -4,17 +4,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.api.extension.SoundExtension
-import fr.o80.twitck.lib.api.extension.StorageExtension
+import fr.o80.twitck.lib.api.extension.*
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.Do
 import java.time.Duration
-import java.util.Date
+import java.util.*
 
 class MarketCommands(
     private val channel: String,
@@ -46,7 +42,7 @@ class MarketCommands(
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
             "!buy" -> handleBuyCommand(messenger, commandEvent)
-            "!market" -> handleMarketCommand(messenger)
+            "!market" -> handleMarketCommand()
         }
 
         return commandEvent
@@ -54,57 +50,56 @@ class MarketCommands(
 
     private fun handleBuyCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
-            val coolDown = CoolDown(Duration.ofMinutes(1))
-            messenger.sendImmediately(channel, messages.usage, coolDown)
+            extensionProvider.first(OverlayExtension::class)
+                .alert(messages.usage, Duration.ofSeconds(10))
             return
         }
 
         val product = products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
-            messenger.sendImmediately(channel, messages.productNotFound)
+            extensionProvider.first(OverlayExtension::class)
+                .alert(messages.productNotFound, Duration.ofSeconds(10))
             return
         }
 
         val price = product.computePrice(commandEvent)
         if (price == null) {
-            messenger.sendImmediately(
-                channel,
-                messages.couldNotGetProductPrice
-            )
+            extensionProvider.first(OverlayExtension::class)
+                .alert(messages.couldNotGetProductPrice, Duration.ofSeconds(10))
         } else {
             doBuy(messenger, commandEvent, product, price)
         }
     }
 
-    private fun handleMarketCommand(messenger: Messenger) {
+    private fun handleMarketCommand() {
         val productNames = products.joinToString(", ") { it.name }
-        val coolDown = CoolDown(Duration.ofMinutes(1))
-        messenger.sendImmediately(
-            channel,
-            messages.weHaveThisProducts.replace("#PRODUCTS#", productNames),
-            coolDown
-        )
+        val message = messages.weHaveThisProducts.replace("#PRODUCTS#", productNames)
+        extensionProvider.first(OverlayExtension::class)
+            .alert(message, Duration.ofSeconds(15))
     }
 
     private fun doBuy(
-            messenger: Messenger,
-            commandEvent: CommandEvent,
-            product: Product,
-            price: Int
+        messenger: Messenger,
+        commandEvent: CommandEvent,
+        product: Product,
+        price: Int
     ) {
         if (points.consumePoints(commandEvent.viewer.login, price)) {
             logger.info("${commandEvent.viewer.displayName} just spend $price points for ${product.name}")
 
             val purchaseResult = product.execute(messenger, commandEvent, logger, storage, serviceLocator)
             Do exhaustive when (purchaseResult) {
-                is PurchaseResult.Success -> onBuySucceeded(messenger, purchaseResult, commandEvent, product)
-                is PurchaseResult.Fail -> onBuyFailed(messenger, purchaseResult, commandEvent, product, price)
-                is PurchaseResult.WaitingValidation -> onBuyIsWaitingForValidation(
-                    messenger,
-                    purchaseResult,
-                    commandEvent,
-                    product
-                )
+                is PurchaseResult.Success ->
+                    onBuySucceeded(purchaseResult, commandEvent, product)
+                is PurchaseResult.Fail ->
+                    onBuyFailed(purchaseResult, commandEvent, product, price)
+                is PurchaseResult.WaitingValidation ->
+                    onBuyIsWaitingForValidation(
+                        messenger,
+                        purchaseResult,
+                        commandEvent,
+                        product
+                    )
             }
         } else {
             messenger.sendImmediately(
@@ -115,25 +110,27 @@ class MarketCommands(
     }
 
     private fun onBuySucceeded(
-            messenger: Messenger,
-            purchaseResult: PurchaseResult.Success,
-            commandEvent: CommandEvent,
-            product: Product
+        purchaseResult: PurchaseResult.Success,
+        commandEvent: CommandEvent,
+        product: Product
     ) {
         logger.info("${commandEvent.viewer.displayName} just bought a ${product.name}!")
-        purchaseResult.message?.let { messenger.sendImmediately(channel, it) }
+        purchaseResult.message?.let { message ->
+            extensionProvider.first(OverlayExtension::class)
+                .alert(message, Duration.ofSeconds(15))
+        }
         extensionProvider.forEach(SoundExtension::class) { sound -> sound.playYoupi() }
     }
 
     private fun onBuyFailed(
-            messenger: Messenger,
-            purchaseResult: PurchaseResult.Fail,
-            commandEvent: CommandEvent,
-            product: Product,
-            price: Int
+        purchaseResult: PurchaseResult.Fail,
+        commandEvent: CommandEvent,
+        product: Product,
+        price: Int
     ) {
         logger.info("${commandEvent.viewer.displayName} failed to buy ${product.name}!")
-        messenger.sendImmediately(channel, purchaseResult.message)
+        extensionProvider.first(OverlayExtension::class)
+            .alert(purchaseResult.message, Duration.ofSeconds(10))
         points.addPoints(commandEvent.viewer.login, price)
     }
 

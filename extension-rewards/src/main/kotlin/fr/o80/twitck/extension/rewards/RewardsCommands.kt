@@ -3,9 +3,10 @@ package fr.o80.twitck.extension.rewards
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.time.TimeChecker
+import java.time.Duration
 
 class RewardsCommands(
     private val channel: String,
@@ -15,18 +16,18 @@ class RewardsCommands(
     private val messages: Messages
 ) {
 
-    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
         if (channel != commandEvent.channel)
             return commandEvent
 
         when (commandEvent.command.tag) {
-            "!claim" -> claim(messenger, commandEvent.viewer)
+            "!claim" -> claim(commandEvent.viewer)
         }
 
         return commandEvent
     }
 
-    private fun claim(messenger: Messenger, viewer: Viewer) {
+    private fun claim(viewer: Viewer) {
         if (claimedPoints == 0) return
 
         claimTimeChecker.executeIfNotCooldown(viewer.login) {
@@ -42,7 +43,8 @@ class RewardsCommands(
                 .replace("#NEW_POINTS#", claimedPoints.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())
 
-            messenger.sendImmediately(channel, message)
+            extensionProvider.first(OverlayExtension::class)
+                .alert(message, Duration.ofSeconds(10))
         }
     }
 

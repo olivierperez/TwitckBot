@@ -2,6 +2,7 @@ package fr.o80.twitck.overlay.graphics.renderer
 
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
+import java.text.Normalizer
 import java.time.Duration
 import java.time.Instant
 
@@ -31,7 +32,7 @@ class InformationRenderer(
 
     override fun render() {
         val message = alert?.text ?: informationText
-        message?.let { text -> renderMessage(text) }
+        message?.let { text -> renderMessage(text.normalize()) }
     }
 
     private fun renderMessage(text: String) {
@@ -70,6 +71,12 @@ class InformationRenderer(
         this.alert = Alert(text, Instant.now() + duration)
     }
 
+}
+
+private fun String.normalize(): String {
+    // TODO  OPZ Regarder ça https://github.com/LWJGL/lwjgl3/issues/486
+    return Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
 }
 
 data class Alert(

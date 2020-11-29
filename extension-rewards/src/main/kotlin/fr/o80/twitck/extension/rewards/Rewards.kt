@@ -126,8 +126,8 @@ class Rewards(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { rewards ->
-                    pipeline.interceptCommandEvent { messenger, commandEvent ->
-                        rewards.commands.interceptCommandEvent(messenger, commandEvent)
+                    pipeline.interceptCommandEvent { _, commandEvent ->
+                        rewards.commands.interceptCommandEvent(commandEvent)
                     }
                     pipeline.interceptMessageEvent { _, messageEvent ->
                         rewards.interceptMessageEvent(messageEvent)
