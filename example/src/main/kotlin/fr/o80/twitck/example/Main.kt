@@ -109,8 +109,7 @@ class Main : CliktCommand() {
                 claim(points = 15, time = Duration.ofMinutes(20))
                 rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(5))
                 messages(
-                    points = "codes source",
-                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
+                        viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
                 )
             }
             install(Market) {

@@ -2,13 +2,7 @@ package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
-import fr.o80.twitck.lib.api.extension.Overlay
-import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.extension.*
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import java.time.Duration
@@ -17,24 +11,17 @@ class Rewards(
     private val channel: String,
     private val commands: RewardsCommands,
     private val extensionProvider: ExtensionProvider,
-    private val messages: Messages,
     private val talkingTimeChecker: StorageFlagTimeChecker,
     private val rewardedPoints: Int
 ) {
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(Overlay::class) { overlay ->
-            overlay.provideInformation(
-                Rewards::class.java.name,
-                listOf("Vous pouvez !claim des ${messages.points} de temps en temps.")
-            )
-        }
         extensionProvider.forEach(HelperExtension::class) { help ->
             help.registerCommand("!claim")
         }
     }
 
-    fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
+    fun interceptMessageEvent(messageEvent: MessageEvent): MessageEvent {
         rewardTalkativeViewers(messageEvent)
         return messageEvent
     }
@@ -83,12 +70,10 @@ class Rewards(
 
         @Dsl
         fun messages(
-            points: String,
             viewerJustClaimed: String,
         ) {
             messages = Messages(
-                points,
-                viewerJustClaimed
+                viewerJustClaimed = viewerJustClaimed
             )
         }
 
@@ -125,7 +110,6 @@ class Rewards(
                 channel = channelName,
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
-                messages = theMessages,
                 talkingTimeChecker = lastTalkChecker,
                 rewardedPoints = rewardedPoints
             )
@@ -142,8 +126,12 @@ class Rewards(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { rewards ->
-                    pipeline.interceptCommandEvent(rewards.commands::interceptCommandEvent)
-                    pipeline.interceptMessageEvent(rewards::interceptMessageEvent)
+                    pipeline.interceptCommandEvent { messenger, commandEvent ->
+                        rewards.commands.interceptCommandEvent(messenger, commandEvent)
+                    }
+                    pipeline.interceptMessageEvent { _, messageEvent ->
+                        rewards.interceptMessageEvent(messageEvent)
+                    }
                     pipeline.requestChannel(rewards.channel)
                     rewards.onInstallationFinished()
                 }
