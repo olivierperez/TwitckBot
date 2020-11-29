@@ -100,8 +100,7 @@ class Main : CliktCommand() {
                     pointsTransferred = "Codes source transferés de #FROM# à #TO#",
                     noPointsEnough = "Les huissiers sont en route vers #FROM#",
                     viewHasNoPoints = "#USER# possède 0 code source",
-                    viewHasPoints = "#USER# possède #POINTS# codes source",
-                    points = "codes source"
+                    viewHasPoints = "#USER# possède #POINTS# codes source"
                 )
             }
             install(Rewards) {

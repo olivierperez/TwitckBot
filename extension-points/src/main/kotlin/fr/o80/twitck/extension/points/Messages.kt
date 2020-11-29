@@ -6,5 +6,4 @@ class Messages(
     val notEnoughPoints: String,
     val viewerHasNoPoints: String,
     val viewerHasPoints: String,
-    val points: String,
 )

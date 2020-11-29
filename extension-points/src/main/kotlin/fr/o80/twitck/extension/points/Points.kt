@@ -9,11 +9,8 @@ class Points(
     override val channel: String,
     private val extensionProvider: ExtensionProvider,
     private val commands: PointsCommands,
-    private val bank: PointsBank,
-    private val messages: Messages
+    private val bank: PointsBank
 ) : PointsManager {
-
-    private val namespace: String = Points::class.java.name
 
     override fun getPoints(login: String): Int {
         return bank.getPoints(login)
@@ -28,9 +25,6 @@ class Points(
     }
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(Overlay::class) { overlay ->
-            overlay.provideInformation(namespace, listOf("Vous avez combien de ${messages.points} ? !points_info"))
-        }
         extensionProvider.forEach(HelperExtension::class) { help ->
             help.registerCommand("!points_info")
         }
@@ -66,9 +60,14 @@ class Points(
             noPointsEnough: String,
             viewHasNoPoints: String,
             viewHasPoints: String,
-            points: String,
         ) {
-            messages = Messages(destinationViewerDoesNotExist, pointsTransferred, noPointsEnough, viewHasNoPoints, viewHasPoints, points)
+            messages = Messages(
+                destinationViewerDoesNotExist,
+                pointsTransferred,
+                noPointsEnough,
+                viewHasNoPoints,
+                viewHasPoints
+            )
         }
 
         fun build(serviceLocator: ServiceLocator): Points {
@@ -95,8 +94,7 @@ class Points(
                 channelName,
                 serviceLocator.extensionProvider,
                 pointsCommands,
-                bank,
-                theMessages
+                bank
             )
         }
     }
@@ -111,7 +109,9 @@ class Points(
                 .apply(configure)
                 .build(serviceLocator)
                 .also { points ->
-                    pipeline.interceptCommandEvent(points.commands::interceptCommandEvent)
+                    pipeline.interceptCommandEvent { messenger, commandEvent ->
+                        points.commands.interceptCommandEvent(messenger, commandEvent)
+                    }
                     pipeline.requestChannel(points.channel)
                     points.onInstallationFinished()
                 }
