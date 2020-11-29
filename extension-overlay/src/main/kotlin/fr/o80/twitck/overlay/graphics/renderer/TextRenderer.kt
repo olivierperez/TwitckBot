@@ -37,6 +37,8 @@ class TextRenderer(
     private val contentScaleX: Float = 1.0f
     private val contentScaleY: Float = 1.0f
 
+    private var textureId: Int = 0
+
     fun init() {
         try {
             ttf = IOUtil.ioResourceToByteBuffer(fontPath, 512 * 1024)
@@ -68,16 +70,30 @@ class TextRenderer(
     }
 
     fun render(text: String) {
-        GL46.glEnable(GL46.GL_TEXTURE_2D)
-        GL46.glEnable(GL46.GL_BLEND)
         draw {
-            pushed {
-                translate(margin, margin + fontHeight, 0f)
-                renderText(text)
+            texture2d {
+                pushed {
+                    translate(margin, margin + fontHeight, 0f)
+                    renderText(text)
+                }
             }
         }
-        GL46.glDisable(GL46.GL_BLEND)
-        GL46.glDisable(GL46.GL_TEXTURE_2D)
+    }
+
+    fun getStringWidth(text: String): Float {
+        return getStringWidth(fontInfo, text, 0, text.length - 1)
+    }
+
+    fun getStringHeight(): Float {
+        MemoryStack.stackPush().use { stack ->
+            val bufAscent: IntBuffer = stack.ints(0)
+            val bufDescent: IntBuffer = stack.ints(0)
+            val bufLineGap: IntBuffer = stack.ints(0)
+
+            STBTruetype.stbtt_GetFontVMetrics(fontInfo, bufAscent, bufDescent, bufLineGap)
+            return (bufAscent.get(0) + bufDescent.get(0) + bufLineGap.get(0)) *
+                STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, fontHeight)
+        }
     }
 
     private fun initFont(bitmap: ByteBuffer, bitmapWidth: Int, bitmapHeight: Int) {
@@ -95,8 +111,8 @@ class TextRenderer(
     }
 
     private fun initGl(bitmap: ByteBuffer) {
-        val texID: Int = GL46.glGenTextures()
-        GL46.glBindTexture(GL46.GL_TEXTURE_2D, texID)
+        textureId = GL46.glGenTextures()
+        GL46.glBindTexture(GL46.GL_TEXTURE_2D, textureId)
         GL46.glTexImage2D(
             GL46.GL_TEXTURE_2D,
             0,
@@ -114,6 +130,7 @@ class TextRenderer(
     }
 
     private fun renderText(text: String) {
+
         val scale = STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, fontHeight)
 
         MemoryStack.stackPush().use { stack ->
@@ -125,6 +142,7 @@ class TextRenderer(
             val factorX = 1.0f / contentScaleX
             val factorY = 1.0f / contentScaleY
             var lineY = 0.0f
+            GL46.glBindTexture(GL46.GL_TEXTURE_2D, textureId)
             GL46.glBegin(GL46.GL_QUADS)
             var i = 0
             val to: Int = text.length

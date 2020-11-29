@@ -32,10 +32,8 @@ class LwjglOverlay(
     )
 
     private val informationRenderer = InformationRenderer(
-        top = height - 50,
-        left = (width - 512) / 2,
-        width = 512,
-        height = 50,
+        height = height,
+        width = width,
         bgColor = Vertex3f(0.8f, 0.8f, 0.8f),
         borderColor = borderColor,
         textColor = textColor

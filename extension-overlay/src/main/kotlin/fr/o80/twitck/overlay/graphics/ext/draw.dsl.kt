@@ -111,6 +111,15 @@ object Draw {
         )
     }
 
+    @Drawer
+    inline fun texture2d(block: () -> Unit) {
+        GL46.glEnable(GL46.GL_TEXTURE_2D)
+        GL46.glEnable(GL46.GL_BLEND)
+        block()
+        GL46.glDisable(GL46.GL_BLEND)
+        GL46.glDisable(GL46.GL_TEXTURE_2D)
+    }
+
 }
 
 // Vertex 3
