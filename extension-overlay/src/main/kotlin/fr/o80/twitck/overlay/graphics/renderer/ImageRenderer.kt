@@ -3,6 +3,7 @@ package fr.o80.twitck.overlay.graphics.renderer
 import fr.o80.twitck.overlay.graphics.ext.draw
 import org.lwjgl.opengl.GL46
 import java.time.Duration
+import java.time.Instant
 
 class ImageRenderer(
     private val height: Int,
@@ -10,11 +11,18 @@ class ImageRenderer(
 ) : Renderer {
 
     private var image: Image? = null
+    private var disappearAt: Instant? = null
 
     override fun init() {
     }
 
     override fun tick() {
+        disappearAt?.let { instant ->
+            if (instant.isBefore(Instant.now())) {
+                disappearAt = null
+                image = null
+            }
+        }
     }
 
     override fun render() {
@@ -54,6 +62,7 @@ class ImageRenderer(
 
     fun setImage(path: String, duration: Duration) {
         image = Image(path)
+        disappearAt = Instant.now() + duration
     }
 
 }

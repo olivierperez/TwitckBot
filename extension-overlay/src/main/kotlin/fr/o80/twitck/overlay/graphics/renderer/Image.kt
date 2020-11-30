@@ -16,6 +16,7 @@ class Image(private val filename: String) {
         if (id != -1)
             return
 
+        // TODO Load from InputStream ?
         val bufferedImage = ImageIO.read(File(filename))
         width = bufferedImage.width
         height = bufferedImage.height

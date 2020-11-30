@@ -30,7 +30,7 @@ class DefaultSoundExtension(
         fun build(serviceLocator: ServiceLocator): DefaultSoundExtension {
             val logger = serviceLocator.loggerFactory.getLogger(DefaultSoundExtension::class)
             val soundPlayer = SoundPlayer(serviceLocator.coolDownManager, logger)
-            val soundCommand = SoundCommand(soundPlayer)
+            val soundCommand = SoundCommand(soundPlayer, serviceLocator.extensionProvider)
             return DefaultSoundExtension(soundCommand, soundPlayer)
         }
     }

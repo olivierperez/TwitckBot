@@ -23,21 +23,24 @@ class SoundPlayer(
         }
     }
 
-    fun playScreen() {
+    fun playScreen(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
             play("audio/ton_ecran.wav", 6f)
+            then()
         }
     }
 
-    fun playYoupi() {
+    fun playYoupi(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "youpi", genericCoolDown) {
             play("audio/youpi.wav", 6f)
+            then()
         }
     }
 
-    fun playYata() {
+    fun playYata(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
             play("audio/yata.wav", 6f)
+            then()
         }
     }
 
