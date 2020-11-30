@@ -15,7 +15,6 @@ class InformationRenderer(
     private val textRenderer: TextRenderer = TextRenderer("fonts/Roboto-Light.ttf")
 ) : Renderer {
 
-
     private var informationText: String? = null
 
     private var alert: Alert? = null
