@@ -2,10 +2,12 @@ package fr.o80.twitck.overlay.graphics.renderer
 
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL46
-import java.io.File
+import java.io.InputStream
 import javax.imageio.ImageIO
 
-class Image(private val filename: String) {
+class Image(
+    private val imageInputStream: InputStream
+) {
 
     var id: Int = -1
         private set
@@ -16,8 +18,7 @@ class Image(private val filename: String) {
         if (id != -1)
             return
 
-        // TODO Load from InputStream ?
-        val bufferedImage = ImageIO.read(File(filename))
+        val bufferedImage = ImageIO.read(imageInputStream)
         width = bufferedImage.width
         height = bufferedImage.height
 

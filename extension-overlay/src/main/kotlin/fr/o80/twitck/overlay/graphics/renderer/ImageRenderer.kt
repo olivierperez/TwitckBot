@@ -2,6 +2,7 @@ package fr.o80.twitck.overlay.graphics.renderer
 
 import fr.o80.twitck.overlay.graphics.ext.draw
 import org.lwjgl.opengl.GL46
+import java.io.InputStream
 import java.time.Duration
 import java.time.Instant
 
@@ -60,8 +61,8 @@ class ImageRenderer(
         }
     }
 
-    fun setImage(path: String, duration: Duration) {
-        image = Image(path)
+    fun setImage(inputStream: InputStream, duration: Duration) {
+        image = Image(inputStream)
         disappearAt = Instant.now() + duration
     }
 

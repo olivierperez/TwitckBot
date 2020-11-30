@@ -14,12 +14,12 @@ class SoundCommand(
         when (commandEvent.command.tag) {
             "!youpi" -> {
                 soundPlayer.playYoupi {
-                    extensionProvider.showImage("extension-overlay\\src\\main\\resources\\vahine.gif")
+                    extensionProvider.showImage("image/vahine.gif")
                 }
             }
             "!yata" -> {
                 soundPlayer.playYata {
-                    extensionProvider.showImage("extension-overlay\\src\\main\\resources\\vahine.gif")
+                    extensionProvider.showImage("image/vahine.gif")
                 }
             }
             "!screen" -> soundPlayer.playScreen()
@@ -31,8 +31,9 @@ class SoundCommand(
 }
 
 private fun ExtensionProvider.showImage(imagePath: String) {
-    this.first(OverlayExtension::class).showImage(
-        imagePath,
-        Duration.ofSeconds(5)
-    )
+    val path = javaClass.classLoader.getResourceAsStream(imagePath)
+        ?: throw IllegalArgumentException("Failed to load image for resources: $imagePath")
+
+    this.first(OverlayExtension::class)
+        .showImage(path, Duration.ofSeconds(5))
 }

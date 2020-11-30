@@ -9,6 +9,7 @@ import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.renderer.ImageRenderer
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
+import java.io.InputStream
 import java.time.Duration
 
 class LwjglOverlay(
@@ -53,7 +54,7 @@ class LwjglOverlay(
         informationRenderer.popAlert(text, duration)
     }
 
-    override fun showImage(path: String, duration: Duration) {
+    override fun showImage(path: InputStream, duration: Duration) {
         imageRenderer.setImage(path, duration)
     }
 
