@@ -37,6 +37,13 @@ class SoundPlayer(
         }
     }
 
+    fun playCoin(then: () -> Unit = {}) {
+        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "coin", genericCoolDown) {
+            play("audio/coin.wav", 6f)
+            then()
+        }
+    }
+
     fun playYata(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
             play("audio/yata.wav", 6f)

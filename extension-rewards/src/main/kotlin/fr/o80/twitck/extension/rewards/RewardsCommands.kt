@@ -5,6 +5,7 @@ import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.time.TimeChecker
 import java.time.Duration
 
@@ -45,6 +46,8 @@ class RewardsCommands(
 
             extensionProvider.first(OverlayExtension::class)
                 .alert(message, Duration.ofSeconds(10))
+            extensionProvider.first(SoundExtension::class)
+                .playCoin()
         }
     }
 

@@ -22,6 +22,10 @@ class DefaultSoundExtension(
         soundPlayer.playYoupi()
     }
 
+    override fun playCoin() {
+        soundPlayer.playCoin()
+    }
+
     class Configuration {
 
         @DslMarker

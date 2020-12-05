@@ -4,4 +4,5 @@ interface SoundExtension {
     fun playRaid()
     fun playYata()
     fun playYoupi()
+    fun playCoin()
 }
