@@ -27,7 +27,7 @@ class PointsCommands(
             // !points_give idontwantgiftsub 152
             "!points_give" -> handleGiveCommand(messenger, commandEvent)
             // !points_info
-            "!points_info" -> handleInfoCommand(messenger, commandEvent)
+            "!points_info", "!points" -> handleInfoCommand(messenger, commandEvent)
         }
 
         return commandEvent
