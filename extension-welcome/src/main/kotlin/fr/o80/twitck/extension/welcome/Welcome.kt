@@ -12,6 +12,7 @@ import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
+import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import fr.o80.twitck.lib.api.service.time.TimeChecker
 import java.time.Duration
@@ -29,7 +30,8 @@ class Welcome(
     private var reactToRaids: Boolean,
     private val welcomeTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
-    private val sound: SoundExtension
+    private val sound: SoundExtension,
+    private val logger: Logger
 ) {
 
     private val followers: List<Follower> by lazy {
@@ -53,6 +55,7 @@ class Welcome(
     }
 
     fun interceptRaidEvent(messenger: Messenger, raidEvent: RaidEvent): RaidEvent {
+        logger.error("channel => $channel")
         handleNewViewer(raidEvent.channel, raidEvent.viewer, messenger)
         thanksForRaiding(raidEvent, messenger)
         sound.playRaid()
@@ -195,6 +198,8 @@ class Welcome(
                 interval = welcomeInterval
             )
 
+            val logger = serviceLocator.loggerFactory.getLogger(Welcome::class)
+
             return Welcome(
                 channel = channelName,
                 messagesForFollowers = messagesForFollowers,
@@ -208,7 +213,8 @@ class Welcome(
                 reactToRaids = reactToRaids,
                 welcomeTimeChecker = welcomeTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
-                sound = sound
+                sound = sound,
+                logger = logger
             )
         }
     }

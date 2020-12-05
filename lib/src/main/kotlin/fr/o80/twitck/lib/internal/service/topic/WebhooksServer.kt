@@ -75,7 +75,7 @@ class WebhooksServer(
             logger.debug("Twitch denied us on ${call.request.path()} because: $reason")
             call.respondText("", contentType = ContentType.Text.Html)
         } else {
-            logger.debug("Twitch challenged us for $mode on ${call.request.path()} with $challenge")
+            logger.info("Twitch challenged us for $mode on ${call.request.path()} with $challenge")
             call.respondText(challenge, contentType = ContentType.Text.Html)
         }
     }

@@ -36,7 +36,8 @@ internal class TwitckBotImpl(
         configuration.commandParser,
         MessageDispatcher(messenger, configuration.messageHandlers),
         CommandDispatcher(messenger, configuration.commandHandlers),
-        RaidDispatcher(messenger, configuration.raidHandlers)
+        RaidDispatcher(messenger, configuration.raidHandlers),
+        configuration.loggerFactory.getLogger(TwitckBotImpl::class)
     )
 
     private val hostUserId: String = configuration.twitchApi.getUser(configuration.hostName).id

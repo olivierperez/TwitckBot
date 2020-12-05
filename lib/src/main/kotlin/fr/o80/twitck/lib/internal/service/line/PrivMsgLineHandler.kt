@@ -6,6 +6,7 @@ import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.bean.event.RaidEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.RaidDispatcher
@@ -15,7 +16,8 @@ internal class PrivMsgLineHandler(
     private val commandParser: CommandParser,
     private val messageDispatcher: MessageDispatcher,
     private val commandDispatcher: CommandDispatcher,
-    private val raidDispatcher: RaidDispatcher
+    private val raidDispatcher: RaidDispatcher,
+    private val logger: Logger
 ) : LineHandler {
 
     private val regex =
@@ -43,6 +45,8 @@ internal class PrivMsgLineHandler(
 
             val command = commandParser.parse(msg)
 
+            logger.error("${tags.msgId} || $line")
+
             when {
                 tags.msgId == "raid" -> dispatchRaid(channel, tags, viewer)
                 command != null -> dispatchCommand(channel, command, tags, viewer)
@@ -52,15 +56,17 @@ internal class PrivMsgLineHandler(
     }
 
     private fun dispatchRaid(channel: String, tags: Map<String, String>, viewer: Viewer) {
+        val raidEvent = RaidEvent(
+            messenger,
+            channel,
+            viewer,
+            tags.msgLogin,
+            tags.msgDisplayName,
+            tags.msgViewerCount
+        )
+        logger.error("Raid => $raidEvent")
         raidDispatcher.dispatch(
-            RaidEvent(
-                messenger,
-                channel,
-                viewer,
-                tags.msgLogin,
-                tags.msgDisplayName,
-                tags.msgViewerCount
-            )
+            raidEvent
         )
     }
 
