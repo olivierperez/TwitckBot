@@ -8,13 +8,20 @@ import java.time.Instant
 
 class ImageRenderer(
     private val height: Int,
-    private val width: Int
+    private val width: Int,
+    private val textRenderer: TextRenderer = TextRenderer(
+        "fonts/Roboto-Black.ttf",
+        margin = 0f,
+        fontHeight = 70f
+    )
 ) : Renderer {
 
     private var image: Image? = null
+    private var text: String? = null
     private var disappearAt: Instant? = null
 
     override fun init() {
+        textRenderer.init()
     }
 
     override fun tick() {
@@ -30,6 +37,20 @@ class ImageRenderer(
         image?.let { img ->
             img.load()
             renderImage(img)
+            text?.let { txt -> renderText(txt, img) }
+        }
+    }
+
+    private fun renderText(text: String, image: Image) {
+        val left = (width - textRenderer.getStringWidth(text) - 30) / 2f
+        val top = (height + image.height) / 2f
+
+        draw {
+            pushed {
+                translate(left, top, 0f)
+                color(0f, 0f, 0f)
+                textRenderer.render(text)
+            }
         }
     }
 
@@ -61,9 +82,10 @@ class ImageRenderer(
         }
     }
 
-    fun setImage(inputStream: InputStream, duration: Duration) {
-        image = Image(inputStream)
-        disappearAt = Instant.now() + duration
+    fun setImage(inputStream: InputStream, text: String?, duration: Duration) {
+        this.image = Image(inputStream)
+        this.text = text
+        this.disappearAt = Instant.now() + duration
     }
 
 }

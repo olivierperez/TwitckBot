@@ -55,7 +55,11 @@ class LwjglOverlay(
     }
 
     override fun showImage(path: InputStream, duration: Duration) {
-        imageRenderer.setImage(path, duration)
+        imageRenderer.setImage(path, null, duration)
+    }
+
+    override fun showImage(path: InputStream, text: String, duration: Duration) {
+        imageRenderer.setImage(path, text, duration)
     }
 
     private fun start() {
