@@ -43,34 +43,38 @@ class ImageRenderer(
     }
 
     private fun renderText(text: String, image: Image) {
-        val (left, top, lines) = computeBestBounds(text, image)
+        val (left, top, lines, biggestWidth) = computeBestBounds(text, image)
 
         draw {
             pushed {
                 color(0f, 0f, 0f)
                 translate(left, top, 0f)
                 lines.forEach { line ->
-                    textRenderer.render(line)
+                    pushed {
+                        translate((biggestWidth - line.width) / 2f, 0f, 0f)
+                        textRenderer.render(line.content)
+                    }
                     translate(0f, textRenderer.fontHeight, 0f)
                 }
             }
         }
     }
 
-    private fun computeBestBounds(text: String, image: Image): Triple<Float, Float, List<String>> {
+    private fun computeBestBounds(text: String, image: Image): Bounds {
         val oneLineWidth = textRenderer.getStringWidth(text)
-        val neededLines = ceil(oneLineWidth / width).toInt()
+        val neededLines = ceil(oneLineWidth / (width - 100)).toInt()
         val charsPerLine = text.length / neededLines
 
         val lines = LineSplitter().split(text, charsPerLine)
-        val biggestLineWidth = lines.map {
-            textRenderer.getStringWidth(it)
-        }.maxOrNull()?.toInt() ?: 0
+            .map { Line(it, textRenderer.getStringWidth(it)) }
+        val biggestLine: Line = lines
+            .maxByOrNull { it.width }
+            ?: Line("", 0f)
 
-        val left = (width - biggestLineWidth - 30) / 2f
+        val left = (width - biggestLine.width - 30) / 2f
         val top = (height + image.height) / 2f
 
-        return Triple(left, top, lines)
+        return Bounds(left, top, lines, biggestLine.width)
     }
 
     private fun renderImage(image: Image) {
@@ -106,5 +110,17 @@ class ImageRenderer(
         this.text = text
         this.disappearAt = Instant.now() + duration
     }
+
+    private data class Bounds(
+        val left: Float,
+        val top: Float,
+        val lines: List<Line>,
+        val biggestWidth: Float
+    )
+
+    private data class Line(
+        val content: String,
+        val width: Float
+    )
 
 }
