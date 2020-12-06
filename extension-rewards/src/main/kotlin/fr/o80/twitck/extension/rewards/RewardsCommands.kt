@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.rewards
 
-import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.Viewer
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
@@ -12,7 +12,7 @@ import java.time.Duration
 class RewardsCommands(
     private val channel: String,
     private val extensionProvider: ExtensionProvider,
-    private val claimTimeChecker : TimeChecker,
+    private val claimTimeChecker: TimeChecker,
     private val claimedPoints: Int,
     private val messages: Messages
 ) {
@@ -44,11 +44,21 @@ class RewardsCommands(
                 .replace("#NEW_POINTS#", claimedPoints.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())
 
-            extensionProvider.first(OverlayExtension::class)
-                .alert(message, Duration.ofSeconds(10))
-            extensionProvider.first(SoundExtension::class)
-                .playCoin()
+            playCoin()
+            displayCoinAndMessage(message)
         }
+    }
+
+    private fun playCoin() {
+        extensionProvider.first(SoundExtension::class)
+            .playCoin()
+    }
+
+    private fun displayCoinAndMessage(message: String) {
+        val coinInputStream = javaClass.classLoader.getResourceAsStream("image/coin.png")
+            ?: throw IllegalArgumentException("Failed to load image for resources Coin")
+        extensionProvider.first(OverlayExtension::class)
+            .showImage(coinInputStream, message, Duration.ofSeconds(5))
     }
 
 }

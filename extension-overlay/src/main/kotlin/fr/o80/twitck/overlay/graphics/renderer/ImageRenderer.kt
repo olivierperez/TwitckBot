@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL46
 import java.io.InputStream
 import java.time.Duration
 import java.time.Instant
+import kotlin.math.ceil
 
 class ImageRenderer(
     private val height: Int,
@@ -42,16 +43,34 @@ class ImageRenderer(
     }
 
     private fun renderText(text: String, image: Image) {
-        val left = (width - textRenderer.getStringWidth(text) - 30) / 2f
-        val top = (height + image.height) / 2f
+        val (left, top, lines) = computeBestBounds(text, image)
 
         draw {
             pushed {
-                translate(left, top, 0f)
                 color(0f, 0f, 0f)
-                textRenderer.render(text)
+                translate(left, top, 0f)
+                lines.forEach { line ->
+                    textRenderer.render(line)
+                    translate(0f, textRenderer.fontHeight, 0f)
+                }
             }
         }
+    }
+
+    private fun computeBestBounds(text: String, image: Image): Triple<Float, Float, List<String>> {
+        val oneLineWidth = textRenderer.getStringWidth(text)
+        val neededLines = ceil(oneLineWidth / width).toInt()
+        val charsPerLine = text.length / neededLines
+
+        val lines = LineSplitter().split(text, charsPerLine)
+        val biggestLineWidth = lines.map {
+            textRenderer.getStringWidth(it)
+        }.maxOrNull()?.toInt() ?: 0
+
+        val left = (width - biggestLineWidth - 30) / 2f
+        val top = (height + image.height) / 2f
+
+        return Triple(left, top, lines)
     }
 
     private fun renderImage(image: Image) {

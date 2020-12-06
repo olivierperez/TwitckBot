@@ -19,4 +19,8 @@ dependencies {
     implementation 'org.lwjgl.osgi:org.lwjgl.glfw:3.2.1.2'
     implementation 'org.lwjgl.osgi:org.lwjgl.opengl:3.2.1.2'
     implementation 'org.lwjgl.osgi:org.lwjgl.stb:3.2.1.2'
+
+    testImplementation 'org.jetbrains.kotlin:kotlin-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
+    testImplementation 'io.mockk:mockk:1.10.0'
 }

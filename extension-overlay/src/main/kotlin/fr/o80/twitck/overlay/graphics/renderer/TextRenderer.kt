@@ -12,12 +12,13 @@ import org.lwjgl.system.MemoryStack
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
+import java.text.Normalizer
 import kotlin.math.round
 
 class TextRenderer(
-    private val fontPath: String,
-    private val margin: Float = 10f,
-    private val fontHeight: Float = 20f
+    val fontPath: String,
+    val margin: Float = 10f,
+    val fontHeight: Float = 20f
 ) {
 
     private val kerningEnabled = true
@@ -74,7 +75,7 @@ class TextRenderer(
             texture2d {
                 pushed {
                     translate(margin, margin + fontHeight, 0f)
-                    renderText(text)
+                    renderText(text.normalize())
                 }
             }
         }
@@ -246,4 +247,10 @@ class TextRenderer(
         cpOut.put(0, c1.toInt())
         return 1
     }
+}
+
+private fun String.normalize(): String {
+    // TODO  OPZ Regarder ça https://github.com/LWJGL/lwjgl3/issues/486
+    return Normalizer.normalize(this, Normalizer.Form.NFD)
+        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
 }
