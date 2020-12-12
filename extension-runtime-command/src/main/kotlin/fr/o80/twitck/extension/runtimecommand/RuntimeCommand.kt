@@ -86,7 +86,7 @@ class RuntimeCommand(
         commandEvent: CommandEvent
     ) {
         runtimeCommands[commandEvent.command.tag]?.let { message ->
-            val coolDown = CoolDown(Duration.ofMinutes(1))
+            val coolDown = CoolDown(Duration.ofSeconds(5))
             messenger.sendImmediately(commandEvent.channel, message, coolDown)
         }
     }
