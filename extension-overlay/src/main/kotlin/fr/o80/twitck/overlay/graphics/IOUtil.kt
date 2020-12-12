@@ -2,6 +2,7 @@ package fr.o80.twitck.overlay.graphics
 
 import org.lwjgl.BufferUtils
 import java.io.IOException
+import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.channels.Channels
 import java.nio.file.Files
@@ -45,13 +46,13 @@ object IOUtil {
                 }
             }
         }
-        buffer.flip()
+        (buffer as Buffer).flip()
         return buffer.slice()
     }
 
     private fun resizeBuffer(buffer: ByteBuffer, newCapacity: Int): ByteBuffer {
         val newBuffer = BufferUtils.createByteBuffer(newCapacity)
-        buffer.flip()
+        (buffer as Buffer).flip()
         newBuffer.put(buffer)
         return newBuffer
     }
