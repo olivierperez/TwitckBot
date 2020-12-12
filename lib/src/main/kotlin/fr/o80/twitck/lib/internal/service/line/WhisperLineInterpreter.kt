@@ -9,12 +9,12 @@ import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.internal.handler.WhisperCommandDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 
-internal class WhisperLineHandler(
+internal class WhisperLineInterpreter(
     private val messenger: Messenger,
     private val commandParser: CommandParser,
     private val whisperDispatcher: WhisperDispatcher,
     private val commandDispatcher: WhisperCommandDispatcher
-) : LineHandler {
+) : LineInterpreter {
 
     private val regex =
         Regex("@([^ ]+) :([^!]+)![^@]+@[^.]+\\.tmi\\.twitch\\.tv WHISPER ([^ ]+) :(.+)$")

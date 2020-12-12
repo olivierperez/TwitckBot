@@ -3,25 +3,22 @@ package fr.o80.twitck.lib.internal.service.line
 import fr.o80.twitck.lib.api.bean.*
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
-import fr.o80.twitck.lib.api.bean.event.RaidEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
-import fr.o80.twitck.lib.internal.handler.RaidDispatcher
 
-internal class PrivMsgLineHandler(
+internal class PrivMsgLineInterpreter(
     private val messenger: Messenger,
     private val commandParser: CommandParser,
     private val messageDispatcher: MessageDispatcher,
     private val commandDispatcher: CommandDispatcher,
-    private val raidDispatcher: RaidDispatcher,
     private val logger: Logger
-) : LineHandler {
+) : LineInterpreter {
 
     private val regex =
-        Regex("^@([^ ]+) :([^!]+)![^@]+@[^.]+\\.tmi\\.twitch\\.tv PRIVMSG (#[^ ]+) :(.+)$")
+        "^@([^ ]+) :([^!]+)![^@]+@[^.]+\\.tmi\\.twitch\\.tv PRIVMSG (#[^ ]+) :(.+)$".toRegex()
 
     override fun handle(line: String) {
         regex.find(line)?.let { matchResult ->
@@ -48,26 +45,10 @@ internal class PrivMsgLineHandler(
             logger.error("${tags.msgId} || $line")
 
             when {
-                tags.msgId == "raid" -> dispatchRaid(channel, tags, viewer)
                 command != null -> dispatchCommand(channel, command, tags, viewer)
                 else -> dispatchMessage(channel, msg, tags, viewer)
             }
         }
-    }
-
-    private fun dispatchRaid(channel: String, tags: Map<String, String>, viewer: Viewer) {
-        val raidEvent = RaidEvent(
-            messenger,
-            channel,
-            viewer,
-            tags.msgLogin,
-            tags.msgDisplayName,
-            tags.msgViewerCount
-        )
-        logger.error("Raid => $raidEvent")
-        raidDispatcher.dispatch(
-            raidEvent
-        )
     }
 
     private fun dispatchCommand(

@@ -4,13 +4,22 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.internal.handler.*
+import fr.o80.twitck.lib.internal.handler.AutoJoiner
+import fr.o80.twitck.lib.internal.handler.CommandDispatcher
+import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
+import fr.o80.twitck.lib.internal.handler.JoinDispatcher
+import fr.o80.twitck.lib.internal.handler.MessageDispatcher
+import fr.o80.twitck.lib.internal.handler.RaidDispatcher
+import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
+import fr.o80.twitck.lib.internal.handler.WhisperCommandDispatcher
+import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
-import fr.o80.twitck.lib.internal.service.line.JoinLineHandler
-import fr.o80.twitck.lib.internal.service.line.LineInterpreter
-import fr.o80.twitck.lib.internal.service.line.PrivMsgLineHandler
-import fr.o80.twitck.lib.internal.service.line.WhisperLineHandler
+import fr.o80.twitck.lib.internal.service.line.JoinLineInterpreter
+import fr.o80.twitck.lib.internal.service.line.LineInterpreters
+import fr.o80.twitck.lib.internal.service.line.PrivMsgLineInterpreter
+import fr.o80.twitck.lib.internal.service.line.RaidInterpreter
+import fr.o80.twitck.lib.internal.service.line.WhisperLineInterpreter
 import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
 import fr.o80.twitck.lib.internal.service.topic.SecretHolder
 import fr.o80.twitck.lib.internal.service.topic.TopicManager
@@ -31,11 +40,16 @@ internal class TwitckBotImpl(
         configuration.coolDownManager
     )
 
-    private val privMsgLineHandler = PrivMsgLineHandler(
+    private val privMsgLineHandler = PrivMsgLineInterpreter(
         messenger,
         configuration.commandParser,
         MessageDispatcher(messenger, configuration.messageHandlers),
         CommandDispatcher(messenger, configuration.commandHandlers),
+        configuration.loggerFactory.getLogger(TwitckBotImpl::class)
+    )
+
+    private val raidInterpreter = RaidInterpreter(
+        messenger,
         RaidDispatcher(messenger, configuration.raidHandlers),
         configuration.loggerFactory.getLogger(TwitckBotImpl::class)
     )
@@ -43,10 +57,10 @@ internal class TwitckBotImpl(
     private val hostUserId: String = configuration.twitchApi.getUser(configuration.hostName).id
 
     private val joinLineHandler =
-        JoinLineHandler(this, JoinDispatcher(messenger, configuration.joinHandlers))
+        JoinLineInterpreter(this, JoinDispatcher(messenger, configuration.joinHandlers))
 
     private val whisperLineHandler =
-        WhisperLineHandler(
+        WhisperLineInterpreter(
             messenger,
             configuration.commandParser,
             WhisperDispatcher(messenger, configuration.whisperHandlers),
@@ -56,8 +70,8 @@ internal class TwitckBotImpl(
     private val autoJoiner =
         AutoJoiner(this, configuration.requestedChannels, configuration.loggerFactory)
 
-    private val lineInterpreter =
-        LineInterpreter(privMsgLineHandler, joinLineHandler, whisperLineHandler)
+    private val lineInterpreters =
+        LineInterpreters(privMsgLineHandler, joinLineHandler, whisperLineHandler, raidInterpreter)
 
     private val logger: Logger = configuration.loggerFactory.getLogger(TwitckBotImpl::class)
 
@@ -120,7 +134,7 @@ internal class TwitckBotImpl(
 
         initializer.handleLine(line)
         ping.handleLine(line)
-        lineInterpreter.handle(line)
+        lineInterpreters.interpretLine(line)
     }
 
     override fun sendLine(line: String) {

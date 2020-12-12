@@ -5,10 +5,10 @@ import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 
-internal class JoinLineHandler(
+internal class JoinLineInterpreter(
     private val bot: TwitckBot,
     private val dispatcher: JoinDispatcher
-) : LineHandler {
+) : LineInterpreter {
     private val regex = Regex("^:([^!]+)![^@]+@[^.]+\\.tmi\\.twitch\\.tv JOIN (#[^ ]+)$")
 
     override fun handle(line: String) {

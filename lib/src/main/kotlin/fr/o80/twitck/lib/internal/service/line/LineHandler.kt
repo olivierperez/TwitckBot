@@ -2,7 +2,7 @@ package fr.o80.twitck.lib.internal.service.line
 
 import fr.o80.twitck.lib.api.bean.Badge
 
-internal interface LineHandler {
+internal interface LineInterpreter {
     fun handle(line: String)
 
     fun parseBadges(value: String): List<Badge> {
