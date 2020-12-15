@@ -17,8 +17,8 @@ class StatsCommand(
     // !stat messages
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
-            "!stat" -> handleStatCommand(messenger, commandEvent)
-            "!stats" -> handleStatCommand(messenger, commandEvent)
+            "!stat", "!stats" -> handleStatCommand(messenger, commandEvent)
+            "!debug" -> {} // TODO OPZ Que le bot liste dans le Log toutes ses données
         }
         return commandEvent
     }
@@ -75,21 +75,22 @@ class StatsCommand(
             val statCalculator = GroupingStatCalculator(data)
 
             val login = commandEvent.command.options.takeIf { it.size >= 2 }?.get(1)
+                ?.toLowerCase()
                 ?: commandEvent.viewer.login
 
-            val viewerStats = statCalculator.countBy(
+            val viewerCommandsStats = statCalculator.countBy(
                 STAT_INFO_VIEWER,
                 STAT_INFO_COMMAND
             )[login]
 
-            if (viewerStats == null) {
+            if (viewerCommandsStats == null) {
                 messenger.sendImmediately(
                     commandEvent.channel,
                     "Pas de stats pour $login",
                     CoolDown(Duration.ofSeconds(30))
                 )
             } else {
-                viewerStats.maxByOrNull { (_, count) -> count }
+                viewerCommandsStats.maxByOrNull { (_, count) -> count }
                     ?.let {
                         messenger.sendImmediately(
                             commandEvent.channel,
