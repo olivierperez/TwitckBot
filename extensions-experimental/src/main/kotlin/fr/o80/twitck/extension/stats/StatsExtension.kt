@@ -1,11 +1,14 @@
 package fr.o80.twitck.extension.stats
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.event.*
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
+import fr.o80.twitck.lib.api.bean.event.FollowsEvent
+import fr.o80.twitck.lib.api.bean.event.JoinEvent
+import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.extension.Stat
 import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class StatsExtension(
@@ -14,7 +17,7 @@ class StatsExtension(
     private val statsCommand: StatsCommand
 ) : Stat {
 
-    fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
+    fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
         statsData.hit(
             STATS_NAMESPACE, "commands", mapOf(
                 STAT_INFO_COMMAND to commandEvent.command.tag.removePrefix("!"),
@@ -24,31 +27,45 @@ class StatsExtension(
         return commandEvent
     }
 
-    fun interceptFollowEvent(messenger: Messenger, followsEvent: FollowsEvent): FollowsEvent {
-        statsData.hit(STATS_NAMESPACE, "follows")
+    fun interceptFollowEvent(followsEvent: FollowsEvent): FollowsEvent {
+        followsEvent.followers.data.forEach { follower ->
+            statsData.hit(
+                STATS_NAMESPACE,
+                "follows",
+                mapOf(
+                    STAT_INFO_VIEWER to follower.fromName
+                )
+            )
+        }
         return followsEvent
     }
 
-    fun interceptJoinEvent(messenger: Messenger, joinEvent: JoinEvent): JoinEvent {
-        statsData.hit(STATS_NAMESPACE, "joins")
+    fun interceptJoinEvent(joinEvent: JoinEvent): JoinEvent {
+        statsData.hit(
+            STATS_NAMESPACE,
+            "joins",
+            mapOf(
+                STAT_INFO_VIEWER to joinEvent.viewer.login
+            )
+        )
         return joinEvent
     }
 
-    fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
+    fun interceptMessageEvent(messageEvent: MessageEvent): MessageEvent {
         statsData.hit(
             STATS_NAMESPACE,
             "bits",
             mapOf(
-                STAT_INFO_COUNT to messageEvent.bits,
-                STAT_INFO_VIEWER to messageEvent.viewer.login
+                STAT_INFO_VIEWER to messageEvent.viewer.login,
+                STAT_INFO_COUNT to messageEvent.bits
             )
-
         )
 
         statsData.hit(
             STATS_NAMESPACE,
             "messages",
             mapOf(
+                STAT_INFO_VIEWER to messageEvent.viewer.login,
                 STAT_INFO_SIZE to messageEvent.message.length,
                 STAT_INFO_COUNT to messageEvent.message.split("\\s+".toRegex()).count()
             )
@@ -58,7 +75,6 @@ class StatsExtension(
     }
 
     fun interceptSubscriptionEvent(
-        messenger: Messenger,
         subscriptionEvent: SubscriptionEvent
     ): SubscriptionEvent {
         statsData.hit(
@@ -67,7 +83,7 @@ class StatsExtension(
         return subscriptionEvent
     }
 
-    fun interceptWhisperEvent(messenger: Messenger, whisperEvent: WhisperEvent): WhisperEvent {
+    fun interceptWhisperEvent(whisperEvent: WhisperEvent): WhisperEvent {
         statsData.hit(
             STATS_NAMESPACE, "whispers",
             mapOf(STAT_INFO_COUNT to 1)
@@ -115,13 +131,27 @@ class StatsExtension(
                 .build()
                 .also { stats ->
                     pipeline.requestChannel(stats.channel)
-                    pipeline.interceptCommandEvent(stats::interceptCommandEvent)
-                    pipeline.interceptFollowEvent(stats::interceptFollowEvent)
-                    pipeline.interceptJoinEvent(stats::interceptJoinEvent)
-                    pipeline.interceptMessageEvent(stats::interceptMessageEvent)
-                    pipeline.interceptSubscriptionEvent(stats::interceptSubscriptionEvent)
-                    pipeline.interceptWhisperEvent(stats::interceptWhisperEvent)
-                    pipeline.interceptCommandEvent(stats.statsCommand::interceptCommandEvent)
+                    pipeline.interceptCommandEvent { _, commandEvent ->
+                        stats.interceptCommandEvent(commandEvent)
+                    }
+                    pipeline.interceptFollowEvent { _, followsEvent ->
+                        stats.interceptFollowEvent(followsEvent)
+                    }
+                    pipeline.interceptJoinEvent { _, joinEvent ->
+                        stats.interceptJoinEvent(joinEvent)
+                    }
+                    pipeline.interceptMessageEvent { _, messageEvent ->
+                        stats.interceptMessageEvent(messageEvent)
+                    }
+                    pipeline.interceptSubscriptionEvent { _, subscriptionEvent ->
+                        stats.interceptSubscriptionEvent(subscriptionEvent)
+                    }
+                    pipeline.interceptWhisperEvent { _, whisperEvent ->
+                        stats.interceptWhisperEvent(whisperEvent)
+                    }
+                    pipeline.interceptCommandEvent { messenger, commandEvent ->
+                        stats.statsCommand.interceptCommandEvent(messenger, commandEvent)
+                    }
                 }
         }
     }
