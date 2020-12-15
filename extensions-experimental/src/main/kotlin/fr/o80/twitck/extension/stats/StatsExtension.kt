@@ -108,13 +108,14 @@ class StatsExtension(
             this.channel = channel
         }
 
-        fun build(): StatsExtension {
+        fun build(serviceLocator: ServiceLocator): StatsExtension {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${StatsExtension::class.simpleName}")
 
             val statsData = StatsData()
+            val logger = serviceLocator.loggerFactory.getLogger(StatsExtension::class)
 
-            val statsCommand = StatsCommand(statsData)
+            val statsCommand = StatsCommand(statsData, logger)
 
             return StatsExtension(channelName, statsData, statsCommand)
         }
@@ -128,7 +129,7 @@ class StatsExtension(
         ): StatsExtension {
             return Configuration()
                 .apply(configure)
-                .build()
+                .build(serviceLocator)
                 .also { stats ->
                     pipeline.requestChannel(stats.channel)
                     pipeline.interceptCommandEvent { _, commandEvent ->

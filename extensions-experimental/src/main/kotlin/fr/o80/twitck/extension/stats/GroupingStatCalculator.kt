@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 class GroupingStatCalculator(
-    private val data: Map<String, List<Extra>>
+    private val data: Map<String, List<Hit>>
 ) {
 
     /*
@@ -31,7 +31,7 @@ class GroupingStatCalculator(
 //                .groupBy { it[name] }
 //    }
 
-    fun groupBy(name: String): Map<Any?, List<Extra>> {
+    fun groupBy(name: String): Map<Any?, List<Hit>> {
         return data
             .flatMap { it.value }
             .filter { it.isNotEmpty() }

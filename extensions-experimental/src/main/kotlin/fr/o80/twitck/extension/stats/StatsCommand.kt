@@ -1,16 +1,20 @@
 package fr.o80.twitck.extension.stats
 
+import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.log.Logger
 import java.time.Duration
 
+private const val DEBUG = "debug"
 private const val VIEWER = "viewer"
 private const val COMMANDS = "commands"
 private const val MESSAGES = "messages"
 
 class StatsCommand(
-    private val statsData: StatsData
+    private val statsData: StatsData,
+    private val logger: Logger
 ) {
     // !stat commands:claim
     // !stat polls
@@ -18,7 +22,6 @@ class StatsCommand(
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
             "!stat", "!stats" -> handleStatCommand(messenger, commandEvent)
-            "!debug" -> {} // TODO OPZ Que le bot liste dans le Log toutes ses données
         }
         return commandEvent
     }
@@ -33,6 +36,7 @@ class StatsCommand(
             MESSAGES -> handleMessagesStat(messenger, commandEvent.channel)
             COMMANDS -> handleCommandsStat(messenger, commandEvent.channel)
             VIEWER -> handleViewerStat(messenger, commandEvent)
+            DEBUG -> handleDebugCommand(commandEvent)
             else -> {
                 // noop for now
             }
@@ -100,6 +104,13 @@ class StatsCommand(
                     }
             }
         }
+    }
+
+    private fun handleDebugCommand(commandEvent: CommandEvent) {
+        if (Badge.BROADCASTER !in commandEvent.viewer.badges)
+            return
+
+        logger.debug("\n---- Stats ----\n${statsData.getDebug()}\n---------------")
     }
 
 }

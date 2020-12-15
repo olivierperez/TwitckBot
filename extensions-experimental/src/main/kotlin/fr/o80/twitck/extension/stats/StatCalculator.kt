@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 class StatCalculator(
-    private val extras: List<Extra>
+    private val extras: List<Hit>
 ) {
 
     fun count(): Int {
