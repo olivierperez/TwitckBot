@@ -1,7 +1,8 @@
 package fr.o80.twitck.extension.promotion
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.*
+import fr.o80.twitck.lib.api.bean.Importance
+import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -11,11 +12,13 @@ import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import fr.o80.twitck.lib.api.service.time.TimeChecker
 import java.time.Duration
+import java.time.Instant
 
 class ViewerPromotion(
     private val channel: String,
     private val messages: Collection<String>,
     private val ignoredLogins: MutableList<String>,
+    private val maxVideoAgeToPromote: Duration,
     private val promotionTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
     private val command: ViewerPromotionCommand
@@ -38,6 +41,7 @@ class ViewerPromotion(
 
     private fun promoteViewer(messenger: Messenger, messageEvent: MessageEvent) {
         val lastVideo = twitchApi.getVideos(messageEvent.viewer.userId, 1)
+            .filter { (it.publishedAt.toInstant() + maxVideoAgeToPromote).isAfter(Instant.now()) }
             .takeIf { it.isNotEmpty() }
             ?.first()
             ?: return
@@ -64,6 +68,8 @@ class ViewerPromotion(
 
         private var intervalBetweenTwoPromotions: Duration = Duration.ofHours(12)
 
+        private var maxVideoAgeToPromote: Duration = Duration.ofDays(120)
+
         @ViewerPromotionDsl
         fun channel(channel: String) {
             this.channel = channel
@@ -84,6 +90,11 @@ class ViewerPromotion(
             intervalBetweenTwoPromotions = time
         }
 
+        @ViewerPromotionDsl
+        fun maxVideoAgeToPromote(time: Duration) {
+            maxVideoAgeToPromote = time
+        }
+
         fun build(serviceLocator: ServiceLocator): ViewerPromotion {
             val channelName = channel
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
@@ -101,6 +112,7 @@ class ViewerPromotion(
                 channel = channelName,
                 messages = messages,
                 ignoredLogins = ignoredLogins,
+                maxVideoAgeToPromote = maxVideoAgeToPromote,
                 promotionTimeChecker = promotionTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 command = ViewerPromotionCommand(
@@ -125,7 +137,10 @@ class ViewerPromotion(
                         viewerPromotion.interceptMessageEvent(messenger, messageEvent)
                     }
                     pipeline.interceptWhisperCommandEvent { messenger, commandEvent ->
-                        viewerPromotion.command.interceptWhisperCommandEvent(messenger, commandEvent)
+                        viewerPromotion.command.interceptWhisperCommandEvent(
+                            messenger,
+                            commandEvent
+                        )
                     }
                     pipeline.interceptCommandEvent { messenger, commandEvent ->
                         viewerPromotion.command.interceptCommandEvent(messenger, commandEvent)

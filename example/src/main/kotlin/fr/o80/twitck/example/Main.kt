@@ -165,6 +165,7 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
                 promotionInterval(Duration.ofHours(1))
+                maxVideoAgeToPromote(Duration.ofDays(120))
                 addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
                 addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
