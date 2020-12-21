@@ -5,7 +5,6 @@ import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
-import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 
@@ -13,8 +12,7 @@ internal class PrivMsgLineInterpreter(
     private val messenger: Messenger,
     private val commandParser: CommandParser,
     private val messageDispatcher: MessageDispatcher,
-    private val commandDispatcher: CommandDispatcher,
-    private val logger: Logger
+    private val commandDispatcher: CommandDispatcher
 ) : LineInterpreter {
 
     private val regex =
@@ -41,8 +39,6 @@ internal class PrivMsgLineInterpreter(
             )
 
             val command = commandParser.parse(msg)
-
-            logger.error("${tags.msgId} || $line")
 
             when {
                 command != null -> dispatchCommand(channel, command, tags, viewer)

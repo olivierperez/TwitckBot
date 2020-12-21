@@ -44,8 +44,7 @@ internal class TwitckBotImpl(
         messenger,
         configuration.commandParser,
         MessageDispatcher(messenger, configuration.messageHandlers),
-        CommandDispatcher(messenger, configuration.commandHandlers),
-        configuration.loggerFactory.getLogger(TwitckBotImpl::class)
+        CommandDispatcher(messenger, configuration.commandHandlers)
     )
 
     private val raidInterpreter = RaidInterpreter(
