@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.promotion
 
-import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.utils.skip
@@ -18,9 +18,24 @@ class ViewerPromotionCommand(
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {
-            SHOUT_OUT_COMMAND -> recordShoutOut(messenger, commandEvent)
+            SHOUT_OUT_COMMAND -> handleShoutOutCommand(messenger, commandEvent)
         }
         return commandEvent
+    }
+
+    private fun handleShoutOutCommand(messenger: Messenger, commandEvent: CommandEvent) {
+        when (commandEvent.command.options.size) {
+            0 -> showUsage(messenger, commandEvent)
+            1 -> shoutOut(messenger, commandEvent)
+            else -> recordShoutOut(messenger, commandEvent)
+        }
+    }
+
+    private fun showUsage(messenger: Messenger, commandEvent: CommandEvent) {
+        messenger.sendImmediately(
+            commandEvent.channel,
+            "usage: $SHOUT_OUT_COMMAND <login> <message>"
+        )
     }
 
     fun interceptWhisperCommandEvent(
@@ -28,28 +43,22 @@ class ViewerPromotionCommand(
         commandEvent: CommandEvent
     ): CommandEvent {
         when (commandEvent.command.tag) {
-            SHOUT_OUT_COMMAND -> shoutOut(commandEvent, messenger)
+            SHOUT_OUT_COMMAND -> shoutOut(messenger, commandEvent)
         }
         return commandEvent
     }
 
     private fun recordShoutOut(messenger: Messenger, commandEvent: CommandEvent) {
-        if (commandEvent.command.options.size < 2) {
-            messenger.sendImmediately(
-                commandEvent.channel,
-                "usage: $SHOUT_OUT_COMMAND <login> <message>"
-            )
-            return
-        }
         val login = commandEvent.command.options[0]
         val message = commandEvent.command.options.skip(1).joinToString(" ")
 
         if (storage.hasUserInfo(login)) {
             storage.putUserInfo(login, namespace, SHOUT_OUT_COMMAND, message)
+            messenger.sendImmediately(channel, "Message reçu !")
         }
     }
 
-    private fun shoutOut(commandEvent: CommandEvent, messenger: Messenger) {
+    private fun shoutOut(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.tag != SHOUT_OUT_COMMAND) return
 
         if (commandEvent.command.options.size != 1) {

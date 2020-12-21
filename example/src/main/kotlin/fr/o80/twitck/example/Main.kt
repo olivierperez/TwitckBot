@@ -71,6 +71,7 @@ class Main : CliktCommand() {
     ): TwitckBot {
         println("Start...")
         // TODO CamouilleLaFrippouille -> répondre à quelques questions, genre : pourquoi tu t'appelles comme ça ?
+        // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
         return twitckBot(oauthToken, hostName) {
 //            --AclExtension--
 //            install(CommandAcl) {
@@ -78,7 +79,7 @@ class Main : CliktCommand() {
 //                on("!points_give", Badge.FOUNDER)
 //            }
             install(LwjglOverlay) {
-                informationText("On partage le stream avec @Infrazfull des fois")
+                informationText("Jusqu'au 25 on participe à Advent of Code")
             }
             install(DefaultSoundExtension) {
             }
