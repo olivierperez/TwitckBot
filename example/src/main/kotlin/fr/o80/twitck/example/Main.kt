@@ -12,6 +12,7 @@ import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.Points
+import fr.o80.twitck.extension.promotion.SHOUT_OUT_COMMAND
 import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
@@ -164,6 +165,11 @@ class Main : CliktCommand() {
             }
             install(ViewerPromotion) {
                 channel(hostChannel)
+                messages(
+                    usage = "usage: $SHOUT_OUT_COMMAND <login>",
+                    noPointsEnough = "#USER# tu n'as pas assez de codes source !",
+                    shoutOutRecorded = "Message reçu !"
+                )
                 ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
                 promotionInterval(Duration.ofHours(1))
                 maxVideoAgeToPromote(Duration.ofDays(120))

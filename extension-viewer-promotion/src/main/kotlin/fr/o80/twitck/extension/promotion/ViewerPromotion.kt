@@ -4,6 +4,7 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -16,7 +17,7 @@ import java.time.Instant
 
 class ViewerPromotion(
     private val channel: String,
-    private val messages: Collection<String>,
+    private val promotionMessages: Collection<String>,
     private val ignoredLogins: MutableList<String>,
     private val maxVideoAgeToPromote: Duration,
     private val promotionTimeChecker: TimeChecker,
@@ -46,7 +47,7 @@ class ViewerPromotion(
             ?.first()
             ?: return
 
-        val randomMessage = messages.random().formatViewer(messageEvent, lastVideo)
+        val randomMessage = promotionMessages.random().formatViewer(messageEvent, lastVideo)
         messenger.sendWhenAvailable(messageEvent.channel, randomMessage, Importance.HIGH)
     }
 
@@ -58,11 +59,11 @@ class ViewerPromotion(
     class Configuration {
 
         @DslMarker
-        private annotation class ViewerPromotionDsl
+        private annotation class Dsl
 
         private var channel: String? = null
 
-        private val messages: MutableList<String> = mutableListOf()
+        private val promotionMessages: MutableList<String> = mutableListOf()
 
         private var ignoredLogins: MutableList<String> = mutableListOf()
 
@@ -70,29 +71,44 @@ class ViewerPromotion(
 
         private var maxVideoAgeToPromote: Duration = Duration.ofDays(120)
 
-        @ViewerPromotionDsl
+        private var messages: ViewerPromotionMessages? = null
+
+        @Dsl
         fun channel(channel: String) {
             this.channel = channel
         }
 
-        @ViewerPromotionDsl
+        @Dsl
         fun addMessage(message: String) {
-            messages += message
+            promotionMessages += message
         }
 
-        @ViewerPromotionDsl
+        @Dsl
         fun ignore(vararg logins: String) {
             ignoredLogins.addAll(logins)
         }
 
-        @ViewerPromotionDsl
+        @Dsl
         fun promotionInterval(time: Duration) {
             intervalBetweenTwoPromotions = time
         }
 
-        @ViewerPromotionDsl
+        @Dsl
         fun maxVideoAgeToPromote(time: Duration) {
             maxVideoAgeToPromote = time
+        }
+
+        @Dsl
+        fun messages(
+            usage: String,
+            noPointsEnough: String,
+            shoutOutRecorded: String
+        ) {
+            messages = ViewerPromotionMessages(
+                usage = usage,
+                noPointsEnough = noPointsEnough,
+                shoutOutRecorded = shoutOutRecorded
+            )
         }
 
         fun build(serviceLocator: ServiceLocator): ViewerPromotion {
@@ -100,6 +116,7 @@ class ViewerPromotion(
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            val points = serviceLocator.extensionProvider.first(PointsManager::class)
 
             val promotionTimeChecker = StorageFlagTimeChecker(
                 storage,
@@ -108,16 +125,20 @@ class ViewerPromotion(
                 intervalBetweenTwoPromotions
             )
 
+            val messages = messages ?: throw IllegalStateException("Messages must be defined")
+
             return ViewerPromotion(
                 channel = channelName,
-                messages = messages,
+                promotionMessages = promotionMessages,
                 ignoredLogins = ignoredLogins,
                 maxVideoAgeToPromote = maxVideoAgeToPromote,
                 promotionTimeChecker = promotionTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 command = ViewerPromotionCommand(
                     channel = channelName,
-                    storage = storage
+                    storage = storage,
+                    points = points,
+                    messages = messages
                 )
             )
         }
