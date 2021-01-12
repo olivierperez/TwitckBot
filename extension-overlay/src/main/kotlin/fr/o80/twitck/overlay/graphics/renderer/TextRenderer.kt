@@ -82,7 +82,7 @@ class TextRenderer(
     }
 
     fun getStringWidth(text: String): Float {
-        return getStringWidth(fontInfo, text, 0, text.length - 1)
+        return getStringWidth(fontInfo, text, 0, text.length)
     }
 
     fun getStringHeight(): Float {

@@ -80,7 +80,7 @@ class Main : CliktCommand() {
 //                on("!points_give", Badge.FOUNDER)
 //            }
             install(LwjglOverlay) {
-                informationText("Jusqu'au 25 on participe à Advent of Code")
+                informationText("Yo les internets c'est Olivier !")
             }
             install(DefaultSoundExtension) {
             }
