@@ -20,6 +20,7 @@ import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.storage.Storage
+import fr.o80.twitck.extension.actions.WebSocketRemoteActions
 import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.extension.whisper.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
@@ -105,6 +106,8 @@ class Main : CliktCommand() {
                     viewHasNoPoints = "#USER# possède 0 code source",
                     viewHasPoints = "#USER# possède #POINTS# codes source"
                 )
+            }
+            install(WebSocketRemoteActions) {
             }
             install(Rewards) {
                 channel(hostChannel)
