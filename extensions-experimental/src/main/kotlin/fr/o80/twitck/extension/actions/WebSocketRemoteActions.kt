@@ -20,8 +20,12 @@ class WebSocketRemoteActions(
         internal fun build(serviceLocator: ServiceLocator): WebSocketRemoteActions {
             val logger = serviceLocator.loggerFactory.getLogger(WebSocketRemoteActions::class)
             val store = RemoteActionStore()
-            val soundCommand = UiWebSocket(store, logger)
-            return WebSocketRemoteActions(soundCommand)
+            val webSocket = UiWebSocket(
+                store,
+                serviceLocator.commandTriggering,
+                logger
+            )
+            return WebSocketRemoteActions(webSocket)
         }
     }
 

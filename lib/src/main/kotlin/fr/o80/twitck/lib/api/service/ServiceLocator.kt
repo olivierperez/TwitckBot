@@ -10,12 +10,14 @@ interface ServiceLocator {
     val loggerFactory: LoggerFactory
     val twitchApi: TwitchApi
     val coolDownManager: CoolDownManager
+    val commandTriggering: CommandTriggering
 }
 
 class ServiceLocatorImpl(
     override val extensionProvider: ExtensionProvider,
     override val loggerFactory: LoggerFactory,
     override val twitchApi: TwitchApi,
+    override val commandTriggering: CommandTriggering,
     override val commandParser: CommandParser = CommandParser(),
     override val coolDownManager: CoolDownManager = CoolDownManager()
 ) : ServiceLocator

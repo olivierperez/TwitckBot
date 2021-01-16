@@ -3,6 +3,7 @@ package fr.o80.twitck.lib.api
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.service.CommandTriggeringImpl
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
 import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
@@ -31,6 +32,7 @@ class TwitckConfigurator(
 ) {
     private val extensions: MutableList<Any> = mutableListOf()
     private val pipeline = PipelineImpl()
+    private val commandTriggering = CommandTriggeringImpl()
     private val loggerFactory = Slf4jLoggerFactory()
 
     private val serviceLocator: ServiceLocator = ServiceLocatorImpl(
@@ -50,7 +52,8 @@ class TwitckConfigurator(
             }
         },
         loggerFactory = loggerFactory,
-        twitchApi = TwitchApiImpl(oauthToken, loggerFactory)
+        twitchApi = TwitchApiImpl(oauthToken, loggerFactory),
+        commandTriggering = commandTriggering
     )
 
     @TwitckConfigDsl
@@ -67,7 +70,8 @@ class TwitckConfigurator(
             oauthToken = oauthToken,
             hostName = hostName,
             pipeline = pipeline,
-            serviceLocator = serviceLocator
+            serviceLocator = serviceLocator,
+            commandsFromExtension = commandTriggering
         )
     }
 

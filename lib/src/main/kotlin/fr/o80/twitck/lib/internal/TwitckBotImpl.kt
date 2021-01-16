@@ -1,25 +1,17 @@
 package fr.o80.twitck.lib.internal
 
 import fr.o80.twitck.lib.api.TwitckBot
+import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
+import fr.o80.twitck.lib.api.bean.Viewer
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.internal.handler.AutoJoiner
-import fr.o80.twitck.lib.internal.handler.CommandDispatcher
-import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
-import fr.o80.twitck.lib.internal.handler.JoinDispatcher
-import fr.o80.twitck.lib.internal.handler.MessageDispatcher
-import fr.o80.twitck.lib.internal.handler.RaidDispatcher
-import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
-import fr.o80.twitck.lib.internal.handler.WhisperCommandDispatcher
-import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
+import fr.o80.twitck.lib.internal.handler.*
 import fr.o80.twitck.lib.internal.service.MessengerImpl
 import fr.o80.twitck.lib.internal.service.Ping
-import fr.o80.twitck.lib.internal.service.line.JoinLineInterpreter
-import fr.o80.twitck.lib.internal.service.line.LineInterpreters
-import fr.o80.twitck.lib.internal.service.line.PrivMsgLineInterpreter
-import fr.o80.twitck.lib.internal.service.line.RaidInterpreter
-import fr.o80.twitck.lib.internal.service.line.WhisperLineInterpreter
+import fr.o80.twitck.lib.internal.service.line.*
 import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
 import fr.o80.twitck.lib.internal.service.topic.SecretHolder
 import fr.o80.twitck.lib.internal.service.topic.TopicManager
@@ -40,11 +32,13 @@ internal class TwitckBotImpl(
         configuration.coolDownManager
     )
 
+    private val commandDispatcher = CommandDispatcher(messenger, configuration.commandHandlers)
+
     private val privMsgLineHandler = PrivMsgLineInterpreter(
         messenger,
         configuration.commandParser,
         MessageDispatcher(messenger, configuration.messageHandlers),
-        CommandDispatcher(messenger, configuration.commandHandlers)
+        commandDispatcher
     )
 
     private val raidInterpreter = RaidInterpreter(
@@ -113,8 +107,8 @@ internal class TwitckBotImpl(
             }
 
             autoJoiner.join()
-
             topicManager.subscribe()
+            configuration.commandsFromExtension.listener = ::listenCommandsFromExtension
         } catch (e: Exception) {
             logger.error("Something gone wrong at startup", e)
             exitProcess(-1)
@@ -164,4 +158,23 @@ internal class TwitckBotImpl(
         super.onJoin(channel, sender, login, hostname)
         logger.trace("$sender join the channel $channel")
     }
+
+    private fun listenCommandsFromExtension(command: String) {
+        commandDispatcher.dispatch(
+            CommandEvent(
+                command = Command(command),
+                messenger = messenger,
+                channel = "#${configuration.hostName}",
+                bits = 0,
+                viewer = Viewer(
+                    login = configuration.hostName,
+                    displayName = configuration.hostName,
+                    badges = listOf(Badge.BROADCASTER),
+                    userId = hostUserId,
+                    color = "#000000"
+                )
+            )
+        )
+    }
+
 }

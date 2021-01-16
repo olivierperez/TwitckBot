@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.actions
 
 import com.squareup.moshi.Moshi
+import fr.o80.twitck.lib.api.service.CommandTriggering
 import fr.o80.twitck.lib.api.service.log.Logger
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.*
@@ -12,6 +13,7 @@ import java.time.Duration
 
 class UiWebSocket(
     private val store: RemoteActionStore,
+    private val commandTriggering: CommandTriggering,
     private val logger: Logger
 ) {
 
@@ -75,7 +77,7 @@ class UiWebSocket(
     private suspend fun onActionsRequested(session: DefaultWebSocketServerSession) {
         logger.debug("Someone requested actions")
         val json = getActionsJson()
-        session.send(Frame.Text(json))
+        session.send(Frame.Text("Actions:$json"))
     }
 
     private suspend fun onNewAction(newActionJson: String) {
@@ -91,8 +93,8 @@ class UiWebSocket(
     }
 
     private fun onCommand(command: String) {
-        // TODO Envoyer la commande dans le pipeline
         println("Command received from UI: $command")
+        commandTriggering.sendCommand(command)
     }
 
     private fun getActionsJson(): String {
