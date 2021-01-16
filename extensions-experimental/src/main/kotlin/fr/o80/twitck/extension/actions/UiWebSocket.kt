@@ -55,27 +55,44 @@ class UiWebSocket(
         val request = frame.readText()
         when {
             request == "GetActions" -> {
-                logger.debug("Someone requested actions")
-                val json = getActionsJson()
-                session.send(Frame.Text(json))
+                onActionsRequested(session)
             }
             request.startsWith("AddAction:") -> {
                 val newActionJson = request.substring(10)
-                logger.debug("Someone requested the adding of action: $newActionJson")
-                val adapter = moshi.adapter(RemoteAction::class.java)
-                val action = adapter.fromJson(newActionJson)!!
-                store.addAction(action)
-
-                val actionsJson = getActionsJson()
-                dispatch { otherSession ->
-                    otherSession.send(Frame.Text("Actions:$actionsJson"))
-                }
+                onNewAction(newActionJson)
+            }
+            request.startsWith("Command:") -> {
+                val command = request.substring(8)
+                onCommand(command)
             }
             else -> {
                 logger.debug("Someone requested something weird: $request")
                 session.send(Frame.Text("Unknown request"))
             }
         }
+    }
+
+    private suspend fun onActionsRequested(session: DefaultWebSocketServerSession) {
+        logger.debug("Someone requested actions")
+        val json = getActionsJson()
+        session.send(Frame.Text(json))
+    }
+
+    private suspend fun onNewAction(newActionJson: String) {
+        logger.debug("Someone requested the adding of action: $newActionJson")
+        val adapter = moshi.adapter(RemoteAction::class.java)
+        val action = adapter.fromJson(newActionJson)!!
+        store.addAction(action)
+
+        val actionsJson = getActionsJson()
+        dispatch { otherSession ->
+            otherSession.send(Frame.Text("Actions:$actionsJson"))
+        }
+    }
+
+    private fun onCommand(command: String) {
+        // TODO Envoyer la commande dans le pipeline
+        println("Command received from UI: $command")
     }
 
     private fun getActionsJson(): String {
