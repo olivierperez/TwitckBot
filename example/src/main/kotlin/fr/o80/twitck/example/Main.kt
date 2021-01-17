@@ -108,6 +108,7 @@ class Main : CliktCommand() {
                 )
             }
             install(WebSocketRemoteActions) {
+                channel(hostChannel)
             }
             install(Rewards) {
                 channel(hostChannel)

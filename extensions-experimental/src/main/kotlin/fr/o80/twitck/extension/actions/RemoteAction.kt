@@ -6,5 +6,5 @@ import com.squareup.moshi.JsonClass
 data class RemoteAction(
     val name: String,
     val image: String,
-    val command: String
+    val execute: String
 )

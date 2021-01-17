@@ -1,7 +1,9 @@
 package fr.o80.twitck.extension.actions
 
 import com.squareup.moshi.Moshi
+import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.service.CommandTriggering
+import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.*
@@ -12,6 +14,7 @@ import io.ktor.websocket.*
 import java.time.Duration
 
 class UiWebSocket(
+    private val channel: String,
     private val store: RemoteActionStore,
     private val commandTriggering: CommandTriggering,
     private val logger: Logger
@@ -20,6 +23,8 @@ class UiWebSocket(
     private val sessions = mutableListOf<DefaultWebSocketServerSession>()
 
     private val moshi = Moshi.Builder().build()
+
+    internal var messenger: Messenger? = null
 
     fun start() {
         embeddedServer(Netty, 8181) {
@@ -67,11 +72,19 @@ class UiWebSocket(
                 val command = request.substring(8)
                 onCommand(command)
             }
+            request.startsWith("Message:") -> {
+                val command = request.substring(8)
+                onMessage(command)
+            }
             else -> {
                 logger.debug("Someone requested something weird: $request")
                 session.send(Frame.Text("Unknown request"))
             }
         }
+    }
+
+    private fun onMessage(message: String) {
+        messenger?.sendImmediately(channel, message, CoolDown(Duration.ofSeconds(1)))
     }
 
     private suspend fun onActionsRequested(session: DefaultWebSocketServerSession) {
