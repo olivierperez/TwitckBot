@@ -1,6 +1,27 @@
 package fr.o80.twitck.extension.actions
 
-class RemoteActionStore {
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
+import fr.o80.twitck.lib.api.extension.StorageExtension
+import java.lang.reflect.Type
+
+private const val KEY_ACTIONS = "actions"
+
+class RemoteActionStore(
+    private val storage: StorageExtension
+) {
+
+    private val namespace: String = RemoteActionStore::class.java.name
+
+    private val moshi = Moshi.Builder().build()
+    private val adapter: JsonAdapter<List<RemoteAction>>
+
+    init {
+        val type: Type =
+            Types.newParameterizedType(MutableList::class.java, RemoteAction::class.java)
+        adapter = moshi.adapter(type)
+    }
 
     private val actions: MutableList<RemoteAction> = mutableListOf(
         RemoteAction("Yata !", "olivier.png", "Command:!yata"),
@@ -10,10 +31,20 @@ class RemoteActionStore {
     )
 
     fun getActions(): List<RemoteAction> {
-        return actions
+        return storage.getGlobalInfo(namespace)
+            .firstOrNull { it.first == KEY_ACTIONS }?.second
+            ?.let { adapter.fromJson(it) }
+            ?: listOf()
     }
 
     fun addAction(action: RemoteAction) {
+        val actions = storage.getGlobalInfo(namespace)
+            .firstOrNull { it.first == KEY_ACTIONS }?.second
+            ?.let { adapter.fromJson(it)!!.toMutableList() }
+            ?: mutableListOf()
+
         actions += action
+
+        storage.putGlobalInfo(namespace, KEY_ACTIONS, adapter.toJson(actions))
     }
 }
