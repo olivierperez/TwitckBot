@@ -1,4 +1,4 @@
-package fr.o80.twitck.extension.actions
+package fr.o80.twitck.extension.actions.model
 
 import com.squareup.moshi.JsonClass
 

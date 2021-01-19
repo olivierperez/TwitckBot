@@ -3,6 +3,7 @@ package fr.o80.twitck.example
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.example.market.CodeReviewProduct
 import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
@@ -42,6 +43,9 @@ class Main : CliktCommand() {
     private val hostName: String by option(help = "Name of the host channel").prompt("Host's name (host-name)")
     private val botName: String by option(help = "Name of the bot channel").prompt("Bot's name (bot-name)")
     private val presenceName: String? by option(help = "Name of the host channel")
+    private val slobsHost: String by option(help = "Streamlabs host").prompt("Streamlabs host")
+    private val slobsPort: Int by option(help = "Streamlabs port").int().prompt("Streamlabs port")
+    private val slobsToken: String by option(help = "Streamlabs token").prompt("Streamlabs token")
 
     override fun run() {
         val hostChannel = "#$hostName"
@@ -109,6 +113,7 @@ class Main : CliktCommand() {
             }
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
+                slobs(slobsHost, slobsPort, slobsToken)
             }
             install(Rewards) {
                 channel(hostChannel)

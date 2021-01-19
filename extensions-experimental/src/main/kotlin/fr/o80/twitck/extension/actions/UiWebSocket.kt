@@ -1,6 +1,10 @@
 package fr.o80.twitck.extension.actions
 
 import com.squareup.moshi.Moshi
+import fr.o80.slobs.SlobsClient
+import fr.o80.twitck.extension.actions.model.Config
+import fr.o80.twitck.extension.actions.model.RemoteAction
+import fr.o80.twitck.extension.actions.model.Scene
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.service.CommandTriggering
 import fr.o80.twitck.lib.api.service.Messenger
@@ -11,11 +15,13 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.runBlocking
 import java.time.Duration
 
 class UiWebSocket(
     private val channel: String,
     private val store: RemoteActionStore,
+    private val slobsClient: SlobsClient,
     private val commandTriggering: CommandTriggering,
     private val logger: Logger
 ) {
@@ -25,6 +31,12 @@ class UiWebSocket(
     private val moshi = Moshi.Builder().build()
 
     internal var messenger: Messenger? = null
+
+    init {
+        runBlocking {
+            slobsClient.connect()
+        }
+    }
 
     fun start() {
         embeddedServer(Netty, 8181) {
@@ -61,8 +73,8 @@ class UiWebSocket(
     private suspend fun onText(session: DefaultWebSocketServerSession, frame: Frame.Text) {
         val request = frame.readText()
         when {
-            request == "GetActions" -> {
-                onActionsRequested(session)
+            request == "GetConfig" -> {
+                onConfigRequested(session)
             }
             request.startsWith("AddAction:") -> {
                 val newActionJson = request.substring(10)
@@ -83,14 +95,13 @@ class UiWebSocket(
         }
     }
 
-    private fun onMessage(message: String) {
-        messenger?.sendImmediately(channel, message, CoolDown(Duration.ofSeconds(1)))
-    }
+    private suspend fun onConfigRequested(session: DefaultWebSocketServerSession) {
+        val actions = store.getActions()
+        val scenes = slobsClient.getScenes().map { Scene(it.id, it.name) }
 
-    private suspend fun onActionsRequested(session: DefaultWebSocketServerSession) {
-        logger.debug("Someone requested actions")
-        val json = getActionsJson()
-        session.send(Frame.Text("Actions:$json"))
+        val config = Config(actions, scenes)
+        val adapter = moshi.adapter(Config::class.java)
+        session.send("Config:${adapter.toJson(config)}")
     }
 
     private suspend fun onNewAction(newActionJson: String) {
@@ -99,15 +110,19 @@ class UiWebSocket(
         val action = adapter.fromJson(newActionJson)!!
         store.addAction(action)
 
-        val actionsJson = getActionsJson()
         dispatch { otherSession ->
-            otherSession.send(Frame.Text("Actions:$actionsJson"))
+            otherSession.send(Frame.Text("Actions:${getActionsJson()}"))
         }
     }
 
     private fun onCommand(command: String) {
         println("Command received from UI: $command")
         commandTriggering.sendCommand(command)
+    }
+
+    private fun onMessage(message: String) {
+        logger.debug("Message received from UI: $message")
+        messenger?.sendImmediately(channel, message, CoolDown(Duration.ofSeconds(1)))
     }
 
     private fun getActionsJson(): String {

@@ -3,6 +3,7 @@ package fr.o80.twitck.extension.actions
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import fr.o80.twitck.extension.actions.model.RemoteAction
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import java.lang.reflect.Type
 

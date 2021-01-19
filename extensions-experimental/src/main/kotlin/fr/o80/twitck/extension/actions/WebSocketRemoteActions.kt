@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension.actions
 
+import fr.o80.slobs.AsyncSlobsClient
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
@@ -27,9 +28,20 @@ class WebSocketRemoteActions(
 
         private var channel: String? = null
 
+        private var slobsHost: String? = null
+        private var slobsPort: Int? = null
+        private var slobsToken: String? = null
+
         @Dsl
         fun channel(channel: String) {
             this.channel = channel
+        }
+
+        @Dsl
+        fun slobs(host: String, port: Int, token: String) {
+            this.slobsHost = host
+            this.slobsPort = port
+            this.slobsToken = token
         }
 
         internal fun build(serviceLocator: ServiceLocator): WebSocketRemoteActions {
@@ -41,9 +53,16 @@ class WebSocketRemoteActions(
 
             val store = RemoteActionStore(storage)
 
+            val slobsClient = AsyncSlobsClient(
+                slobsHost ?: throw IllegalStateException("Slobs host is required"),
+                slobsPort ?: throw IllegalStateException("Slobs port is required"),
+                slobsToken ?: throw IllegalStateException("Slobs token is required")
+            )
+
             val webSocket = UiWebSocket(
                 channelName,
                 store,
+                slobsClient,
                 serviceLocator.commandTriggering,
                 logger
             )

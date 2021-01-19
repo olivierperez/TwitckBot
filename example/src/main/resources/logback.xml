@@ -22,6 +22,7 @@
 
     <logger name="NETWORK" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+    <logger name="org.apache.http" level="INFO"/>
     <logger name="fr.o80.twitck.overlay" level="DEBUG"/>
     <logger name="fr.o80.twitck.extension.storage" level="DEBUG"/>
 </configuration>
