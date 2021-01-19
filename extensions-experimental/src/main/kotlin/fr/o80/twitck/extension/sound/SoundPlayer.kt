@@ -19,34 +19,34 @@ class SoundPlayer(
 
     fun playRaid() {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "raid", genericCoolDown) {
-            play("audio/raid.wav", 6f)
+            play("audio/raid.wav", 4f)
         }
     }
 
     fun playScreen(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
-            play("audio/ton_ecran.wav", 6f)
+            play("audio/ton_ecran.wav", 4f)
             then()
         }
     }
 
     fun playYoupi(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "youpi", genericCoolDown) {
-            play("audio/youpi.wav", 6f)
+            play("audio/youpi.wav", 4f)
             then()
         }
     }
 
     fun playCoin(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "coin", genericCoolDown) {
-            play("audio/coin.wav", 6f)
+            play("audio/coin.wav", 4f)
             then()
         }
     }
 
     fun playYata(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
-            play("audio/yata.wav", 6f)
+            play("audio/yata.wav", 4f)
             then()
         }
     }
