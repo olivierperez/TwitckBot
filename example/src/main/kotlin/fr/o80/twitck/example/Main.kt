@@ -145,7 +145,6 @@ class Main : CliktCommand() {
                 channel(hostChannel)
                 interval(Duration.ofMinutes(15))
                 remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
-                remind("Olivier tweet peu, mais bien https://twitter.com/olivierperez")
                 remind("On se retrouve sur discord en dehors des streams ? https://discord.gg/S4HxU2YfaT")
                 remind("Olivier partage quelques bouts de code sur https://github.com/olivierperez")
                 remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
