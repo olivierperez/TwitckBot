@@ -27,6 +27,8 @@ internal class TwitckBotImpl(
 
     private val ping = Ping(this)
 
+    // TODO OPZ Afin que le Messenger arrête de connaitre le Bot
+    // TODO OPZ Il faut que le messenger gère une BlockingQueue, et que le bot ait un thread qui dépile cette Queue
     private val messenger: Messenger = MessengerImpl(
         this,
         configuration.coolDownManager

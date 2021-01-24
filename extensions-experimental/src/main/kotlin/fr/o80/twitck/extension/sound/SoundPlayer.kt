@@ -15,12 +15,10 @@ class SoundPlayer(
     private val logger: Logger
 ) {
 
-    private val genericCoolDown = CoolDown(Duration.ofSeconds(10))
+    private val genericCoolDown = CoolDown(Duration.ofSeconds(3))
 
     fun playRaid() {
-        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "raid", genericCoolDown) {
-            play("audio/raid.wav", 4f)
-        }
+        play("audio/raid.wav", 4f)
     }
 
     fun playScreen(then: () -> Unit = {}) {
@@ -38,10 +36,8 @@ class SoundPlayer(
     }
 
     fun playCoin(then: () -> Unit = {}) {
-        coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "coin", genericCoolDown) {
-            play("audio/coin.wav", 4f)
-            then()
-        }
+        play("audio/coin.wav", 4f)
+        then()
     }
 
     fun playYata(then: () -> Unit = {}) {
