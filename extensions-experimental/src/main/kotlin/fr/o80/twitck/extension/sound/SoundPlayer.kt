@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.sound
 
 import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.extension.Sound
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.service.CoolDownManager
 import java.io.BufferedInputStream
@@ -17,37 +18,41 @@ class SoundPlayer(
 
     private val genericCoolDown = CoolDown(Duration.ofSeconds(3))
 
+    fun playCoin(then: () -> Unit = {}) {
+        loadAndPlay("audio/coin.wav", 4f)
+        then()
+    }
+
     fun playRaid() {
-        play("audio/raid.wav", 4f)
+        loadAndPlay("audio/raid.wav", 4f)
     }
 
     fun playScreen(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "screen", genericCoolDown) {
-            play("audio/ton_ecran.wav", 4f)
+            loadAndPlay("audio/ton_ecran.wav", 4f)
             then()
         }
     }
 
     fun playYoupi(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "youpi", genericCoolDown) {
-            play("audio/youpi.wav", 4f)
+            loadAndPlay("audio/youpi.wav", 4f)
             then()
         }
-    }
-
-    fun playCoin(then: () -> Unit = {}) {
-        play("audio/coin.wav", 4f)
-        then()
     }
 
     fun playYata(then: () -> Unit = {}) {
         coolDownManager.executeIfCooledDown(COOL_DOWN_NAMESPACE, "yata", genericCoolDown) {
-            play("audio/yata.wav", 4f)
+            loadAndPlay("audio/yata.wav", 4f)
             then()
         }
     }
 
-    private fun play(fileName: String, masterGain: Float) {
+    fun play(sound: Sound) {
+        loadAndPlay("audio/${sound.file}", 4f)
+    }
+
+    private fun loadAndPlay(fileName: String, masterGain: Float) {
         try {
             val clip = AudioSystem.getClip()
             val resourceAsStream = javaClass.classLoader.getResourceAsStream(fileName)

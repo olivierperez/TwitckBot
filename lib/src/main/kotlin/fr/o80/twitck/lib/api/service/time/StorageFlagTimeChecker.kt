@@ -15,10 +15,13 @@ class StorageFlagTimeChecker(
     private val now: () -> LocalDateTime = { LocalDateTime.now() }
 ) : TimeChecker {
 
-    override fun executeIfNotCooldown(login: String, block: () -> Unit) {
-        if (couldExecute(login)) {
+    override fun executeIfNotCooldown(login: String, block: () -> Unit): TimeFallback {
+        return if (couldExecute(login)) {
             handled(login)
             block()
+            NoOpFallback
+        } else {
+            DoFallback
         }
     }
 

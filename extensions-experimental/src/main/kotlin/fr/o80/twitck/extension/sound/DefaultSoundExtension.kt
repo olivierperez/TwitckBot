@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.sound
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.extension.Sound
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -24,6 +25,10 @@ class DefaultSoundExtension(
 
     override fun playCoin() {
         soundPlayer.playCoin()
+    }
+
+    override fun play(sound: Sound) {
+        soundPlayer.play(sound)
     }
 
     class Configuration {
