@@ -15,7 +15,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
 
     compileOnly project(":lib")
-    implementation("com.github.olivierperez.KotlinSlobs:lib:1.1")
+    implementation("com.github.olivierperez.KotlinSlobs:lib:1.2")
 
     implementation "com.squareup.moshi:moshi:1.9.3"
     implementation "com.squareup.moshi:moshi-adapters:1.9.3"

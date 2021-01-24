@@ -88,6 +88,10 @@ class UiWebSocket(
                 val command = request.substring(8)
                 onMessage(command)
             }
+            request.startsWith("Scene:") -> {
+                val sceneId = request.substring(6)
+                onScene(sceneId)
+            }
             else -> {
                 logger.debug("Someone requested something weird: $request")
                 session.send(Frame.Text("Unknown request"))
@@ -123,6 +127,10 @@ class UiWebSocket(
     private fun onMessage(message: String) {
         logger.debug("Message received from UI: $message")
         messenger?.sendImmediately(channel, message, CoolDown(Duration.ofSeconds(1)))
+    }
+
+    private suspend fun onScene(sceneId: String) {
+        slobsClient.switchTo(sceneId)
     }
 
     private fun getActionsJson(): String {
