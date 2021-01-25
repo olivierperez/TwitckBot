@@ -320,11 +320,11 @@ class Main : CliktCommand() {
                 }
                 command("!yata") { _, _, extensionProvider ->
                     extensionProvider.first(SoundExtension::class).play("yata")
-                    extensionProvider.showImage("image/vahine.gif", "Youpi !")
+                    extensionProvider.showImage("image/vahine.gif", "Yata Yata Yata")
                 }
                 command("!youpi") { _, _, extensionProvider ->
                     extensionProvider.first(SoundExtension::class).play("youpi")
-                    extensionProvider.showImage("image/vahine.gif", "Yata Yata Yata")
+                    extensionProvider.showImage("image/vahine.gif", "Youpi !")
                 }
             }
             install(Channel) {

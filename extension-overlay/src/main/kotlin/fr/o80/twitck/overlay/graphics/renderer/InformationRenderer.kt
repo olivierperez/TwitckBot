@@ -18,6 +18,9 @@ class InformationRenderer(
 
     private var alert: Alert? = null
 
+    private val horizontalPadding = 20f
+    private val verticalPadding = 10f
+
     override fun init() {
         textRenderer.init()
     }
@@ -38,8 +41,8 @@ class InformationRenderer(
             pushed {
                 val messageWidth = textRenderer.getStringWidth(text)
                 val messageHeight = textRenderer.getStringHeight()
-                val messageBoxWidth = messageWidth + 30
-                val messageBoxHeight = messageHeight + 40
+                val messageBoxWidth = messageWidth + horizontalPadding * 2
+                val messageBoxHeight = messageHeight + verticalPadding * 2
 
                 translate(
                     (width - messageBoxWidth) / 2f,
@@ -56,6 +59,7 @@ class InformationRenderer(
 
                 color(textColor.x, textColor.y, textColor.z)
 
+                translate(horizontalPadding, verticalPadding, 0f)
                 textRenderer.render(text)
             }
         }

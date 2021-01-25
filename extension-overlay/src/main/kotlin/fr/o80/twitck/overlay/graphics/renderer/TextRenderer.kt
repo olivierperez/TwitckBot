@@ -17,7 +17,7 @@ import kotlin.math.round
 
 class TextRenderer(
     val fontPath: String,
-    val margin: Float = 10f,
+    val margin: Float = 0f,
     val fontHeight: Float = 20f
 ) {
 
@@ -92,8 +92,8 @@ class TextRenderer(
             val bufLineGap: IntBuffer = stack.ints(0)
 
             STBTruetype.stbtt_GetFontVMetrics(fontInfo, bufAscent, bufDescent, bufLineGap)
-            return (bufAscent.get(0) + bufDescent.get(0) + bufLineGap.get(0)) *
-                STBTruetype.stbtt_ScaleForPixelHeight(fontInfo, fontHeight)
+            return (bufAscent.get(0) - bufDescent.get(0) + bufLineGap.get(0)) *
+                STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontHeight)
         }
     }
 
