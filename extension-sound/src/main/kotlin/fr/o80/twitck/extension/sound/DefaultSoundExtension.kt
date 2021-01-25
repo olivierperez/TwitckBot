@@ -67,7 +67,7 @@ class DefaultSoundExtension(
 
         fun build(serviceLocator: ServiceLocator): DefaultSoundExtension {
             sounds["celebration"] = celebration
-            sounds["negation"] = negation
+            sounds["negative"] = negation
             sounds["positive"] = positive
             sounds["raid"] = raid
 
