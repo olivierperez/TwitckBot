@@ -1,7 +1,6 @@
 package fr.o80.twitck.overlay.graphics
 
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import fr.o80.twitck.overlay.graphics.renderer.Renderer
@@ -11,7 +10,7 @@ import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL46
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
-import java.util.Queue
+import java.util.*
 import java.util.concurrent.ConcurrentLinkedDeque
 
 class OverlayWindow(

@@ -76,10 +76,10 @@ fun intersection(
 
     val intersection = if (diviseur != 0f) {
         val m = (first.x * first.from.y
-                - first.x * second.from.y
-                - first.y * first.from.x
-                + first.y * second.from.x
-                ) / diviseur
+            - first.x * second.from.y
+            - first.y * first.from.x
+            + first.y * second.from.x
+            ) / diviseur
 
         second.from + j * m
     } else {

@@ -16,9 +16,9 @@ import java.text.Normalizer
 import kotlin.math.round
 
 class TextRenderer(
-    val fontPath: String,
-    val margin: Float = 0f,
-    val fontHeight: Float = 20f
+    private val fontPath: String,
+    private val margin: Float = 0f,
+    private val fontHeight: Float = 20f
 ) {
 
     private val kerningEnabled = true
@@ -92,8 +92,8 @@ class TextRenderer(
             val bufLineGap: IntBuffer = stack.ints(0)
 
             STBTruetype.stbtt_GetFontVMetrics(fontInfo, bufAscent, bufDescent, bufLineGap)
-            return (bufAscent.get(0) - bufDescent.get(0) + bufLineGap.get(0)) *
-                STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontHeight)
+            val scaleEm = STBTruetype.stbtt_ScaleForMappingEmToPixels(fontInfo, fontHeight)
+            return (bufAscent.get(0) - bufDescent.get(0) + bufLineGap.get(0)) * scaleEm
         }
     }
 
@@ -164,13 +164,26 @@ class TextRenderer(
                     continue
                 }
                 val cpX = x[0]
-                STBTruetype.stbtt_GetBakedQuad(charData, bitmapWidth, bitmapHeight, codePoint - 32, x, y, q, true)
+                STBTruetype.stbtt_GetBakedQuad(
+                    charData,
+                    bitmapWidth,
+                    bitmapHeight,
+                    codePoint - 32,
+                    x,
+                    y,
+                    q,
+                    true
+                )
                 x.put(0, scale(cpX, x[0], factorX))
                 if (kerningEnabled && i < to) {
                     getCodePoint(text, to, i, pCodePoints)
                     x.put(
                         0,
-                        x[0] + STBTruetype.stbtt_GetCodepointKernAdvance(fontInfo, codePoint, pCodePoints[0]) * scale
+                        x[0] + STBTruetype.stbtt_GetCodepointKernAdvance(
+                            fontInfo,
+                            codePoint,
+                            pCodePoints[0]
+                        ) * scale
                     )
                 }
                 val x0: Float = scale(cpX, q.x0(), factorX)

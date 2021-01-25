@@ -1,5 +1,7 @@
 package fr.o80.twitck.overlay.graphics.renderer
 
+import fr.o80.twitck.overlay.graphics.ext.Draw
+import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import org.lwjgl.opengl.GL46
 import java.io.InputStream
@@ -12,14 +14,19 @@ class ImageRenderer(
     private val width: Int,
     private val textRenderer: TextRenderer = TextRenderer(
         "fonts/Roboto-Black.ttf",
-        margin = 0f,
         fontHeight = 70f
-    )
+    ),
+    private val textColor: Vertex3f,
+    private val backgroundColor: Vertex3f,
+    private val borderColor: Vertex3f
 ) : Renderer {
 
     private var image: Image? = null
     private var text: String? = null
     private var disappearAt: Instant? = null
+
+    private val horizontalPadding = 20f
+    private val verticalPadding = 10f
 
     override fun init() {
         textRenderer.init()
@@ -38,25 +45,59 @@ class ImageRenderer(
         image?.let { img ->
             img.load()
             renderImage(img)
-            text?.let { txt -> renderText(txt, img) }
+            text?.let { txt -> render(txt, img) }
         }
     }
 
-    private fun renderText(text: String, image: Image) {
+    private fun render(text: String, image: Image) {
         val (left, top, lines, biggestWidth) = computeBestBounds(text, image)
+        val fontHeight = textRenderer.getStringHeight()
 
         draw {
             pushed {
-                color(0f, 0f, 0f)
-                translate(left, top, 0f)
-                lines.forEach { line ->
-                    pushed {
-                        translate((biggestWidth - line.width) / 2f, 0f, 0f)
-                        textRenderer.render(line.content)
-                    }
-                    translate(0f, textRenderer.fontHeight, 0f)
-                }
+                translate(left - horizontalPadding, top, 0f)
+                drawBackground(biggestWidth, fontHeight, lines.size)
+                drawText(biggestWidth, fontHeight, lines)
             }
+        }
+    }
+
+    private fun Draw.drawBackground(
+        biggestWidth: Float,
+        fontHeight: Float,
+        linesCount: Int
+    ) {
+        color(backgroundColor)
+        quad(
+            0f,
+            0f,
+            biggestWidth + horizontalPadding * 2,
+            fontHeight * linesCount + verticalPadding * 2
+        )
+
+        lineWidth(2f)
+        color(borderColor)
+        rect(
+            0f,
+            0f,
+            biggestWidth + horizontalPadding * 2,
+            fontHeight * linesCount + verticalPadding * 2
+        )
+    }
+
+    private fun Draw.drawText(
+        biggestWidth: Float,
+        fontHeight: Float,
+        lines: List<Line>
+    ) {
+        color(textColor)
+        translate(0f, verticalPadding, 0f)
+        lines.forEach { line ->
+            pushed {
+                translate(horizontalPadding + (biggestWidth - line.width) / 2f, 0f, 0f)
+                textRenderer.render(line.content)
+            }
+            translate(0f, fontHeight, 0f)
         }
     }
 
@@ -67,14 +108,14 @@ class ImageRenderer(
 
         val lines = LineSplitter().split(text, charsPerLine)
             .map { Line(it, textRenderer.getStringWidth(it)) }
-        val biggestLine: Line = lines
-            .maxByOrNull { it.width }
-            ?: Line("", 0f)
+        val biggestLine: Float = lines
+            .maxOfOrNull { it.width }
+            ?: 0f
 
-        val left = (width - biggestLine.width - 30) / 2f
+        val left = (width - biggestLine) / 2f
         val top = (height + image.height) / 2f
 
-        return Bounds(left, top, lines, biggestLine.width)
+        return Bounds(left, top, lines, biggestLine)
     }
 
     private fun renderImage(image: Image) {

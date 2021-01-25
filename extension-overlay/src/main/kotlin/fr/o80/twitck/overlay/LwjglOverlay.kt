@@ -20,7 +20,8 @@ class LwjglOverlay(
 
     private val width = 1920
     private val height = 1080
-    private val bgColor = Vertex3f(0f, 0.6f, 0f)
+    private val greenBackgroundColor = Vertex3f(0f, 0.6f, 0f)
+    private val textBackgroundColor = Vertex3f(0.8f, 0.8f, 0.8f)
     private val borderColor = Vertex3f(0.5f, 0.5f, 0.5f)
     private val textColor = Vertex3f(0.1f, 0.1f, 0.1f)
 
@@ -28,7 +29,7 @@ class LwjglOverlay(
         title = windowName,
         width = width,
         height = height,
-        bgColor = bgColor,
+        bgColor = greenBackgroundColor,
         updatesPerSecond = 55,
         logger
     )
@@ -36,14 +37,17 @@ class LwjglOverlay(
     private val informationRenderer = InformationRenderer(
         height = height,
         width = width,
-        bgColor = Vertex3f(0.8f, 0.8f, 0.8f),
+        backgroundColor = textBackgroundColor,
         borderColor = borderColor,
         textColor = textColor
     )
 
     private val imageRenderer = ImageRenderer(
         height = height,
-        width = width
+        width = width,
+        backgroundColor = textBackgroundColor,
+        borderColor = borderColor,
+        textColor = textColor
     )
 
     init {

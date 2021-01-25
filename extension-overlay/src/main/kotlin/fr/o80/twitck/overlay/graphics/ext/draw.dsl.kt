@@ -87,6 +87,11 @@ object Draw {
     }
 
     @Drawer
+    fun color(color: Vertex3f) {
+        GL46.glColor3f(color.x, color.y, color.z)
+    }
+
+    @Drawer
     fun point(x: Double, y: Double, z: Double) {
         GL46.glBegin(GL46.GL_POINTS)
         GL46.glVertex3d(x, y, z)
@@ -150,7 +155,10 @@ data class Vertex2i(val x: Int, val y: Int)
 
 data class Vector2f(val from: Vertex2f, val to: Vertex2f) {
 
-    constructor(x1: Float, y1: Float, x2: Float, y2: Float) : this(Vertex2f(x1, y1), Vertex2f(x2, y2))
+    constructor(x1: Float, y1: Float, x2: Float, y2: Float) : this(
+        Vertex2f(x1, y1),
+        Vertex2f(x2, y2)
+    )
 
     val size = from distanceWith to
 

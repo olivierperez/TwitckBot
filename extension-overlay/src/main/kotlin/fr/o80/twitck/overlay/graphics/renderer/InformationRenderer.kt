@@ -8,7 +8,7 @@ import java.time.Instant
 class InformationRenderer(
     private val height: Int,
     private val width: Int,
-    private val bgColor: Vertex3f,
+    private val backgroundColor: Vertex3f,
     private val borderColor: Vertex3f,
     private val textColor: Vertex3f,
     private val textRenderer: TextRenderer = TextRenderer("fonts/Roboto-Light.ttf")
@@ -50,14 +50,14 @@ class InformationRenderer(
                     0f
                 )
 
-                color(bgColor.x, bgColor.y, bgColor.z)
+                color(backgroundColor)
                 quad(0f, 0f, messageBoxWidth, messageBoxHeight)
 
                 lineWidth(2f)
-                color(borderColor.x, borderColor.y, borderColor.z)
+                color(borderColor)
                 rect(0f, 0f, messageBoxWidth, messageBoxHeight)
 
-                color(textColor.x, textColor.y, textColor.z)
+                color(textColor)
 
                 translate(horizontalPadding, verticalPadding, 0f)
                 textRenderer.render(text)
