@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -111,11 +112,13 @@ class ViewerPromotion(
         fun messages(
             usage: String,
             noPointsEnough: String,
+            noAutoShoutOut: String,
             shoutOutRecorded: String
         ) {
             messages = ViewerPromotionMessages(
                 usage = usage,
                 noPointsEnough = noPointsEnough,
+                noAutoShoutOut = noAutoShoutOut,
                 shoutOutRecorded = shoutOutRecorded
             )
         }
@@ -126,6 +129,7 @@ class ViewerPromotion(
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
             val points = serviceLocator.extensionProvider.first(PointsManager::class)
+            val sound = serviceLocator.extensionProvider.first(SoundExtension::class)
 
             val promotionTimeChecker = StorageFlagTimeChecker(
                 storage,
@@ -146,6 +150,7 @@ class ViewerPromotion(
                 command = ViewerPromotionCommand(
                     channel = channelName,
                     storage = storage,
+                    sound = sound,
                     points = points,
                     messages = messages
                 ),

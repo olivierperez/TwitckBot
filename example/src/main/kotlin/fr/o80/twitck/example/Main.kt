@@ -192,6 +192,7 @@ class Main : CliktCommand() {
                 messages(
                     usage = "usage: $SHOUT_OUT_COMMAND <login>",
                     noPointsEnough = "#USER# tu n'as pas assez de codes source !",
+                    noAutoShoutOut = "Petit malin #USER#...",
                     shoutOutRecorded = "Message reçu !"
                 )
                 ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")

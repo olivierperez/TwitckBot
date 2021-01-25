@@ -3,6 +3,7 @@ package fr.o80.twitck.extension.promotion
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.utils.skip
@@ -15,6 +16,7 @@ const val SHOUT_OUT_COST = 50
 class ViewerPromotionCommand(
     private val channel: String,
     private val storage: StorageExtension,
+    private val sound: SoundExtension,
     private val points: PointsManager,
     private val messages: ViewerPromotionMessages
 ) {
@@ -54,17 +56,26 @@ class ViewerPromotionCommand(
     }
 
     private fun recordShoutOut(messenger: Messenger, commandEvent: CommandEvent) {
-        if(!points.consumePoints(commandEvent.viewer.login, RECORDING_COST)) {
-            val message = messages.noPointsEnough.replace("#USER#", commandEvent.viewer.login)
-            messenger.sendImmediately(channel, message)
+        val viewerLogin = commandEvent.viewer.login
+        val shoutOutLogin = commandEvent.command.options[0]
+        val message = commandEvent.command.options.skip(1).joinToString(" ")
+
+        if (viewerLogin == shoutOutLogin) {
+            val errorMessage = messages.noAutoShoutOut.replace("#USER#", viewerLogin)
+            messenger.sendImmediately(channel, errorMessage)
+            sound.playNegative()
             return
         }
 
-        val login = commandEvent.command.options[0]
-        val message = commandEvent.command.options.skip(1).joinToString(" ")
+        if(!points.consumePoints(viewerLogin, RECORDING_COST)) {
+            val errorMessage = messages.noPointsEnough.replace("#USER#", viewerLogin)
+            messenger.sendImmediately(channel, errorMessage)
+            sound.playNegative()
+            return
+        }
 
-        if (storage.hasUserInfo(login)) {
-            storage.putUserInfo(login, namespace, SHOUT_OUT_COMMAND, message)
+        if (storage.hasUserInfo(shoutOutLogin)) {
+            storage.putUserInfo(shoutOutLogin, namespace, SHOUT_OUT_COMMAND, message)
             messenger.sendImmediately(channel, messages.shoutOutRecorded)
         }
     }
