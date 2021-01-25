@@ -24,8 +24,8 @@ class TextRenderer(
     private val kerningEnabled = true
     private val drawBoxBorder = false
 
-    lateinit var ttf: ByteBuffer
-    lateinit var fontInfo: STBTTFontinfo
+    private lateinit var ttf: ByteBuffer
+    private lateinit var fontInfo: STBTTFontinfo
 
     private var ascent = 0
     private var descent = 0
@@ -33,10 +33,12 @@ class TextRenderer(
 
     private var bitmapWidth: Int = 0
     private var bitmapHeight: Int = 0
-    lateinit var charData: STBTTBakedChar.Buffer
+    private lateinit var charData: STBTTBakedChar.Buffer
 
     private val contentScaleX: Float = 1.0f
     private val contentScaleY: Float = 1.0f
+
+    private val charBufferSize = 224
 
     private var textureId: Int = 0
 
@@ -75,7 +77,7 @@ class TextRenderer(
             texture2d {
                 pushed {
                     translate(margin, margin + fontHeight, 0f)
-                    renderText(text.normalize())
+                    renderText(text)
                 }
             }
         }
@@ -98,7 +100,7 @@ class TextRenderer(
     }
 
     private fun initFont(bitmap: ByteBuffer, bitmapWidth: Int, bitmapHeight: Int) {
-        charData = STBTTBakedChar.malloc(96)
+        charData = STBTTBakedChar.malloc(charBufferSize)
 
         STBTruetype.stbtt_BakeFontBitmap(
             ttf,
@@ -160,7 +162,7 @@ class TextRenderer(
                     x.put(0, 0.0f)
                     lineStart = i
                     continue
-                } else if (codePoint < 32 || 128 <= codePoint) {
+                } else if (codePoint < 32 || 32 + charBufferSize <= codePoint) {
                     continue
                 }
                 val cpX = x[0]
@@ -260,10 +262,4 @@ class TextRenderer(
         cpOut.put(0, c1.toInt())
         return 1
     }
-}
-
-private fun String.normalize(): String {
-    // TODO  OPZ Regarder ça https://github.com/LWJGL/lwjgl3/issues/486
-    return Normalizer.normalize(this, Normalizer.Form.NFD)
-        .replace("\\p{InCombiningDiacriticalMarks}+".toRegex(), "")
 }
