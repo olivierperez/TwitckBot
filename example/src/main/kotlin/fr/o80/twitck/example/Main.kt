@@ -82,9 +82,7 @@ class Main : CliktCommand() {
         // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
         // TODO OPZ Développer une TODO-liste intégrée au bot
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
-        // TODO GiftSub Ajouter !shoutout au Help
         // TODO OPZ Ajouter un background à l'Overlay
-        // TODO OPZ Empêcher un Shoutout de sois-même
         return twitckBot(oauthToken, hostName) {
 //            --AclExtension--
 //            install(CommandAcl) {

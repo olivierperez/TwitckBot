@@ -81,16 +81,24 @@ class ViewerPromotionCommand(
     }
 
     private fun shoutOut(messenger: Messenger, commandEvent: CommandEvent) {
-        if(!points.consumePoints(commandEvent.viewer.login, SHOUT_OUT_COST)) {
-            val message = messages.noPointsEnough.replace("#USER#", commandEvent.viewer.login)
+        val viewerLogin = commandEvent.viewer.login
+        val shoutOutLogin = commandEvent.command.options[0]
+
+        if (viewerLogin == shoutOutLogin) {
+            val errorMessage = messages.noAutoShoutOut.replace("#USER#", viewerLogin)
+            messenger.sendImmediately(channel, errorMessage)
+            sound.playNegative()
+            return
+        }
+
+        if(!points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
+            val message = messages.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, message)
             return
         }
 
-        val login = commandEvent.command.options[0]
-
-        if (storage.hasUserInfo(login)) {
-            storage.getUserInfo(login, namespace, SHOUT_OUT_COMMAND)?.let { message ->
+        if (storage.hasUserInfo(shoutOutLogin)) {
+            storage.getUserInfo(shoutOutLogin, namespace, SHOUT_OUT_COMMAND)?.let { message ->
                 messenger.sendImmediately(
                     channel,
                     message,
