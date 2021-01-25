@@ -73,8 +73,7 @@ internal class TwitckBotImpl(
     private val topicManager = TopicManager(
         userId = hostUserId,
         api = configuration.twitchApi,
-        // TODO OPZ BotHusky ne devrait pas se trouver dans la lib
-        ngrokTunnel = NgrokTunnel("BotHusky", 8080),
+        ngrokTunnel = NgrokTunnel("TwitckBot", 8080),
         secret = SecretHolder.secret,
         webhooksServer = WebhooksServer(
             followsDispatcher = FollowsDispatcher(messenger, configuration.followsHandlers),
