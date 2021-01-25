@@ -9,6 +9,7 @@ import fr.o80.twitck.example.market.CommandProduct
 import fr.o80.twitck.example.market.CompareLanguageProduct
 import fr.o80.twitck.example.market.KotlinProduct
 import fr.o80.twitck.extension.Presence
+import fr.o80.twitck.extension.actions.WebSocketRemoteActions
 import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.Help
 import fr.o80.twitck.extension.market.Market
@@ -21,13 +22,14 @@ import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.storage.Storage
-import fr.o80.twitck.extension.actions.WebSocketRemoteActions
 import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.extension.whisper.Whisper
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.Importance
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.LwjglOverlay
@@ -83,7 +85,6 @@ class Main : CliktCommand() {
         // TODO GiftSub Ajouter !shoutout au Help
         // TODO OPZ Ajouter un background à l'Overlay
         // TODO OPZ Empêcher un Shoutout de sois-même
-        // TODO OPZ !tester
         return twitckBot(oauthToken, hostName) {
 //            --AclExtension--
 //            install(CommandAcl) {
@@ -94,6 +95,15 @@ class Main : CliktCommand() {
                 informationText("Yo les internets c'est Olivier !")
             }
             install(DefaultSoundExtension) {
+                celebration("audio/youpi.wav")
+                negative("audio/fail.wav")
+                positive("audio/coin.wav")
+                raid("audio/raid.wav")
+                custom("buy", "audio/coin.wav")
+                custom("gogol", "audio/alerte_aux_gogols.wav")
+                custom("yata", "audio/yata.wav")
+                custom("youpi", "audio/youpi.wav")
+                custom("screen", "audio/ton_ecran.wav")
             }
             install(Storage) {
                 output(File(".storage/"))
@@ -126,7 +136,7 @@ class Main : CliktCommand() {
                 claim(points = 15, time = Duration.ofMinutes(20))
                 rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(5))
                 messages(
-                        viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
+                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
                 )
             }
             install(Market) {
@@ -267,7 +277,7 @@ class Main : CliktCommand() {
                         )
                     }
                     extensionProvider.forEach(SoundExtension::class) { sound ->
-                        sound.playYoupi()
+                        sound.playCelebration()
                     }
                 }
                 newSubscriptions { messenger, events ->
@@ -306,10 +316,21 @@ class Main : CliktCommand() {
                     events.forEach { println("$it") }
                     println("\n\n>>/Notifications bizarres<<")
                 }
+                command("!screen") { _, _, extensionProvider ->
+                    extensionProvider.first(SoundExtension::class).play("screen")
+                }
+                command("!yata") { _, _, extensionProvider ->
+                    extensionProvider.first(SoundExtension::class).play("yata")
+                    extensionProvider.showImage("image/vahine.gif", "Youpi !")
+                }
+                command("!youpi") { _, _, extensionProvider ->
+                    extensionProvider.first(SoundExtension::class).play("youpi")
+                    extensionProvider.showImage("image/vahine.gif", "Yata Yata Yata")
+                }
             }
             install(Channel) {
                 channel(botChannel)
-                command("!help") { messenger, _ ->
+                command("!help") { messenger, _, _ ->
                     messenger.sendImmediately(botChannel, "Il n'y a pas encore d'aide")
                 }
                 join { messenger, join ->
@@ -334,4 +355,10 @@ class Main : CliktCommand() {
     }
 }
 
+private fun ExtensionProvider.showImage(imagePath: String, text: String) {
+    val path = javaClass.classLoader.getResourceAsStream(imagePath)
+        ?: throw IllegalArgumentException("Failed to load image for resources: $imagePath")
 
+    this.first(OverlayExtension::class)
+        .showImage(path, text, Duration.ofSeconds(5))
+}

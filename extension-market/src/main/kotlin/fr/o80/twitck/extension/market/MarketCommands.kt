@@ -119,7 +119,7 @@ class MarketCommands(
             extensionProvider.first(OverlayExtension::class)
                 .alert(message, Duration.ofSeconds(15))
         }
-        extensionProvider.forEach(SoundExtension::class) { sound -> sound.playYoupi() }
+        extensionProvider.forEach(SoundExtension::class) { sound -> sound.play("buy") }
     }
 
     private fun onBuyFailed(

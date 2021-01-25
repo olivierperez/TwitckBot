@@ -86,7 +86,7 @@ class Channel(
 
         commandCallbacks.forEach { (commandTag, callback) ->
             if (commandTag == commandEvent.command.tag) {
-                callback(messenger, commandEvent)
+                callback(messenger, commandEvent, extensionProvider)
             }
         }
 
@@ -181,7 +181,8 @@ class Channel(
 
 typealias CommandCallback = (
     messenger: Messenger,
-    commandEvent: CommandEvent
+    commandEvent: CommandEvent,
+    extensionProvider: ExtensionProvider
 ) -> Unit
 
 typealias JoinCallback = (

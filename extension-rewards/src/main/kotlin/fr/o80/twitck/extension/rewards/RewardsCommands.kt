@@ -5,7 +5,6 @@ import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
-import fr.o80.twitck.lib.api.extension.Sound
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.time.TimeChecker
 import java.time.Duration
@@ -54,12 +53,12 @@ class RewardsCommands(
 
     private fun playCoin() {
         extensionProvider.first(SoundExtension::class)
-            .playCoin()
+            .playCelebration()
     }
 
     private fun playFail() {
         extensionProvider.first(SoundExtension::class)
-            .play(Sound.FAIL)
+            .playNegative()
     }
 
     private fun displayCoinAndMessage(message: String) {
