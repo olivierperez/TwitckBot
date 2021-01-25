@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.graphics.utils
 
 import org.junit.Test
 import kotlin.test.assertEquals

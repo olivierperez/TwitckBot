@@ -3,13 +3,15 @@ package fr.o80.twitck.overlay.graphics.renderer
 import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
+import fr.o80.twitck.overlay.graphics.model.Image
+import fr.o80.twitck.overlay.graphics.utils.LineSplitter
 import org.lwjgl.opengl.GL46
 import java.io.InputStream
 import java.time.Duration
 import java.time.Instant
 import kotlin.math.ceil
 
-class ImageRenderer(
+class PopupImageRenderer(
     private val height: Int,
     private val width: Int,
     private val textRenderer: TextRenderer = TextRenderer(

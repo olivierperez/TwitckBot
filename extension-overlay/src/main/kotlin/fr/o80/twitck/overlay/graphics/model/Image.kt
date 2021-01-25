@@ -1,5 +1,9 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.graphics.model
 
+import fr.o80.twitck.overlay.graphics.ext.alpha
+import fr.o80.twitck.overlay.graphics.ext.blue
+import fr.o80.twitck.overlay.graphics.ext.green
+import fr.o80.twitck.overlay.graphics.ext.red
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.GL46
 import java.io.InputStream

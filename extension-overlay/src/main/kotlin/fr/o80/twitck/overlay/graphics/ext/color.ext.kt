@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.graphics.ext
 
 fun Int.alpha() = (this shr 24 and 255).toByte()
 fun Int.red() = (this shr 16 and 255).toByte()

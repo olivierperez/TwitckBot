@@ -7,7 +7,7 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
-import fr.o80.twitck.overlay.graphics.renderer.ImageRenderer
+import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
 import java.io.InputStream
 import java.time.Duration
@@ -42,7 +42,7 @@ class LwjglOverlay(
         textColor = textColor
     )
 
-    private val imageRenderer = ImageRenderer(
+    private val popupImageRenderer = PopupImageRenderer(
         height = height,
         width = width,
         backgroundColor = textBackgroundColor,
@@ -59,17 +59,17 @@ class LwjglOverlay(
     }
 
     override fun showImage(path: InputStream, duration: Duration) {
-        imageRenderer.setImage(path, null, duration)
+        popupImageRenderer.setImage(path, null, duration)
     }
 
     override fun showImage(path: InputStream, text: String, duration: Duration) {
-        imageRenderer.setImage(path, text, duration)
+        popupImageRenderer.setImage(path, text, duration)
     }
 
     private fun start() {
         Thread(overlay).start()
         overlay.registerRender(informationRenderer)
-        overlay.registerRender(imageRenderer)
+        overlay.registerRender(popupImageRenderer)
     }
 
     class Configuration {

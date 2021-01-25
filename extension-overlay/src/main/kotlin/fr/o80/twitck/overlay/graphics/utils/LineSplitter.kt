@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.graphics.utils
 
 class LineSplitter {
     fun split(text: String, charsPerLine: Int): List<String> {
