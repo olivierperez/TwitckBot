@@ -4,6 +4,8 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelperExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.extension.TwitckExtension
@@ -22,7 +24,8 @@ class ViewerPromotion(
     private val maxVideoAgeToPromote: Duration,
     private val promotionTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
-    private val command: ViewerPromotionCommand
+    private val command: ViewerPromotionCommand,
+    private val extensionProvider: ExtensionProvider
 ) {
 
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
@@ -55,6 +58,12 @@ class ViewerPromotion(
         this.replace("#USER#", messageEvent.viewer.displayName)
             .replace("#URL#", video.url)
             .replace("#GAME#", video.game)
+
+    private fun onInstallationFinished() {
+        extensionProvider.forEach(HelperExtension::class) { help ->
+            help.registerCommand(SHOUT_OUT_COMMAND)
+        }
+    }
 
     class Configuration {
 
@@ -139,7 +148,8 @@ class ViewerPromotion(
                     storage = storage,
                     points = points,
                     messages = messages
-                )
+                ),
+                extensionProvider = serviceLocator.extensionProvider
             )
         }
     }
@@ -167,6 +177,7 @@ class ViewerPromotion(
                         viewerPromotion.command.interceptCommandEvent(messenger, commandEvent)
                     }
                     pipeline.requestChannel(viewerPromotion.channel)
+                    viewerPromotion.onInstallationFinished()
                 }
         }
     }

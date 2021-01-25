@@ -8,6 +8,11 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.sanitizeLogin
 import fr.o80.twitck.lib.utils.tryToInt
 
+const val POINTS_ADD_COMMAND = "!points_add"
+const val POINTS_GIVE_COMMAND = "!points_give"
+const val POINTS_COMMAND = "!points"
+const val POINTS_COMMAND_2 = "!points_info"
+
 class PointsCommands(
     private val channel: String,
     private val privilegedBadges: Array<out Badge>,
@@ -23,11 +28,11 @@ class PointsCommands(
 
         when (commandEvent.command.tag) {
             // !points_add Pipiks_ 13000
-            "!points_add" -> handleAddCommand(commandEvent)
+            POINTS_ADD_COMMAND -> handleAddCommand(commandEvent)
             // !points_give idontwantgiftsub 152
-            "!points_give" -> handleGiveCommand(messenger, commandEvent)
-            // !points_info
-            "!points_info", "!points" -> handleInfoCommand(messenger, commandEvent)
+            POINTS_GIVE_COMMAND -> handleGiveCommand(messenger, commandEvent)
+            // !points
+            POINTS_COMMAND, POINTS_COMMAND_2 -> handleInfoCommand(messenger, commandEvent)
         }
 
         return commandEvent

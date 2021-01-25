@@ -26,7 +26,8 @@ class Points(
 
     private fun onInstallationFinished() {
         extensionProvider.forEach(HelperExtension::class) { help ->
-            help.registerCommand("!points_info")
+            help.registerCommand(POINTS_COMMAND)
+            help.registerCommand(POINTS_GIVE_COMMAND)
         }
     }
 
