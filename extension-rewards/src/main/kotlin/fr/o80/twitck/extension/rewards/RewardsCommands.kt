@@ -53,7 +53,7 @@ class RewardsCommands(
 
     private fun playCoin() {
         extensionProvider.first(SoundExtension::class)
-            .playCelebration()
+            .playPositive()
     }
 
     private fun playFail() {

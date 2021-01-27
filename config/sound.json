@@ -1,0 +1,32 @@
+{
+  "extension": "DefaultSoundExtension",
+  "enabled": true,
+  "data": {
+    "celebration": "audio/youpi.wav",
+    "negative": "audio/fail.wav",
+    "positive": "audio/coin.wav",
+    "raid": "audio/raid.wav",
+    "custom": [
+      {
+        "id": "buy",
+        "path": "audio/coin.wav"
+      },
+      {
+        "id": "gogol",
+        "path": "audio/alerte_aux_gogols.wav"
+      },
+      {
+        "id": "yata",
+        "path": "audio/yata.wav"
+      },
+      {
+        "id": "youpi",
+        "path": "audio/youpi.wav"
+      },
+      {
+        "id": "screen",
+        "path": "audio/ton_ecran.wav"
+      }
+    ]
+  }
+}

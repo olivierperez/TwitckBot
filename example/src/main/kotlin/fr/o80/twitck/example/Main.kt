@@ -24,6 +24,7 @@ import fr.o80.twitck.extension.stats.StatsExtension
 import fr.o80.twitck.extension.storage.Storage
 import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.extension.whisper.Whisper
+import fr.o80.twitck.lib.api.BotFactory
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
@@ -82,6 +83,14 @@ class Main : CliktCommand() {
         // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
         // TODO OPZ Développer une TODO-liste intégrée au bot
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
+        // TODO OPZ Remettre le !market dans le chat
+        val botFactory = BotFactory(
+            configDirectory = File("./configs/"),
+            oauthToken = oauthToken,
+            hostName = hostName
+        )
+
+        return botFactory.create()
         return twitckBot(oauthToken, hostName) {
 //            --AclExtension--
 //            install(CommandAcl) {
@@ -324,6 +333,9 @@ class Main : CliktCommand() {
                 command("!youpi") { _, _, extensionProvider ->
                     extensionProvider.first(SoundExtension::class).play("youpi")
                     extensionProvider.showImage("image/vahine.gif", "Youpi !")
+                }
+                command("!gogol") { _, _, extensionProvider ->
+                    extensionProvider.first(SoundExtension::class).play("gogol")
                 }
             }
             install(Channel) {

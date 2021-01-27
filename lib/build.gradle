@@ -27,4 +27,5 @@ dependencies {
     testImplementation "org.jetbrains.kotlin:kotlin-test"
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
     testImplementation "io.mockk:mockk:1.10.0"
+    implementation "org.jetbrains.kotlin:kotlin-script-runtime:1.4.10"
 }
