@@ -5,7 +5,7 @@ import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
-import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -126,7 +126,7 @@ class ViewerPromotion(
                 ?: throw IllegalStateException("Channel must be set for the extension ${ViewerPromotion::class.simpleName}")
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
-            val points = serviceLocator.extensionProvider.first(PointsManager::class)
+            val points = serviceLocator.extensionProvider.first(PointsExtension::class)
             val sound = serviceLocator.extensionProvider.first(SoundExtension::class)
 
             val promotionTimeChecker = StorageFlagTimeChecker(

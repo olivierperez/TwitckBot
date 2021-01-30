@@ -68,7 +68,7 @@ class Poll(
             return Poll(
                 PollCommands(
                     channel = channelName,
-                    privilegedBadges = privilegedBadges,
+                    privilegedBadges = privilegedBadges.toList(),
                     messages = theMessages,
                     pointsForEachVote = points,
                     extensionProvider = serviceLocator.extensionProvider

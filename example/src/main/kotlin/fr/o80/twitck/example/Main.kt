@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
+import fr.o80.twitck.extension.points.DefaultPointsExtension
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.InMemoryStatsExtension
 import fr.o80.twitck.extension.storage.InFileStorageExtension
@@ -72,6 +73,7 @@ class Main : CliktCommand() {
             .install(InFileStorageExtension::installer)
             .install(DefaultHelpExtension::installer)
             .install(InMemoryStatsExtension::installer)
+            .install(DefaultPointsExtension::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -80,20 +82,6 @@ class Main : CliktCommand() {
 //                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
 //                on("!points_give", Badge.FOUNDER)
 //            }
-            install(StatsExtension) {
-                channel(hostChannel)
-            }
-            install(Points) {
-                channel(hostChannel)
-                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
-                messages(
-                    destinationViewerDoesNotExist = "Le destinataire n'existe pas",
-                    pointsTransferred = "Codes source transferés de #FROM# à #TO#",
-                    noPointsEnough = "Les huissiers sont en route vers #FROM#",
-                    viewHasNoPoints = "#USER# possède 0 code source",
-                    viewHasPoints = "#USER# possède #POINTS# codes source"
-                )
-            }
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)

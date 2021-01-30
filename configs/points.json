@@ -1,0 +1,18 @@
+{
+  "extension": "DefaultSoundExtension",
+  "enabled": true,
+  "data": {
+    "channel": "#gnu_coding_cafe",
+    "badges": [
+      "BROADCASTER",
+      "MODERATOR"
+    ],
+    "messages": {
+      "destinationViewerDoesNotExist": "Le destinataire n'existe pas",
+      "pointsTransferred": "Codes source transferés de #FROM# à #TO#",
+      "notEnoughPoints": "Les huissiers sont en route vers #FROM#",
+      "viewerHasNoPoints": "#USER# possède 0 code source",
+      "viewerHasPoints": "#USER# possède #POINTS# codes source"
+    }
+  }
+}

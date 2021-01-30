@@ -18,7 +18,7 @@ const val SCOPE_PERMANENT = "permanent"
 // TODO OPZ Extraire la partie gestion des commandes
 class RuntimeCommand(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>,
+    private val privilegedBadges: Collection<Badge>,
     private val extensionProvider: ExtensionProvider,
     private val logger: Logger
 ) {
@@ -130,7 +130,7 @@ class RuntimeCommand(
             val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
             return RuntimeCommand(
                 channelName,
-                theBadges,
+                theBadges.toList(),
                 serviceLocator.extensionProvider,
                 serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
             )

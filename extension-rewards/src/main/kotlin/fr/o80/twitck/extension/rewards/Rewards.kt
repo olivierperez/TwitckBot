@@ -3,7 +3,7 @@ package fr.o80.twitck.extension.rewards
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
-import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
@@ -32,7 +32,7 @@ class Rewards(
         if (rewardedPoints == 0) return
 
         talkingTimeChecker.executeIfNotCooldown(messageEvent.viewer.login) {
-            extensionProvider.forEach(PointsManager::class) { points ->
+            extensionProvider.forEach(PointsExtension::class) { points ->
                 points.addPoints(messageEvent.viewer.login, rewardedPoints)
             }
         }

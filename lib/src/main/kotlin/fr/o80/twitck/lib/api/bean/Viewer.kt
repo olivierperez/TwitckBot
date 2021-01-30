@@ -7,7 +7,7 @@ data class Viewer(
     var userId : String,
     var color : String
 ) {
-    infix fun hasNoPrivilegesOf(privilegedBadges: Array<out Badge>): Boolean {
+    infix fun hasNoPrivilegesOf(privilegedBadges: Collection<Badge>): Boolean {
         return badges.none { badge -> badge in privilegedBadges }
     }
 }

@@ -2,7 +2,7 @@ package fr.o80.twitck.extension.promotion
 
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -17,7 +17,7 @@ class ViewerPromotionCommand(
     private val channel: String,
     private val storage: StorageExtension,
     private val sound: SoundExtension,
-    private val points: PointsManager,
+    private val points: PointsExtension,
     private val messages: ViewerPromotionMessages
 ) {
 

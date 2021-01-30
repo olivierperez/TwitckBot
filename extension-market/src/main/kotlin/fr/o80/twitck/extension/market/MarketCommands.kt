@@ -33,8 +33,8 @@ class MarketCommands(
 
     private val namespace: String = Market::class.java.name
 
-    private val points: PointsManager by lazy {
-        extensionProvider.provide(PointsManager::class).first()
+    private val points: PointsExtension by lazy {
+        extensionProvider.provide(PointsExtension::class).first()
     }
 
     private val lockWaitingForValidation = Any()
