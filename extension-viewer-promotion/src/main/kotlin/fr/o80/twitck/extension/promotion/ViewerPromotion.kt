@@ -1,15 +1,13 @@
 package fr.o80.twitck.extension.promotion
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsManager
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
@@ -61,7 +59,7 @@ class ViewerPromotion(
             .replace("#GAME#", video.game)
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelperExtension::class) { help ->
+        extensionProvider.forEach(HelpExtension::class) { help ->
             help.registerCommand(SHOUT_OUT_COMMAND)
         }
     }
@@ -159,7 +157,7 @@ class ViewerPromotion(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, ViewerPromotion> {
+    /*companion object Extension : ExtensionInstaller<Configuration, ViewerPromotion> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -185,5 +183,5 @@ class ViewerPromotion(
                     viewerPromotion.onInstallationFinished()
                 }
         }
-    }
+    }*/
 }

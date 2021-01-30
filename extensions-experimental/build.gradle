@@ -1,31 +1,16 @@
-plugins {
-    id "org.jetbrains.kotlin.jvm"
-    id "org.jetbrains.kotlin.kapt"
-}
-
 group "fr.o80.twitck"
 version "0.0.4"
 
 repositories {
-    mavenCentral()
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-
     compileOnly project(":lib")
+
     implementation("com.github.olivierperez.KotlinSlobs:lib:1.2")
 
-    implementation "com.squareup.moshi:moshi:1.9.3"
-    implementation "com.squareup.moshi:moshi-adapters:1.9.3"
-    implementation "com.squareup.moshi:moshi-kotlin:1.9.3"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.9.3"
-
-    implementation "io.ktor:ktor-server-core:1.3.0"
-    implementation "io.ktor:ktor-server-netty:1.3.0"
-    implementation "io.ktor:ktor-websockets:1.3.0"
-
-    testImplementation "org.jetbrains.kotlin:kotlin-test"
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
+    implementation("io.ktor:ktor-server-core:1.3.0")
+    implementation("io.ktor:ktor-server-netty:1.3.0")
+    implementation("io.ktor:ktor-websockets:1.3.0")
 }

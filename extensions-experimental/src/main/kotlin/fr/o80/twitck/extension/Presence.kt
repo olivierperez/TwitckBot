@@ -1,9 +1,5 @@
 package fr.o80.twitck.extension
 
-import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.ServiceLocator
-
 class Presence(
     private val channel: String
 ) {
@@ -26,7 +22,7 @@ class Presence(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Presence> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Presence> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -39,5 +35,5 @@ class Presence(
                     pipeline.requestChannel(presence.channel)
                 }
         }
-    }
+    }*/
 }

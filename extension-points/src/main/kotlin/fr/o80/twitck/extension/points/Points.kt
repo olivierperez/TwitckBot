@@ -1,8 +1,10 @@
 package fr.o80.twitck.extension.points
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.extension.*
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelpExtension
+import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Points(
@@ -25,7 +27,7 @@ class Points(
     }
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelperExtension::class) { help ->
+        extensionProvider.forEach(HelpExtension::class) { help ->
             help.registerCommand(POINTS_COMMAND)
             help.registerCommand(POINTS_GIVE_COMMAND)
         }
@@ -100,7 +102,7 @@ class Points(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Points> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Points> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -118,5 +120,5 @@ class Points(
                 }
         }
 
-    }
+    }*/
 }

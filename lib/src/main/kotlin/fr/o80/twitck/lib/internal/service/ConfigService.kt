@@ -1,32 +1,25 @@
 package fr.o80.twitck.lib.internal.service
 
 import com.squareup.moshi.Moshi
-import fr.o80.twitck.lib.internal.bean.PartialExtensionConfig
+import com.squareup.moshi.Types
+import fr.o80.twitck.lib.internal.bean.ExtensionConfig
 import java.io.File
 import kotlin.reflect.KClass
 
 interface ConfigService {
-    fun getConfigsFrom(directory: File): List<Pair<File, PartialExtensionConfig>>
-    fun <T : Any> getConfig(clazz: KClass<T>): T
+    fun <T : Any> getConfig(file: String, clazz: KClass<T>): T
 }
 
-class ConfigServiceImpl : ConfigService {
+class ConfigServiceImpl(
+    private val configDirectory: File
+) : ConfigService {
 
     private val moshi = Moshi.Builder().build()
-    private val partialAdapter = moshi.adapter(PartialExtensionConfig::class.java)!!
 
-    override fun getConfigsFrom(directory: File): List<Pair<File, PartialExtensionConfig>> {
-        return directory
-            .listFiles { _, name -> name.endsWith(".json") }
-            ?.map { file ->
-                val partialConfig = partialAdapter.fromJson(file.readText())
-                    ?: throw IllegalArgumentException("Wrong format of the config file: ${file.path}")
-                Pair(file, partialConfig)
-            } ?: emptyList()
-    }
-
-    override fun <T : Any> getConfig(clazz: KClass<T>): T {
-        TODO("Not yet implemented")
+    override fun <T : Any> getConfig(file: String, clazz: KClass<T>): T {
+        val types = Types.newParameterizedType(ExtensionConfig::class.java, clazz.java)
+        return moshi.adapter<ExtensionConfig<T>>(types)!!
+            .fromJson(File(configDirectory, file).readText())!!.data
     }
 
 }

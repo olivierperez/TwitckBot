@@ -1,20 +1,6 @@
-plugins {
-    id "org.jetbrains.kotlin.jvm"
-}
-
 group 'fr.o80.twitck'
 version '0.0.4'
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
     implementation project(':lib')
-
-    testImplementation "org.jetbrains.kotlin:kotlin-test"
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit"
-    testImplementation "io.mockk:mockk:1.10.0"
 }

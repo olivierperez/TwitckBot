@@ -2,13 +2,13 @@ package fr.o80.twitck.overlay
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.OverlayExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.internal.service.ConfigService
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
-import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
+import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
 import java.io.InputStream
 import java.time.Duration
 
@@ -67,46 +67,28 @@ class LwjglOverlay(
     }
 
     private fun start() {
-        Thread(overlay).start()
+        // TODO OPZ Remettre : Thread(overlay).start()
         overlay.registerRender(informationRenderer)
         overlay.registerRender(popupImageRenderer)
     }
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class Dsl
-
-        private var informationText: String? = null
-
-        @Dsl
-        fun informationText(text: String) {
-            informationText = text
-        }
-
-        fun build(serviceLocator: ServiceLocator): LwjglOverlay {
-            val logger = serviceLocator.loggerFactory.getLogger(LwjglOverlay::class)
-            return LwjglOverlay(
-                windowName = "Streaming Overlay",
-                informationText = informationText,
-                logger = logger
-            )
-        }
-    }
-
-    companion object Extension : TwitckExtension<Configuration, LwjglOverlay> {
-        override fun install(
+    companion object {
+        fun installer(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): LwjglOverlay {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { overlay ->
-                    overlay.start()
-                }
-        }
+            configService: ConfigService
+        ): OverlayExtension {
+            val configuration = configService.getConfig("overlay.json", OverlayConfiguration::class)
+            val logger = serviceLocator.loggerFactory.getLogger(LwjglOverlay::class)
 
+            return LwjglOverlay(
+                windowName = "Streaming Overlay",
+                informationText = configuration.informationText,
+                logger = logger
+            ).also { overlay ->
+                overlay.start()
+            }
+        }
     }
+
 }

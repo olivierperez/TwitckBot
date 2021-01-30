@@ -4,12 +4,12 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.internal.service.ConfigService
 import java.io.File
 
-class Storage(
+class InFileStorageExtension(
     private val outputDirectory: File,
     private val logger: Logger,
     private val sanitizer: FileNameSanitizer = FileNameSanitizer()
@@ -114,38 +114,18 @@ class Storage(
     private fun getUserFile(login: String) =
         File(outputDirectory, "users/${sanitizer(login)}.json")
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class Dsl
-
-        private var output: File? = null
-
-        @Dsl
-        fun output(output: File) {
-            this.output = output
-        }
-
-        fun build(serviceLocator: ServiceLocator): Storage {
-            val theOutput = output
-                ?: throw IllegalStateException("Output must be set for the extension ${Storage::class.simpleName}")
-
-            val logger = serviceLocator.loggerFactory.getLogger(Storage::class)
-
-            return Storage(theOutput, logger)
-        }
-    }
-
-    companion object Extension : TwitckExtension<Configuration, Storage> {
-        override fun install(
+    companion object {
+        fun installer(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): Storage {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-        }
+            configService: ConfigService
+        ): StorageExtension {
+            val theOutput =
+                configService.getConfig("storage.json", InFileStorageConfiguration::class).storageDirectory
+            val logger = serviceLocator.loggerFactory.getLogger(InFileStorageExtension::class)
 
+            return InFileStorageExtension(File(theOutput), logger)
+        }
     }
+
 }

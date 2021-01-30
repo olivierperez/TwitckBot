@@ -1,8 +1,10 @@
 package fr.o80.twitck.extension.rewards
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
-import fr.o80.twitck.lib.api.extension.*
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelpExtension
+import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import java.time.Duration
@@ -16,7 +18,7 @@ class Rewards(
 ) {
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelperExtension::class) { help ->
+        extensionProvider.forEach(HelpExtension::class) { help ->
             help.registerCommand("!claim")
         }
     }
@@ -116,7 +118,7 @@ class Rewards(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Rewards> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Rewards> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -137,6 +139,6 @@ class Rewards(
                 }
         }
 
-    }
+    }*/
 }
 

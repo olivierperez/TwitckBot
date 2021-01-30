@@ -1,10 +1,8 @@
 package fr.o80.twitck.extension.actions
 
 import fr.o80.slobs.AsyncSlobsClient
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
@@ -16,7 +14,10 @@ class WebSocketRemoteActions(
         uiWebSocket.start()
     }
 
-    private fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
+    private fun interceptMessageEvent(
+        messenger: Messenger,
+        messageEvent: MessageEvent
+    ): MessageEvent {
         uiWebSocket.messenger = messenger
         return messageEvent
     }
@@ -70,7 +71,7 @@ class WebSocketRemoteActions(
         }
     }
 
-    companion object : TwitckExtension<Configuration, WebSocketRemoteActions> {
+    /*companion object : ExtensionInstaller<Configuration, WebSocketRemoteActions> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -85,6 +86,6 @@ class WebSocketRemoteActions(
                     }
                 }
         }
-    }
+    }*/
 
 }

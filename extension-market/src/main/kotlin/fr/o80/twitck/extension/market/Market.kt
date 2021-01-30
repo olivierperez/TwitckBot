@@ -1,9 +1,7 @@
 package fr.o80.twitck.extension.market
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Market(
@@ -13,7 +11,7 @@ class Market(
 ) {
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelperExtension::class) { helper ->
+        extensionProvider.forEach(HelpExtension::class) { helper ->
             helper.registerCommand("!buy")
             helper.registerCommand("!market")
         }
@@ -81,7 +79,7 @@ class Market(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Market> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Market> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -97,5 +95,5 @@ class Market(
                 }
         }
 
-    }
+    }*/
 }

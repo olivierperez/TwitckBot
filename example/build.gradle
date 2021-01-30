@@ -1,12 +1,7 @@
-plugins {
-    id "org.jetbrains.kotlin.jvm"
-}
-
 group 'fr.o80.twitck'
 version '1.0-SNAPSHOT'
 
 repositories {
-    mavenCentral()
     maven { url "https://jitpack.io" }
 }
 

@@ -1,18 +1,16 @@
 package fr.o80.twitck.extension.runtimecommand
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import java.time.Duration
-import java.util.Locale
+import java.util.*
 
 const val SCOPE_STREAM = "stream"
 const val SCOPE_PERMANENT = "permanent"
@@ -100,7 +98,9 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.forEach(HelperExtension::class) { helper -> helper.registerCommand(newCommand) }
+        extensionProvider.forEach(HelpExtension::class) { helper ->
+            helper.registerCommand(newCommand)
+        }
     }
 
     class Configuration {
@@ -137,7 +137,7 @@ class RuntimeCommand(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, RuntimeCommand> {
+    /*companion object Extension : ExtensionInstaller<Configuration, RuntimeCommand> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -157,5 +157,5 @@ class RuntimeCommand(
                     runtimeCommand.onInstallationFinished()
                 }
         }
-    }
+    }*/
 }

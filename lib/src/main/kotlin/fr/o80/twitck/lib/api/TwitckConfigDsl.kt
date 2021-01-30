@@ -1,22 +1,13 @@
 package fr.o80.twitck.lib.api
 
-import fr.o80.twitck.lib.api.bean.TwitckConfiguration
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.TwitckExtension
-import fr.o80.twitck.lib.api.service.CommandTriggeringImpl
-import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
-import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
-import fr.o80.twitck.lib.internal.PipelineImpl
-import fr.o80.twitck.lib.internal.TwitckBotImpl
-import fr.o80.twitck.lib.internal.service.TwitchApiImpl
-import kotlin.reflect.KClass
-import kotlin.reflect.cast
+//TODO OPZ Supprimer ce fichier
+/*import fr.o80.twitck.lib.api.extension.ExtensionInstaller
+import fr.o80.twitck.lib.internal.TwitckBotImpl*/
 
-@DslMarker
-private annotation class TwitckConfigDsl
+/*@DslMarker
+private annotation class TwitckConfigDsl*/
 
-@TwitckConfigDsl
+/*@TwitckConfigDsl
 fun twitckBot(
     oauthToken: String,
     hostName: String,
@@ -24,9 +15,9 @@ fun twitckBot(
 ): TwitckBot {
     val configuration = TwitckConfigurator(oauthToken, hostName).apply(configurator).build()
     return TwitckBotImpl(configuration)
-}
+}*/
 
-class TwitckConfigurator(
+/*class TwitckConfigurator(
     private val oauthToken: String,
     private val hostName: String
 ) {
@@ -54,25 +45,25 @@ class TwitckConfigurator(
         loggerFactory = loggerFactory,
         twitchApi = TwitchApiImpl(oauthToken, loggerFactory),
         commandTriggering = commandTriggering
-    )
+    )*/
 
-    @TwitckConfigDsl
-    fun <Configuration : Any, A : Any> install(
-        extension: TwitckExtension<Configuration, A>,
-        configure: Configuration.() -> Unit
-    ) {
-        val installed = extension.install(pipeline, serviceLocator, configure)
-        extensions += installed
-    }
+/*@TwitckConfigDsl
+fun <Configuration : Any, A : Any> install(
+    extension: ExtensionInstaller<Configuration, A>,
+    configure: Configuration.() -> Unit
+) {
+    val installed = extension.install(pipeline, serviceLocator, configure)
+    extensions += installed
+}*/
 
-    internal fun build(): TwitckConfiguration {
-        return TwitckConfiguration(
-            oauthToken = oauthToken,
-            hostName = hostName,
-            pipeline = pipeline,
-            serviceLocator = serviceLocator,
-            commandsFromExtension = commandTriggering
-        )
-    }
+/* internal fun build(): TwitckConfiguration {
+     return TwitckConfiguration(
+         oauthToken = oauthToken,
+         hostName = hostName,
+         pipeline = pipeline,
+         serviceLocator = serviceLocator,
+         commandsFromExtension = commandTriggering
+     )
+ }
 
-}
+}*/

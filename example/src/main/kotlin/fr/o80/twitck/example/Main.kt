@@ -4,37 +4,14 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
-import fr.o80.twitck.example.market.CodeReviewProduct
-import fr.o80.twitck.example.market.CommandProduct
-import fr.o80.twitck.example.market.CompareLanguageProduct
-import fr.o80.twitck.example.market.KotlinProduct
-import fr.o80.twitck.extension.Presence
-import fr.o80.twitck.extension.actions.WebSocketRemoteActions
-import fr.o80.twitck.extension.channel.Channel
-import fr.o80.twitck.extension.help.Help
-import fr.o80.twitck.extension.market.Market
-import fr.o80.twitck.extension.points.Points
-import fr.o80.twitck.extension.promotion.SHOUT_OUT_COMMAND
-import fr.o80.twitck.extension.promotion.ViewerPromotion
-import fr.o80.twitck.extension.repeat.Repeat
-import fr.o80.twitck.extension.rewards.Rewards
-import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
+import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
-import fr.o80.twitck.extension.stats.StatsExtension
-import fr.o80.twitck.extension.storage.Storage
-import fr.o80.twitck.extension.welcome.Welcome
-import fr.o80.twitck.extension.whisper.Whisper
+import fr.o80.twitck.extension.storage.InFileStorageExtension
 import fr.o80.twitck.lib.api.BotFactory
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.CoolDown
-import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
-import fr.o80.twitck.lib.api.extension.SoundExtension
-import fr.o80.twitck.lib.api.twitckBot
 import fr.o80.twitck.overlay.LwjglOverlay
-import fr.o80.twitck.poll.Poll
 import java.io.File
 import java.time.Duration
 
@@ -84,41 +61,23 @@ class Main : CliktCommand() {
         // TODO OPZ Développer une TODO-liste intégrée au bot
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
         // TODO OPZ Remettre le !market dans le chat
-        val botFactory = BotFactory(
+        return BotFactory(
             configDirectory = File("./configs/"),
             oauthToken = oauthToken,
             hostName = hostName
         )
+            .install(LwjglOverlay::installer)
+            .install(DefaultSoundExtension::installer)
+            .install(InFileStorageExtension::installer)
+            .install(DefaultHelpExtension::installer)
+            .create()
 
-        return botFactory.create()
-        return twitckBot(oauthToken, hostName) {
+        /*return twitckBot(oauthToken, hostName) {
 //            --AclExtension--
 //            install(CommandAcl) {
 //                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
 //                on("!points_give", Badge.FOUNDER)
 //            }
-            install(LwjglOverlay) {
-                informationText("Yo les internets c'est Olivier !")
-            }
-            install(DefaultSoundExtension) {
-                celebration("audio/youpi.wav")
-                negative("audio/fail.wav")
-                positive("audio/coin.wav")
-                raid("audio/raid.wav")
-                custom("buy", "audio/coin.wav")
-                custom("gogol", "audio/alerte_aux_gogols.wav")
-                custom("yata", "audio/yata.wav")
-                custom("youpi", "audio/youpi.wav")
-                custom("screen", "audio/ton_ecran.wav")
-            }
-            install(Storage) {
-                output(File(".storage/"))
-            }
-            install(Help) {
-                channel(hostChannel)
-                registerCommand("!nothing", "Cette commande dit qu'elle ne fait rien, du tout.")
-                registerCommand("!language", "Ici on fait du Kotlin, best language ever")
-            }
             install(StatsExtension) {
                 channel(hostChannel)
             }
@@ -361,7 +320,7 @@ class Main : CliktCommand() {
                     channel("#$presenceChannel")
                 }
             }
-        }
+        }*/
     }
 }
 

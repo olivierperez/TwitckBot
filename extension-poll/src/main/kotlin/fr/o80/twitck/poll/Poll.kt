@@ -1,8 +1,6 @@
 package fr.o80.twitck.poll
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Poll(
@@ -79,7 +77,7 @@ class Poll(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Poll> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Poll> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -93,5 +91,5 @@ class Poll(
                 }
         }
 
-    }
+    }*/
 }

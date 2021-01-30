@@ -1,6 +1,5 @@
 package fr.o80.twitck.extension.stats
 
-import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.event.JoinEvent
@@ -8,7 +7,6 @@ import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.extension.Stat
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class StatsExtension(
@@ -121,7 +119,7 @@ class StatsExtension(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, StatsExtension> {
+    /*companion object Extension : ExtensionInstaller<Configuration, StatsExtension> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -155,6 +153,6 @@ class StatsExtension(
                     }
                 }
         }
-    }
+    }*/
 
 }

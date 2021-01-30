@@ -1,17 +1,15 @@
 package fr.o80.twitck.extension.channel
 
-import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.NewFollower
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.event.JoinEvent
-import fr.o80.twitck.lib.api.bean.NewFollower
 import fr.o80.twitck.lib.api.bean.subscription.NewSubscription
 import fr.o80.twitck.lib.api.bean.subscription.Notification
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.bean.subscription.UnknownType
 import fr.o80.twitck.lib.api.bean.twitch.TwitchSubscriptionData
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -159,7 +157,7 @@ class Channel(
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, Channel> {
+    /*companion object Extension : ExtensionInstaller<Configuration, Channel> {
         override fun install(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
@@ -176,7 +174,7 @@ class Channel(
                     pipeline.requestChannel(channel.channel)
                 }
         }
-    }
+    }*/
 }
 
 typealias CommandCallback = (
