@@ -14,7 +14,7 @@ class RewardsCommands(
     private val extensionProvider: ExtensionProvider,
     private val claimTimeChecker: TimeChecker,
     private val claimedPoints: Int,
-    private val messages: Messages
+    private val messages: RewardsMessages
 ) {
 
     fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {

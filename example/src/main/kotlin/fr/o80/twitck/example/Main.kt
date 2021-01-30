@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.points.DefaultPointsExtension
+import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.InMemoryStatsExtension
 import fr.o80.twitck.extension.storage.InFileStorageExtension
@@ -74,6 +75,7 @@ class Main : CliktCommand() {
             .install(DefaultHelpExtension::installer)
             .install(InMemoryStatsExtension::installer)
             .install(DefaultPointsExtension::installer)
+            .install(Rewards::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -85,14 +87,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(Rewards) {
-                channel(hostChannel)
-                claim(points = 15, time = Duration.ofMinutes(20))
-                rewardTalkativeViewers(points = 5, time = Duration.ofMinutes(5))
-                messages(
-                    viewerJustClaimed = "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
-                )
             }
             install(Market) {
                 channel(hostChannel)
