@@ -1,0 +1,7 @@
+{
+  "extension": "InMemoryStatsExtension",
+  "enabled": true,
+  "data": {
+    "channel": "#gnu_coding_cafe"
+  }
+}

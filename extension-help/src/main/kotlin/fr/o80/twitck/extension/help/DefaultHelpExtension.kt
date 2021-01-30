@@ -76,8 +76,8 @@ class DefaultHelpExtension(
             val channelName = config.channel
 
             return DefaultHelpExtension(channelName, config.commands).also { help ->
-                pipeline.interceptCommandEvent(help::interceptCommandEvent)
                 pipeline.requestChannel(channelName)
+                pipeline.interceptCommandEvent(help::interceptCommandEvent)
             }
         }
     }

@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
+import fr.o80.twitck.extension.stats.InMemoryStatsExtension
 import fr.o80.twitck.extension.storage.InFileStorageExtension
 import fr.o80.twitck.lib.api.BotFactory
 import fr.o80.twitck.lib.api.TwitckBot
@@ -70,6 +71,7 @@ class Main : CliktCommand() {
             .install(DefaultSoundExtension::installer)
             .install(InFileStorageExtension::installer)
             .install(DefaultHelpExtension::installer)
+            .install(InMemoryStatsExtension::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
