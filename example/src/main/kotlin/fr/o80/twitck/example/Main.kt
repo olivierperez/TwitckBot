@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
+import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.DefaultPointsExtension
 import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
@@ -64,6 +65,8 @@ class Main : CliktCommand() {
         // TODO OPZ Développer une TODO-liste intégrée au bot
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
         // TODO OPZ Remettre le !market dans le chat
+        // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
+        // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
         return BotFactory(
             configDirectory = File("./configs/"),
             oauthToken = oauthToken,
@@ -76,6 +79,7 @@ class Main : CliktCommand() {
             .install(InMemoryStatsExtension::installer)
             .install(DefaultPointsExtension::installer)
             .install(Rewards::installer)
+            .install(Market::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -87,24 +91,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(Market) {
-                channel(hostChannel)
-                messages(
-                    couldNotGetProductPrice = "Impossible de calculer le prix pour l'achat demandé !",
-                    productNotFound = "le produit n'existe pas",
-                    usage = "Usage de !buy => !buy <produit> <paramètres>",
-                    weHaveThisProducts = "Voilà tout ce que j'ai sur l'étagère : #PRODUCTS#",
-                    youDontHaveEnoughPoints = "@#USER# tu n'as pas assez de codes source pour cet achat !",
-                    yourPurchaseIsPending = "@#USER# ton achat est en attente de validation"
-                )
-                product(CommandProduct)
-                product(CodeReviewProduct)
-                product(KotlinProduct)
-                product(CompareLanguageProduct)
-                // TODO idée CamouilleLaFripouille 500 codes source => assistance UML (15 min)
-                // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
-                // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
             }
             install(Repeat) {
                 channel(hostChannel)

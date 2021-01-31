@@ -1,99 +1,47 @@
 package fr.o80.twitck.extension.market
 
+import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.internal.service.ConfigService
 
 class Market(
     private val channel: String,
-    private val commands: MarketCommands,
-    private val extensionProvider: ExtensionProvider
+    extensionProvider: ExtensionProvider
 ) {
 
-    private fun onInstallationFinished() {
+    init {
         extensionProvider.forEach(HelpExtension::class) { helper ->
             helper.registerCommand("!buy")
             helper.registerCommand("!market")
         }
     }
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class Dsl
-
-        private var channel: String? = null
-        private var messages: Messages? = null
-        private val products: MutableList<Product> = mutableListOf()
-
-        @Dsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        @Dsl
-        fun messages(
-            couldNotGetProductPrice: String,
-            productNotFound: String,
-            usage: String,
-            weHaveThisProducts: String,
-            youDontHaveEnoughPoints: String,
-            yourPurchaseIsPending: String
-        ) {
-            messages = Messages(
-                couldNotGetProductPrice = couldNotGetProductPrice,
-                productNotFound = productNotFound,
-                usage = usage,
-                weHaveThisProducts = weHaveThisProducts,
-                youDontHaveEnoughPoints = youDontHaveEnoughPoints,
-                yourPurchaseIsPending = yourPurchaseIsPending
-            )
-        }
-
-        @Dsl
-        fun product(product: Product) {
-            products.add(product)
-        }
-
-        fun build(serviceLocator: ServiceLocator): Market {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${Market::class.simpleName}")
-            val theMessages = messages
-                ?: throw IllegalArgumentException("Messages must be set for the extension ${Market::class.simpleName}")
-
+    companion object {
+        fun installer(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configService: ConfigService
+        ): Market {
+            val config = configService.getConfig("market.json", MarketConfiguration::class)
             val logger = serviceLocator.loggerFactory.getLogger(Market::class)
 
             val commands = MarketCommands(
-                channelName,
-                theMessages,
-                products,
+                config.channel,
+                config.messages,
+                config.products,
                 logger,
-                serviceLocator.extensionProvider,
-                serviceLocator
-            )
-            return Market(
-                channelName,
-                commands,
                 serviceLocator.extensionProvider
             )
+            return Market(
+                config.channel,
+                serviceLocator.extensionProvider
+            ).also { market ->
+                pipeline.requestChannel(market.channel)
+                pipeline.interceptCommandEvent(commands::interceptCommandEvent)
+            }
         }
     }
 
-    /*companion object Extension : ExtensionInstaller<Configuration, Market> {
-        override fun install(
-            pipeline: Pipeline,
-            serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): Market {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { market ->
-                    pipeline.interceptCommandEvent(market.commands::interceptCommandEvent)
-                    pipeline.requestChannel(market.channel)
-                    market.onInstallationFinished()
-                }
-        }
-
-    }*/
 }

@@ -25,7 +25,7 @@ class PollCommandsTest {
 
         pollCommands = PollCommands(
             channel = "channel",
-            privilegedBadges = arrayOf(),
+            privilegedBadges = listOf(),
             messages = messages,
             pointsForEachVote = 5,
             extensionProvider = mockk()
