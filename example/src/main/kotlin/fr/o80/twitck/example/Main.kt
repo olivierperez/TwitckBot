@@ -12,6 +12,7 @@ import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.InMemoryStatsExtension
 import fr.o80.twitck.extension.storage.InFileStorageExtension
+import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.lib.api.BotFactory
 import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
@@ -80,6 +81,7 @@ class Main : CliktCommand() {
             .install(Rewards::installer)
             .install(Market::installer)
             .install(Repeat::installer)
+            .install(Welcome::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -91,25 +93,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(Welcome) {
-                channel(hostChannel)
-                host(hostName, "Salut $hostName ! Fais comme chez toi hein !?")
-                ignore(botName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
-                reactTo(joins = false, messages = true, commands = true, raids = true)
-                welcomeInterval(Duration.ofHours(2))
-                messageForViewer("Compilation de #USER# impossible, trop de bugs.")
-                messageForViewer("Décompilation de #USER# en cours...")
-                messageForViewer("#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?")
-                messageForViewer("#USER# croit profondément au retour du Pascal...")
-                messageForViewer("#USER# vient de finir sa lecture des internets mondiaux.")
-                messageForViewer("Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?")
-                messageForViewer("#USER# a presque DL tout Wikipedia")
-                messageForFollower("Yo #USER# la meilleure personne des internets mondiaux!")
-                messageForFollower("Prière d'accueillir #USER# comme il se doit.")
-                messageForFollower("Oh ! Mais ne serait-ce pas notre célèbre #USER# qui se joint à nous ?")
-                messageForFollower("OMG ! mais c'est #USER# !!")
-                messageForFollower("Faites place à sa majesté #USER# !")
             }
             install(ViewerPromotion) {
                 channel(hostChannel)

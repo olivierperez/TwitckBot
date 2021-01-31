@@ -1,9 +1,9 @@
 {
   "login": "gnu_coding_cafe",
   "extras": {
-    "fr.o80.twitck.extension.rewards.Rewards//talkedRewardedAt": "2021-01-31T19:16:25.262",
-    "fr.o80.twitck.extension.points.DefaultPointsExtension//balance": "125",
-    "fr.o80.twitck.extension.welcome.Welcome//welcomedAt": "2021-01-27T19:24:37.511",
+    "fr.o80.twitck.extension.rewards.Rewards//talkedRewardedAt": "2021-01-31T19:50:49.526",
+    "fr.o80.twitck.extension.points.DefaultPointsExtension//balance": "130",
+    "fr.o80.twitck.extension.welcome.Welcome//welcomedAt": "2021-01-31T19:50:49.535",
     "fr.o80.twitck.extension.promotion.ViewerPromotion//promotedAt": "2020-12-16T21:31:45.567",
     "fr.o80.twitck.extension.promotion.ViewerPromotion//!shoutout": "Vous êtes pile au bon endroit !",
     "fr.o80.twitck.extension.rewards.Rewards//claimedAt": "2021-01-30T17:16:07.83"

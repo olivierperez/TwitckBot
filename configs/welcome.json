@@ -1,0 +1,41 @@
+{
+  "extension": "DefaultSoundExtension",
+  "enabled": true,
+  "data": {
+    "channel": "#gnu_coding_cafe",
+    "streamId": "124210976",
+    "secondsBetweenWelcomes": 7200,
+    "ignoreViewers": [
+      "lurxx",
+      "anotherttvviewer",
+      "letsdothis_streamers"
+    ],
+    "messages": {
+      "forBroadcaster": [
+        "Salut #VIEWER# ! Fais comme chez toi hein !?"
+      ],
+      "forViewers": [
+        "Compilation de #USER# impossible, trop de bugs.",
+        "Décompilation de #USER# en cours...",
+        "#USER# télécharge les internets mondiaux, quelqu'un peut lui prêter 1 ou 2 disquettes svp ?",
+        "#USER# croit profondément au retour du Pascal...",
+        "#USER# vient de finir sa lecture des internets mondiaux.",
+        "Quelqu'un peut expliquer à #USER# la différence entre Java et JavaScript ?",
+        "#USER# a presque DL tout Wikipedia"
+      ],
+      "forFollowers": [
+        "Yo #USER# la meilleure personne des internets mondiaux!",
+        "Prière d'accueillir #USER# comme il se doit.",
+        "Oh ! Mais ne serait-ce pas notre célèbre #USER# qui se joint à nous ?",
+        "OMG ! mais c'est #USER# !!",
+        "Faites place à sa majesté #USER# !"
+      ]
+    },
+    "reactTo": {
+      "joins": false,
+      "messages": true,
+      "commands": false,
+      "raids": true
+    }
+  }
+}
