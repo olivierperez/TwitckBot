@@ -1,13 +1,16 @@
 package fr.o80.twitck.extension.repeat
 
+import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.internal.service.ConfigService
 import java.time.Duration
 
 class Repeat(
     private val channel: String,
     private val intervalBetweenRepeatedMessages: Duration,
-    private val messages: MutableList<String>
+    private val messages: List<String>
 ) {
 
     private var configured = false
@@ -33,58 +36,23 @@ class Repeat(
         }.start()
     }
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class Dsl
-
-        private var channel: String? = null
-
-        private var intervalBetweenRepeatedMessages: Duration = Duration.ofMinutes(5)
-
-        private val messages = mutableListOf<String>()
-
-        @Dsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        @Dsl
-        fun interval(interval: Duration) {
-            intervalBetweenRepeatedMessages = interval
-        }
-
-        @Dsl
-        fun remind(message: String) {
-            messages += message
-        }
-
-        fun build(): Repeat {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${Repeat::class.simpleName}")
-
-            return Repeat(
-                channelName,
-                intervalBetweenRepeatedMessages,
-                messages
-            )
-        }
-    }
-
-    /*companion object Extension : ExtensionInstaller<Configuration, Repeat> {
-
-        override fun install(
+    companion object {
+        fun installer(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
+            configService: ConfigService
         ): Repeat {
-            return Configuration()
-                .apply(configure)
-                .build()
-                .also { repeat ->
+            val config = configService.getConfig("repeat.json", RepeatConfiguration::class)
+
+            return Repeat(
+                config.channel,
+                Duration.ofSeconds(config.secondsBetweenRepeatedMessages),
+                config.messages
+            ).also { repeat ->
                     pipeline.interceptMessageEvent(repeat::interceptMessageEvent)
                     pipeline.requestChannel(repeat.channel)
                 }
         }
-    }*/
+    }
+
 }

@@ -1,0 +1,16 @@
+{
+  "extension": "DefaultSoundExtension",
+  "enabled": true,
+  "data": {
+    "channel": "#gnu_coding_cafe",
+    "secondsBetweenRepeatedMessages": 900,
+    "messages": [
+      "Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot",
+      "On se retrouve sur discord en dehors des streams ? https://discord.gg/S4HxU2YfaT",
+      "Olivier partage quelques bouts de code sur https://github.com/olivierperez",
+      "Vous savez qu'on stream du Game Dev les jeudis ?",
+      "Vous faites de l'Android ? nous aussi, et ça se retrouve sur Youtube https://youtu.be/ig-_10msUUE",
+      "Le refactoring Kata c'est bon pour la santé, du coup on le pratique ici de temps en temps"
+    ]
+  }
+}

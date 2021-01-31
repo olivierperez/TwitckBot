@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.DefaultPointsExtension
+import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.InMemoryStatsExtension
@@ -60,11 +61,9 @@ class Main : CliktCommand() {
         presenceChannel: String?
     ): TwitckBot {
         println("Start...")
-        // TODO CamouilleLaFrippouille -> répondre à quelques questions, genre : pourquoi tu t'appelles comme ça ?
         // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
-        // TODO OPZ Développer une TODO-liste intégrée au bot
+
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
-        // TODO OPZ Remettre le !market dans le chat
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
         return BotFactory(
@@ -80,6 +79,7 @@ class Main : CliktCommand() {
             .install(DefaultPointsExtension::installer)
             .install(Rewards::installer)
             .install(Market::installer)
+            .install(Repeat::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -91,17 +91,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(Repeat) {
-                channel(hostChannel)
-                interval(Duration.ofMinutes(15))
-                remind("Retrouvez mon code source sur https://github.com/olivierperez/TwitckBot")
-                remind("On se retrouve sur discord en dehors des streams ? https://discord.gg/S4HxU2YfaT")
-                remind("Olivier partage quelques bouts de code sur https://github.com/olivierperez")
-                remind("Vous savez qu'on streame du Game Dev de temps en temps ?")
-                remind("Vous faites de l'Android ? nous aussi, et ça se retrouve sur Youtube https://youtu.be/ig-_10msUUE")
-                remind("Le refactoring Kata c'est bon pour la santé, du coup on le pratique ici de temps en temps")
-                remind("On partage le stream avec @Infrazfull des fois")
             }
             install(Welcome) {
                 channel(hostChannel)
