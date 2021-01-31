@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.DefaultPointsExtension
+import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
@@ -82,6 +83,7 @@ class Main : CliktCommand() {
             .install(Market::installer)
             .install(Repeat::installer)
             .install(Welcome::installer)
+            .install(ViewerPromotion::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -93,20 +95,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(ViewerPromotion) {
-                channel(hostChannel)
-                messages(
-                    usage = "usage: $SHOUT_OUT_COMMAND <login>",
-                    noPointsEnough = "#USER# tu n'as pas assez de codes source !",
-                    noAutoShoutOut = "Petit malin #USER#...",
-                    shoutOutRecorded = "Message reçu !"
-                )
-                ignore(hostName, "lurxx", "anotherttvviewer", "letsdothis_streamers")
-                promotionInterval(Duration.ofHours(1))
-                maxVideoAgeToPromote(Duration.ofDays(120))
-                addMessage("#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#")
-                addMessage("Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#")
             }
             install(Poll) {
                 channel(hostChannel)
