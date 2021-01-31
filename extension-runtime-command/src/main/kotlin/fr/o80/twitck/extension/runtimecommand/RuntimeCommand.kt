@@ -1,5 +1,6 @@
 package fr.o80.twitck.extension.runtimecommand
 
+import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
@@ -9,6 +10,7 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.internal.service.ConfigService
 import java.time.Duration
 import java.util.*
 
@@ -31,7 +33,7 @@ class RuntimeCommand(
 
     private val runtimeCommands = mutableMapOf<String, String?>()
 
-    private fun onInstallationFinished() {
+    init {
         storage.getGlobalInfo(namespace)
             .filter { it.first.startsWith("Command//") }
             .forEach { runtimeCommands[it.first.substring("Command//".length)] = it.second }
@@ -89,7 +91,7 @@ class RuntimeCommand(
         }
     }
 
-    fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
+    private fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
         runtimeCommands[newCommand] = message
 
         if (scope == SCOPE_PERMANENT) {
@@ -103,59 +105,28 @@ class RuntimeCommand(
         }
     }
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class RuntimeCommandDsl
-
-        private var channel: String? = null
-        private var badges: Array<out Badge>? = null
-
-        @RuntimeCommandDsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        @RuntimeCommandDsl
-        fun privilegedBadges(vararg badges: Badge) {
-            if (badges.isEmpty()) {
-                throw IllegalArgumentException("Impossible to set an empty list of privileged badges.")
-            }
-            this.badges = badges
-        }
-
-        fun build(serviceLocator: ServiceLocator): RuntimeCommand {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${RuntimeCommand::class.simpleName}")
-            val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
+    companion object {
+        fun installer(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configService: ConfigService
+        ): RuntimeCommand {
+            val config = configService.getConfig("runtime_commands.json", RuntimeCommandConfiguration::class)
             return RuntimeCommand(
-                channelName,
-                theBadges.toList(),
+                config.channel,
+                config.privilegedBadges,
                 serviceLocator.extensionProvider,
                 serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
-            )
+            ).also { runtimeCommand ->
+                pipeline.requestChannel(config.channel)
+                pipeline.interceptCommandEvent { messenger, commandEvent ->
+                    runtimeCommand.interceptCommandEvent(
+                        messenger,
+                        commandEvent
+                    )
+                }
+            }
         }
     }
 
-    /*companion object Extension : ExtensionInstaller<Configuration, RuntimeCommand> {
-        override fun install(
-            pipeline: Pipeline,
-            serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): RuntimeCommand {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { runtimeCommand ->
-                    pipeline.requestChannel(runtimeCommand.channel)
-                    pipeline.interceptCommandEvent { messenger, commandEvent ->
-                        runtimeCommand.interceptCommandEvent(
-                            messenger,
-                            commandEvent
-                        )
-                    }
-                    runtimeCommand.onInstallationFinished()
-                }
-        }
-    }*/
 }

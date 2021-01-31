@@ -10,6 +10,7 @@ import fr.o80.twitck.extension.points.DefaultPointsExtension
 import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
 import fr.o80.twitck.extension.rewards.Rewards
+import fr.o80.twitck.extension.runtimecommand.RuntimeCommand
 import fr.o80.twitck.extension.sound.DefaultSoundExtension
 import fr.o80.twitck.extension.stats.InMemoryStatsExtension
 import fr.o80.twitck.extension.storage.InFileStorageExtension
@@ -84,6 +85,7 @@ class Main : CliktCommand() {
             .install(Repeat::installer)
             .install(Welcome::installer)
             .install(ViewerPromotion::installer)
+            .install(RuntimeCommand::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -108,10 +110,6 @@ class Main : CliktCommand() {
                     currentPollResult = "Sondage en cours... #TITLE# #RESULTS#",
                     pollHasNoVotes = "Personne n'a répondu à la question #TITLE#"
                 )
-            }
-            install(RuntimeCommand) {
-                channel(hostChannel)
-                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
             }
             install(Whisper) {
                 whisper { messenger, whisper ->

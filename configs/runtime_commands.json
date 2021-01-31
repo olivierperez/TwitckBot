@@ -1,0 +1,11 @@
+{
+  "extension": "DefaultSoundExtension",
+  "enabled": true,
+  "data": {
+    "channel": "#gnu_coding_cafe",
+    "privilegedBadges": [
+      "BROADCASTER",
+      "MODERATOR"
+    ]
+  }
+}
