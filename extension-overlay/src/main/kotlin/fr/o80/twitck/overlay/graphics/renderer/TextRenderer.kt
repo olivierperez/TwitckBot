@@ -12,7 +12,6 @@ import org.lwjgl.system.MemoryStack
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.nio.IntBuffer
-import java.text.Normalizer
 import kotlin.math.round
 
 class TextRenderer(
@@ -38,7 +37,7 @@ class TextRenderer(
     private val contentScaleX: Float = 1.0f
     private val contentScaleY: Float = 1.0f
 
-    private val charBufferSize = 224
+    private val charBufferSize = 255
 
     private var textureId: Int = 0
 
