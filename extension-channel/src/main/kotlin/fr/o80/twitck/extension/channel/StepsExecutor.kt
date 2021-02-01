@@ -4,8 +4,6 @@ import fr.o80.twitck.extension.channel.config.CommandStep
 import fr.o80.twitck.extension.channel.config.MessageStep
 import fr.o80.twitck.extension.channel.config.OverlayStep
 import fr.o80.twitck.extension.channel.config.SoundStep
-import fr.o80.twitck.lib.api.bean.Viewer
-import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
@@ -18,20 +16,24 @@ class StepsExecutor(
     fun execute(
         steps: List<CommandStep>,
         messenger: Messenger,
-        commandEvent: CommandEvent
+        param: StepParam
     ) {
         steps.forEach { step ->
             when (step) {
-                is MessageStep -> send(step, messenger, commandEvent)
+                is MessageStep -> send(step, messenger, param)
                 is OverlayStep -> show(step)
                 is SoundStep -> play(step)
             }
         }
     }
 
-    private fun send(step: MessageStep, messenger: Messenger, commandEvent: CommandEvent) {
-        val message = step.message.formatFor(commandEvent.viewer)
-        messenger.sendImmediately(commandEvent.channel, message)
+    private fun send(
+        step: MessageStep,
+        messenger: Messenger,
+        param: StepParam
+    ) {
+        val message = step.message.formatFor(param.viewerName)
+        messenger.sendImmediately(param.channel, message)
     }
 
     private fun show(step: OverlayStep) {
@@ -48,6 +50,11 @@ class StepsExecutor(
     }
 }
 
-private fun String.formatFor(viewer: Viewer): String {
-    return this.replace("#USER#", viewer.displayName)
+class StepParam(
+    val channel: String,
+    val viewerName: String
+)
+
+private fun String.formatFor(viewerName: String): String {
+    return this.replace("#USER#", viewerName)
 }

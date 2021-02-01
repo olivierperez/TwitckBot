@@ -11,7 +11,14 @@ class ChannelCommands(
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         commandConfigs[commandEvent.command.tag]?.let { commandConfig ->
-            stepsExecutor.execute(commandConfig, messenger, commandEvent)
+            stepsExecutor.execute(
+                commandConfig,
+                messenger,
+                StepParam(
+                    commandEvent.channel,
+                    commandEvent.viewer.displayName
+                )
+            )
         }
 
         return commandEvent

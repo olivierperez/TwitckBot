@@ -27,11 +27,12 @@ class Channel {
 
             val stepsExecutor = StepsExecutor(serviceLocator.extensionProvider)
             val commands = ChannelCommands(config.commands, stepsExecutor)
+            val follows = ChannelFollows(config.follows, stepsExecutor)
 
             return Channel().also {
                 pipeline.requestChannel(config.channel)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
-//                pipeline.interceptFollowEvent(channel::interceptFollowEvent)
+                pipeline.interceptFollowEvent(follows::interceptFollowEvent)
 //                pipeline.interceptJoinEvent(channel::interceptJoinEvent)
 //                pipeline.interceptSubscriptionEvent(channel::interceptSubscriptionEvent)
             }
