@@ -20,6 +20,7 @@ import fr.o80.twitck.lib.api.TwitckBot
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.overlay.LwjglOverlay
+import fr.o80.twitck.poll.Poll
 import java.io.File
 import java.time.Duration
 
@@ -86,6 +87,7 @@ class Main : CliktCommand() {
             .install(Welcome::installer)
             .install(ViewerPromotion::installer)
             .install(RuntimeCommand::installer)
+            .install(Poll::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -97,19 +99,6 @@ class Main : CliktCommand() {
             install(WebSocketRemoteActions) {
                 channel(hostChannel)
                 slobs(slobsHost, slobsPort, slobsToken)
-            }
-            install(Poll) {
-                channel(hostChannel)
-                privilegedBadges(Badge.BROADCASTER, Badge.MODERATOR)
-                pointsToEarn(15)
-                messages(
-                    errorCreationPollUsage = "Pour créer un sondage : \"!poll <durée> <question>\"",
-                    errorDurationIsMissing = "Il faut choisir la durée du sondage !",
-                    newPoll = "Nouveau sondage : #TITLE# Utilisez !vote pour répondre",
-                    pollHasJustFinished = "Sondage terminé. #TITLE# #RESULTS#",
-                    currentPollResult = "Sondage en cours... #TITLE# #RESULTS#",
-                    pollHasNoVotes = "Personne n'a répondu à la question #TITLE#"
-                )
             }
             install(Whisper) {
                 whisper { messenger, whisper ->

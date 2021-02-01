@@ -12,7 +12,7 @@ import kotlin.concurrent.schedule
 class PollCommands(
     private val channel: String,
     private val privilegedBadges: Collection<Badge>,
-    private val messages: Messages,
+    private val i18n: PollI18n,
     private val pointsForEachVote: Int,
     private val extensionProvider: ExtensionProvider,
     private val timeParser: TimeParser = TimeParser()
@@ -58,7 +58,7 @@ class PollCommands(
     private fun startPoll(messenger: Messenger, commandEvent: CommandEvent) {
         val command = commandEvent.command
         if (command.options.size < 2) {
-            messenger.sendImmediately(channel, messages.errorCreationPollUsage)
+            messenger.sendImmediately(channel, i18n.errorCreationPollUsage)
             return
         }
 
@@ -66,16 +66,16 @@ class PollCommands(
         val title = command.options.subList(1, command.options.size).joinToString(" ")
 
         if (seconds == -1L) {
-            messenger.sendImmediately(channel, messages.errorDurationIsMissing)
+            messenger.sendImmediately(channel, i18n.errorDurationIsMissing)
             return
         }
 
         currentPoll = CurrentPoll(title)
-        messenger.sendImmediately(channel, messages.newPoll.replace("#TITLE#", title))
+        messenger.sendImmediately(channel, i18n.newPoll.replace("#TITLE#", title))
 
         Timer().schedule(seconds * 1000) {
             currentPoll?.let { poll ->
-                val resultMsg = generateResultMessage(poll, messages.pollHasJustFinished)
+                val resultMsg = generateResultMessage(poll, i18n.pollHasJustFinished)
                 messenger.sendImmediately(channel, resultMsg)
                 currentPoll = null
             }
@@ -84,7 +84,7 @@ class PollCommands(
 
     private fun showResult(messenger: Messenger) {
         currentPoll?.let { poll ->
-            val resultMsg = generateResultMessage(poll, messages.currentPollResult)
+            val resultMsg = generateResultMessage(poll, i18n.currentPollResult)
             messenger.sendImmediately(channel, resultMsg)
         }
     }
@@ -94,7 +94,7 @@ class PollCommands(
 
         return if (bestResults.isNotEmpty()) {
             val resultsMsg = bestResults.joinToString(", ") {
-                messages.oneResultFormat
+                i18n.oneResultFormat
                     .replace("#ANSWER#", it.first)
                     .replace("#COUNT#", it.second.toString())
             }
@@ -102,7 +102,7 @@ class PollCommands(
                 .replace("#TITLE#", poll.title)
                 .replace("#RESULTS#", resultsMsg)
         } else {
-            messages.pollHasNoVotes.replace("#TITLE#", poll.title)
+            i18n.pollHasNoVotes.replace("#TITLE#", poll.title)
         }
     }
 
