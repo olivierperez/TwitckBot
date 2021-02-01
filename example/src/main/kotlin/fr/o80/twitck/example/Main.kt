@@ -99,24 +99,6 @@ class Main : CliktCommand() {
                     }
                 }
             }
-            install(Channel) {
-                channel(botChannel)
-                command("!help") { messenger, _, _ ->
-                    messenger.sendImmediately(botChannel, "Il n'y a pas encore d'aide")
-                }
-                join { messenger, join ->
-                    if (!join.viewer.login.equals(botName, true)) {
-                        messenger.sendImmediately(
-                            join.channel,
-                            "Salut ${join.viewer.displayName} ! Que fais-tu ici ?"
-                        )
-                        messenger.sendImmediately(
-                            hostChannel,
-                            "Heu... Il y a ${join.viewer.displayName} qui est venu chez moi, je fais quoi ?"
-                        )
-                    }
-                }
-            }
         }*/
     }
 }
