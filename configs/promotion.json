@@ -3,7 +3,7 @@
   "enabled": true,
   "data": {
     "channel": "#gnu_coding_cafe",
-    "secondsBetweenTwoPromotions": 3600,
+    "secondsBetweenTwoPromotions": 7200,
     "daysSinceLastVideoToPromote": 120,
     "ignoreViewers": [
       "lurxx",
@@ -14,7 +14,7 @@
       "#USER# stream dans la catégorie #GAME#, n'hésitez pas à aller le voir #URL#",
       "Envie de #GAME# ? n'hésitez pas à aller voir #USER# -> #URL#"
     ],
-    "messages": {
+    "i18n": {
       "usage": "usage: $SHOUT_OUT_COMMAND <login>",
       "noPointsEnough": "#USER# tu n'as pas assez de codes source !",
       "noAutoShoutOut": "Petit malin #USER#...",

@@ -14,7 +14,7 @@ class RewardsCommands(
     private val extensionProvider: ExtensionProvider,
     private val claimTimeChecker: TimeChecker,
     private val claimedPoints: Int,
-    private val messages: RewardsMessages
+    private val i18n: RewardsI18n
 ) {
 
     fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
@@ -39,7 +39,7 @@ class RewardsCommands(
                 }
                 .sumBy { pointsManager -> pointsManager.getPoints(viewer.login) }
 
-            val message = messages.viewerJustClaimed
+            val message = i18n.viewerJustClaimed
                 .replace("#USER#", viewer.displayName)
                 .replace("#NEW_POINTS#", claimedPoints.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())

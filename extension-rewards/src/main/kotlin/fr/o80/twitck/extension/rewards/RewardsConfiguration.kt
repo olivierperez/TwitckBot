@@ -9,10 +9,10 @@ class RewardsConfiguration(
     val claimedPoints: Int,
     val secondsBetweenTwoTalkRewards: Long,
     val rewardedPoints: Int,
-    val messages: RewardsMessages
+    val i18n: RewardsI18n
 )
 
 @JsonClass(generateAdapter = true)
-class RewardsMessages(
+class RewardsI18n(
     val viewerJustClaimed: String
 )

@@ -16,7 +16,7 @@ const val POINTS_COMMAND_2 = "!points_info"
 class PointsCommands(
     private val channel: String,
     private val privilegedBadges: Collection<Badge>,
-    private val message: PointsMessages,
+    private val message: PointsI18n,
     private val bank: PointsBank,
     private val logger: Logger,
     private val storage: StorageExtension

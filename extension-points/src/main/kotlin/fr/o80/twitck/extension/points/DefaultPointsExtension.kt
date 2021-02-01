@@ -49,7 +49,7 @@ class DefaultPointsExtension(
             val pointsCommands = PointsCommands(
                 config.channel,
                 config.badges.map { Badge.fromValue(it) },
-                config.messages,
+                config.i18n,
                 bank,
                 logger,
                 storage

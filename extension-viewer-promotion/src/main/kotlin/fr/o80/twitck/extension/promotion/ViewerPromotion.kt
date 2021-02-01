@@ -97,7 +97,7 @@ class ViewerPromotion(
                     storage = storage,
                     sound = sound,
                     points = points,
-                    messages = config.messages
+                    i18n = config.i18n
                 ),
                 extensionProvider = serviceLocator.extensionProvider
             ).also { viewerPromotion ->

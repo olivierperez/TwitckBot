@@ -11,7 +11,7 @@ import java.time.Duration
 
 class MarketCommands(
     private val channel: String,
-    private val messages: MarketMessages,
+    private val i18n: MarketI18n,
     private val products: List<MarketProduct>,
     private val logger: Logger,
     private val extensionProvider: ExtensionProvider
@@ -33,7 +33,7 @@ class MarketCommands(
     private fun handleBuyCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
             extensionProvider.first(OverlayExtension::class)
-                .alert(messages.usage, Duration.ofSeconds(10))
+                .alert(i18n.usage, Duration.ofSeconds(10))
             return
         }
 
@@ -41,7 +41,7 @@ class MarketCommands(
             products.firstOrNull { product -> product.name == commandEvent.command.options[0] }
         if (product == null) {
             extensionProvider.first(OverlayExtension::class)
-                .alert(messages.productNotFound, Duration.ofSeconds(10))
+                .alert(i18n.productNotFound, Duration.ofSeconds(10))
             return
         }
 
@@ -51,7 +51,7 @@ class MarketCommands(
 
     private fun handleMarketCommand(messenger: Messenger, commandEvent: CommandEvent) {
         val productNames = products.joinToString(", ") { it.name }
-        val message = messages.weHaveThisProducts.replace("#PRODUCTS#", productNames)
+        val message = i18n.weHaveThisProducts.replace("#PRODUCTS#", productNames)
         messenger.sendImmediately(commandEvent.channel, message, CoolDown.ofSeconds(15))
     }
 
@@ -84,7 +84,7 @@ class MarketCommands(
         } else {
             messenger.sendImmediately(
                 channel,
-                messages.youDontHaveEnoughPoints.replace("#USER#", commandEvent.viewer.displayName)
+                i18n.youDontHaveEnoughPoints.replace("#USER#", commandEvent.viewer.displayName)
             )
         }
     }

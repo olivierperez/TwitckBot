@@ -69,7 +69,7 @@ class Rewards(
                 extensionProvider = serviceLocator.extensionProvider,
                 claimTimeChecker = lastClaimChecker,
                 claimedPoints = config.claimedPoints,
-                messages = config.messages
+                i18n = config.i18n
             )
 
             return Rewards(

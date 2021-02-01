@@ -9,11 +9,11 @@ class ViewerPromotionConfiguration(
     val daysSinceLastVideoToPromote: Long,
     val ignoreViewers: List<String>,
     val promotionMessages: List<String>,
-    val messages: ViewerPromotionMessages
+    val i18n: ViewerPromotionI18n
 )
 
 @JsonClass(generateAdapter = true)
-class ViewerPromotionMessages(
+class ViewerPromotionI18n(
     val usage: String,
     val noPointsEnough: String,
     val noAutoShoutOut: String,

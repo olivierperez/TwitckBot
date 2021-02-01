@@ -3,7 +3,7 @@
   "enabled": true,
   "data": {
     "channel": "#gnu_coding_cafe",
-    "messages": {
+    "i18n": {
       "couldNotGetProductPrice": "Impossible de calculer le prix pour l'achat demandé !",
       "productNotFound": "le produit n'existe pas",
       "usage": "Usage de !buy => !buy <produit> <paramètres>",

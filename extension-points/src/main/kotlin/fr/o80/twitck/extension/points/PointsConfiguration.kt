@@ -6,11 +6,11 @@ import com.squareup.moshi.JsonClass
 class PointsConfiguration(
     val channel: String,
     val badges: Array<String>,
-    val messages: PointsMessages
+    val i18n: PointsI18n
 )
 
 @JsonClass(generateAdapter = true)
-class PointsMessages(
+class PointsI18n(
     val destinationViewerDoesNotExist: String,
     val pointsTransferred: String,
     val notEnoughPoints: String,

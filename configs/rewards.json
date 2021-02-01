@@ -7,7 +7,7 @@
     "claimedPoints": 15,
     "secondsBetweenTwoTalkRewards": 300,
     "rewardedPoints": 5,
-    "messages": {
+    "i18n": {
       "viewerJustClaimed": "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
     }
   }

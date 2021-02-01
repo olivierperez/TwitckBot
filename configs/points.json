@@ -7,7 +7,7 @@
       "BROADCASTER",
       "MODERATOR"
     ],
-    "messages": {
+    "i18n": {
       "destinationViewerDoesNotExist": "Le destinataire n'existe pas",
       "pointsTransferred": "Codes source transferés de #FROM# à #TO#",
       "notEnoughPoints": "Les huissiers sont en route vers #FROM#",

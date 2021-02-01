@@ -29,7 +29,7 @@ class Market(
 
             val commands = MarketCommands(
                 config.channel,
-                config.messages,
+                config.i18n,
                 config.products,
                 logger,
                 serviceLocator.extensionProvider

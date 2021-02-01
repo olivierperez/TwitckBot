@@ -5,12 +5,12 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class MarketConfiguration(
     val channel: String,
-    val messages: MarketMessages,
+    val i18n: MarketI18n,
     val products: List<MarketProduct>
 )
 
 @JsonClass(generateAdapter = true)
-class MarketMessages(
+class MarketI18n(
     val productNotFound: String,
     val usage: String,
     val weHaveThisProducts: String,
