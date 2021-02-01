@@ -66,7 +66,7 @@ class Main : CliktCommand() {
             .install(InMemoryStatsExtension::installer)
             .install(DefaultPointsExtension::installer)
             .install(Rewards::installer)
-            .install(Market::installer)
+            .install(Market::installer) // TODO Refaire fonctionner !
             .install(Repeat::installer)
             .install(Welcome::installer)
             .install(ViewerPromotion::installer)
@@ -75,31 +75,6 @@ class Main : CliktCommand() {
             .install(WebSocketRemoteActions::installer)
             .install(Channel::installer)
             .create()
-
-        /*return twitckBot(oauthToken, hostName) {
-            install(Channel) {
-                channel(hostChannel)
-                follow { messenger, newFollowers, extensionProvider ->
-                    if (newFollowers.size == 1) {
-                        messenger.sendImmediately(
-                            hostChannel,
-                            "Merci ${newFollowers[0].fromName} pour ton follow !",
-                            CoolDown(Duration.ofHours(1))
-                        )
-                    } else {
-                        val names = newFollowers.joinToString(" ") { it.fromName }
-                        messenger.sendImmediately(
-                            hostChannel,
-                            "Merci pour vos follows $names",
-                            CoolDown(Duration.ofHours(1))
-                        )
-                    }
-                    extensionProvider.forEach(SoundExtension::class) { sound ->
-                        sound.playCelebration()
-                    }
-                }
-            }
-        }*/
     }
 }
 
