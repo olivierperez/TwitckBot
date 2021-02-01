@@ -31,43 +31,26 @@ class Main : CliktCommand() {
 
     private val oauthToken: String by option(help = "Oauth token of the bot").prompt("Bot's oauth token (oauth-token)")
     private val hostName: String by option(help = "Name of the host channel").prompt("Host's name (host-name)")
-    private val botName: String by option(help = "Name of the bot channel").prompt("Bot's name (bot-name)")
-    private val presenceName: String? by option(help = "Name of the host channel")
-    private val slobsHost: String by option(help = "Streamlabs host").prompt("Streamlabs host")
-    private val slobsPort: Int by option(help = "Streamlabs port").int().prompt("Streamlabs port")
-    private val slobsToken: String by option(help = "Streamlabs token").prompt("Streamlabs token")
 
     override fun run() {
-        val hostChannel = "#$hostName"
-        val botChannel = "#$botName"
-
         val bot = configureBot(
             oauthToken = oauthToken,
-            hostName = hostName,
-            hostChannel = hostChannel,
-            botName = botName,
-            botChannel = botChannel,
-            presenceChannel = presenceName
+            hostName = hostName
         )
 
         bot.connectToServer()
-        println("Initialized!")
-
-        bot.send(hostChannel, "En position !")
-        println("Ready to go!")
+        banner()
     }
 
     private fun configureBot(
         oauthToken: String,
-        hostName: String,
-        hostChannel: String,
-        botName: String,
-        botChannel: String,
-        presenceChannel: String?
+        hostName: String
     ): TwitckBot {
-        println("Start...")
+        println("Starting...")
         // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
 
+        // TODO OPZ Extension ACL
+        // TODO OPZ Extension Whisper
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
@@ -93,53 +76,6 @@ class Main : CliktCommand() {
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
-//            --AclExtension--
-//            install(CommandAcl) {
-//                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
-//                on("!points_give", Badge.FOUNDER)
-//            }
-            install(Whisper) {
-                whisper { messenger, whisper ->
-                    when {
-                        whisper.message.startsWith("!host") -> {
-                            val split = whisper.message.split(" ")
-                            when (split.size) {
-                                2 -> messenger.sendImmediately(botChannel, "/host ${split[1]}")
-                                else -> println("Quelque chose ne va pas dans la demande : \"${whisper.message}\"")
-                            }
-                        }
-                        whisper.message == "!unhost" -> {
-                            messenger.sendImmediately(botChannel, "/unhost")
-                        }
-                        whisper.message.startsWith("!shuto") -> {
-                            val split = whisper.message.split(" ")
-                            when (split.size) {
-                                2 -> messenger.sendImmediately(
-                                    hostChannel,
-                                    "Envoi d'un shuto à ${split[1]} !"
-                                )
-                                3 -> messenger.sendImmediately(
-                                    hostChannel,
-                                    "Envoi d'un shuto ${split[1]} à ${split[2]} !"
-                                )
-                            }
-                        }
-                        whisper.message.startsWith("!mawashi") -> {
-                            val split = whisper.message.split(" ")
-                            when (split.size) {
-                                2 -> messenger.sendImmediately(
-                                    hostChannel,
-                                    "Envoi d'un mawashi geri à ${split[1]} !"
-                                )
-                                3 -> messenger.sendImmediately(
-                                    hostChannel,
-                                    "Envoi d'un mawashi geri ${split[1]} à ${split[2]} !"
-                                )
-                            }
-                        }
-                    }
-                }
-            }
             install(Channel) {
                 channel(hostChannel)
                 follow { messenger, newFollowers, extensionProvider ->
@@ -160,42 +96,6 @@ class Main : CliktCommand() {
                     extensionProvider.forEach(SoundExtension::class) { sound ->
                         sound.playCelebration()
                     }
-                }
-                newSubscriptions { messenger, events ->
-                    events.forEach { subscription ->
-                        if (subscription.isGift) {
-                            messenger.sendWhenAvailable(
-                                hostChannel,
-                                "Merci ${subscription.gifterName} pour le cadeau à ${subscription.userName} !",
-                                Importance.HIGH
-                            )
-                        } else {
-                            messenger.sendWhenAvailable(
-                                hostChannel,
-                                "Merci ${subscription.userName} pour le sub!",
-                                Importance.HIGH
-                            )
-                        }
-                    }
-                }
-                notificationSubscriptions { messenger, events ->
-                    events.forEach { notification ->
-                        println("T'as un message de ${notification.userName} -> ${notification.message}")
-                    }
-                    messenger.sendImmediately(
-                        hostChannel,
-                        "DEBUG Hé $hostName, tu as vu le message de ${events.joinToString(", ") { it.userName }}"
-                    )
-                }
-                unknownTypeSubscriptions { messenger, eventType, events ->
-                    messenger.sendImmediately(
-                        hostChannel,
-                        "DEBUG J'ai reçu des notification bizarres, regarde donc les logs !"
-                    )
-                    println(">>Notifications bizarres<<\n\n")
-                    println("---${eventType}---\n$events\n---")
-                    events.forEach { println("$it") }
-                    println("\n\n>>/Notifications bizarres<<")
                 }
                 command("!screen") { _, _, extensionProvider ->
                     extensionProvider.first(SoundExtension::class).play("screen")
