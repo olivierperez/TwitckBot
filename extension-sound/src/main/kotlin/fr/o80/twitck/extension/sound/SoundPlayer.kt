@@ -13,14 +13,10 @@ class SoundPlayer(
     fun play(id: String) {
         val sound = sounds[id]
         if (sound != null) {
-            loadAndPlay(sound)
+            loadAndPlay(sound.path, sound.gain)
         } else {
             logger.error("Sound \"$id\" is not defined!")
         }
-    }
-
-    private fun loadAndPlay(soundConfig: OneSound) {
-        loadAndPlay(soundConfig.path, soundConfig.gain)
     }
 
     private fun loadAndPlay(fileName: String, masterGain: Float) {
