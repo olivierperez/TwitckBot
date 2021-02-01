@@ -3,8 +3,8 @@ package fr.o80.twitck.example
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
-import com.github.ajalt.clikt.parameters.types.int
 import fr.o80.twitck.extension.actions.WebSocketRemoteActions
+import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.DefaultPointsExtension
@@ -73,6 +73,7 @@ class Main : CliktCommand() {
             .install(RuntimeCommand::installer)
             .install(Poll::installer)
             .install(WebSocketRemoteActions::installer)
+            .install(Channel::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -96,20 +97,6 @@ class Main : CliktCommand() {
                     extensionProvider.forEach(SoundExtension::class) { sound ->
                         sound.playCelebration()
                     }
-                }
-                command("!screen") { _, _, extensionProvider ->
-                    extensionProvider.first(SoundExtension::class).play("screen")
-                }
-                command("!yata") { _, _, extensionProvider ->
-                    extensionProvider.first(SoundExtension::class).play("yata")
-                    extensionProvider.showImage("image/vahine.gif", "Yata Yata Yata")
-                }
-                command("!youpi") { _, _, extensionProvider ->
-                    extensionProvider.first(SoundExtension::class).play("youpi")
-                    extensionProvider.showImage("image/vahine.gif", "Youpi !")
-                }
-                command("!gogol") { _, _, extensionProvider ->
-                    extensionProvider.first(SoundExtension::class).play("gogol")
                 }
             }
             install(Channel) {

@@ -8,18 +8,22 @@ import kotlin.reflect.KClass
 
 interface ConfigService {
     fun <T : Any> getConfig(file: String, clazz: KClass<T>): T
+    fun <T : Any> getConfig(file: String, clazz: KClass<T>, moshi: Moshi): T
 }
 
 class ConfigServiceImpl(
     private val configDirectory: File
 ) : ConfigService {
 
-    private val moshi = Moshi.Builder().build()
+    private val defaultMoshi = Moshi.Builder().build()
 
-    override fun <T : Any> getConfig(file: String, clazz: KClass<T>): T {
+    override fun <T : Any> getConfig(file: String, clazz: KClass<T>, moshi: Moshi): T {
         val types = Types.newParameterizedType(ExtensionConfig::class.java, clazz.java)
         return moshi.adapter<ExtensionConfig<T>>(types)!!
             .fromJson(File(configDirectory, file).readText())!!.data
     }
+
+    override fun <T : Any> getConfig(file: String, clazz: KClass<T>): T =
+        getConfig(file, clazz, defaultMoshi)
 
 }
