@@ -67,7 +67,7 @@ class LwjglOverlay(
     }
 
     private fun start() {
-        // TODO OPZ Remettre : Thread(overlay).start()
+        Thread(overlay).start()
         overlay.registerRender(informationRenderer)
         overlay.registerRender(popupImageRenderer)
     }
