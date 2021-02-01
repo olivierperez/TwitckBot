@@ -1,4 +1,5 @@
 .backup/
+.config/
 .idea/
 .gradle/
 .storage/

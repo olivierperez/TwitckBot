@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
+import fr.o80.twitck.extension.actions.WebSocketRemoteActions
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.market.Market
 import fr.o80.twitck.extension.points.DefaultPointsExtension
@@ -71,7 +72,7 @@ class Main : CliktCommand() {
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer +9min Va chercher la pizza)
         // TODO idée GiftSub !cron pour que le bot nous rappel des choses (genre !timer !pizza +97min Va chercher la pizza, puis !pizza => "dans 34 minutes")
         return BotFactory(
-            configDirectory = File("./configs/"),
+            configDirectory = File("./.config/"),
             oauthToken = oauthToken,
             hostName = hostName
         )
@@ -88,6 +89,7 @@ class Main : CliktCommand() {
             .install(ViewerPromotion::installer)
             .install(RuntimeCommand::installer)
             .install(Poll::installer)
+            .install(WebSocketRemoteActions::installer)
             .create()
 
         /*return twitckBot(oauthToken, hostName) {
@@ -96,10 +98,6 @@ class Main : CliktCommand() {
 //                on("!points_add", Badge.BROADCASTER, Badge.MODERATOR)
 //                on("!points_give", Badge.FOUNDER)
 //            }
-            install(WebSocketRemoteActions) {
-                channel(hostChannel)
-                slobs(slobsHost, slobsPort, slobsToken)
-            }
             install(Whisper) {
                 whisper { messenger, whisper ->
                     when {
@@ -230,11 +228,6 @@ class Main : CliktCommand() {
                             "Heu... Il y a ${join.viewer.displayName} qui est venu chez moi, je fais quoi ?"
                         )
                     }
-                }
-            }
-            presenceChannel?.let {
-                install(Presence) {
-                    channel("#$presenceChannel")
                 }
             }
         }*/

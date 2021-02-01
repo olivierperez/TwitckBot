@@ -1,7 +1,0 @@
-{
-  "extension": "DefaultSoundExtension",
-  "enabled": true,
-  "data": {
-    "storageDirectory": ".storage_test/"
-  }
-}
