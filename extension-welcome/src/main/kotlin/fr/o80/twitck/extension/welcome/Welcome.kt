@@ -70,7 +70,9 @@ class Welcome(
 
         if (messagesForBroadcaster.isNotEmpty() && Badge.BROADCASTER in viewer.badges) {
             welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
-                welcomeHost(channel, messagesForBroadcaster.random(), messenger)
+                val message = messagesForBroadcaster.random()
+                    .replace("#USER#", viewer.displayName)
+                welcomeHost(channel, message, messenger)
             }
             return
         }
