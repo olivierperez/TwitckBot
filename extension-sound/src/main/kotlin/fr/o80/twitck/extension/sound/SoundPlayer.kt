@@ -2,6 +2,10 @@ package fr.o80.twitck.extension.sound
 
 import fr.o80.twitck.lib.api.service.log.Logger
 import java.io.BufferedInputStream
+import java.io.File
+import java.io.InputStream
+import java.nio.file.Files
+import java.nio.file.Paths
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
 
@@ -22,8 +26,7 @@ class SoundPlayer(
     private fun loadAndPlay(fileName: String, masterGain: Float) {
         try {
             val clip = AudioSystem.getClip()
-            val resourceAsStream = javaClass.classLoader.getResourceAsStream(fileName)
-                ?: throw IllegalArgumentException("File not found! \"$fileName\"")
+            val resourceAsStream = getSoundStream(fileName)
             val bufferedAudioStream = BufferedInputStream(resourceAsStream)
             val audioInputStream = AudioSystem.getAudioInputStream(bufferedAudioStream)
             clip.open(audioInputStream)
@@ -32,6 +35,16 @@ class SoundPlayer(
             clip.start()
         } catch (e: Exception) {
             logger.error("Something gone wrong while playing $fileName", e)
+        }
+    }
+
+    private fun getSoundStream(fileName: String): InputStream {
+        val audioFile = File(fileName)
+        return if (audioFile.isFile && audioFile.canRead()) {
+            audioFile.inputStream()
+        } else {
+            SoundPlayer::class.java.classLoader.getResourceAsStream(fileName)
+                ?: throw IllegalArgumentException("File not found! \"$fileName\"")
         }
     }
 
