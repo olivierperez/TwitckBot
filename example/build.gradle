@@ -1,6 +1,3 @@
-group 'fr.o80.twitck'
-version '1.0-SNAPSHOT'
-
 repositories {
     maven { url "https://jitpack.io" }
 }
