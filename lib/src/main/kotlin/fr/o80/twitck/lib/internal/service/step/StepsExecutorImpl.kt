@@ -1,19 +1,22 @@
-package fr.o80.twitck.extension.channel
+package fr.o80.twitck.lib.internal.service.step
 
-import fr.o80.twitck.extension.channel.config.CommandStep
-import fr.o80.twitck.extension.channel.config.MessageStep
-import fr.o80.twitck.extension.channel.config.OverlayStep
-import fr.o80.twitck.extension.channel.config.SoundStep
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.step.CommandStep
+import fr.o80.twitck.lib.api.service.step.MessageStep
+import fr.o80.twitck.lib.api.service.step.OverlayStep
+import fr.o80.twitck.lib.api.service.step.SoundStep
+import fr.o80.twitck.lib.api.service.step.StepParam
+import fr.o80.twitck.lib.api.service.step.StepsExecutor
 import java.time.Duration
 
-class StepsExecutor(
+internal class StepsExecutorImpl(
     private val extensionProvider: ExtensionProvider
-) {
-    fun execute(
+) : StepsExecutor {
+
+    override fun execute(
         steps: List<CommandStep>,
         messenger: Messenger,
         param: StepParam
@@ -48,12 +51,8 @@ class StepsExecutor(
         extensionProvider.first(SoundExtension::class)
             .play(step.soundId)
     }
-}
 
-class StepParam(
-    val channel: String,
-    val viewerName: String
-)
+}
 
 private fun String.formatFor(viewerName: String): String {
     return this.replace("#USER#", viewerName)

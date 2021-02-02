@@ -1,12 +1,6 @@
 package fr.o80.twitck.extension.channel
 
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import fr.o80.twitck.extension.channel.config.ChannelConfiguration
-import fr.o80.twitck.extension.channel.config.CommandStep
-import fr.o80.twitck.extension.channel.config.MessageStep
-import fr.o80.twitck.extension.channel.config.OverlayStep
-import fr.o80.twitck.extension.channel.config.SoundStep
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.internal.service.ConfigService
@@ -21,13 +15,11 @@ class Channel {
         ): Channel {
             val config = configService.getConfig(
                 "channel.json",
-                ChannelConfiguration::class,
-                channelConfigMoshi()
+                ChannelConfiguration::class
             )
 
-            val stepsExecutor = StepsExecutor(serviceLocator.extensionProvider)
-            val commands = ChannelCommands(config.commands, stepsExecutor)
-            val follows = ChannelFollows(config.follows, stepsExecutor)
+            val commands = ChannelCommands(config.commands, serviceLocator.stepsExecutor)
+            val follows = ChannelFollows(config.follows, serviceLocator.stepsExecutor)
 
             return Channel().also {
                 pipeline.requestChannel(config.channel)
@@ -37,14 +29,5 @@ class Channel {
 //                pipeline.interceptSubscriptionEvent(channel::interceptSubscriptionEvent)
             }
         }
-
-        private fun channelConfigMoshi() = Moshi.Builder()
-            .add(
-                PolymorphicJsonAdapterFactory.of(CommandStep::class.java, "type")
-                    .withSubtype(SoundStep::class.java, CommandStep.Type.SOUND.value)
-                    .withSubtype(OverlayStep::class.java, CommandStep.Type.OVERLAY.value)
-                    .withSubtype(MessageStep::class.java, CommandStep.Type.MESSAGE.value)
-            )
-            .build()
     }
 }

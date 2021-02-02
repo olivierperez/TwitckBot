@@ -1,8 +1,10 @@
 package fr.o80.twitck.extension.channel
 
-import fr.o80.twitck.extension.channel.config.CommandStep
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.step.CommandStep
+import fr.o80.twitck.lib.api.service.step.StepParam
+import fr.o80.twitck.lib.api.service.step.StepsExecutor
 
 class ChannelCommands(
     private val commandConfigs: Map<String, List<CommandStep>>,

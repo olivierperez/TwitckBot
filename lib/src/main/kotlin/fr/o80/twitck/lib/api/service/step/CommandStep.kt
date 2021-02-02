@@ -1,4 +1,4 @@
-package fr.o80.twitck.extension.channel.config
+package fr.o80.twitck.lib.api.service.step
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
