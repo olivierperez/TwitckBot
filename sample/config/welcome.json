@@ -1,0 +1,33 @@
+{
+  "extension": "Welcome",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "streamId": "<Your streamer id>",
+    "secondsBetweenWelcomes": 7200,
+    "ignoreViewers": [
+      "lurxx",
+      "anotherttvviewer",
+      "letsdothis_streamers"
+    ],
+    "messages": {
+      "forBroadcaster": [
+        "Hey #USER#! Welcome home!"
+      ],
+      "forViewers": [
+        "#USER# just arrived to the place to be",
+        "#USER# almost downloaded all Wikipedia content"
+      ],
+      "forFollowers": [
+        "Please give seat to #USER#",
+        "Bring some water to #USER#, a beer is fine too"
+      ]
+    },
+    "reactTo": {
+      "joins": false,
+      "messages": true,
+      "commands": false,
+      "raids": true
+    }
+  }
+}

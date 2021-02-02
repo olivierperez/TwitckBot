@@ -1,0 +1,43 @@
+{
+  "extension": "Market",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "i18n": {
+      "productNotFound": "The product doesn't exist!",
+      "usage": "Usage of !buy => !buy <produit> <paramètres>",
+      "weHaveThisProducts": "Here is what I can sell: #PRODUCTS#",
+      "youDontHaveEnoughPoints": "@#USER# you're too poor to afford this product!"
+    },
+    "products": [
+      {
+        "name": "command",
+        "price": 200,
+        "steps": [
+          {
+            "type": "command",
+            "command": "!cmd permanent !#USER# #PARAMS#"
+          },
+          {
+            "type": "sound",
+            "sound": "positive"
+          }
+        ]
+      },
+      {
+        "name": "hello",
+        "price": 20,
+        "steps": [
+          {
+            "type": "message",
+            "message": "Hello #PARAM-0#"
+          },
+          {
+            "type": "sound",
+            "sound": "positive"
+          }
+        ]
+      }
+    ]
+  }
+}
