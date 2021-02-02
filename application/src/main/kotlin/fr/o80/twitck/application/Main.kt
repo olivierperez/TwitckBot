@@ -1,4 +1,4 @@
-package fr.o80.twitck.example
+package fr.o80.twitck.application
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
