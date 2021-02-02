@@ -12,7 +12,7 @@ class PointsBank(
         extensionProvider.provide(StorageExtension::class).first()
     }
 
-    private val namespace: String = Points::class.java.name
+    private val namespace: String = DefaultPointsExtension::class.java.name
 
     private val lock = Any()
 

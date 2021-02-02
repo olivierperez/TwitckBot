@@ -12,21 +12,21 @@ import kotlin.test.assertEquals
 class PollCommandsTest {
 
     @MockK
-    lateinit var messages: Messages
+    lateinit var i18n: PollI18n
 
-    lateinit var pollCommands: PollCommands
+    private lateinit var pollCommands: PollCommands
 
     @BeforeTest
     fun setup() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        every { messages.pollHasNoVotes } returns "pas de votes pour #TITLE#"
-        every { messages.oneResultFormat } returns "[#ANSWER#|#COUNT#]"
+        every { i18n.pollHasNoVotes } returns "pas de votes pour #TITLE#"
+        every { i18n.oneResultFormat } returns "[#ANSWER#|#COUNT#]"
 
         pollCommands = PollCommands(
             channel = "channel",
-            privilegedBadges = arrayOf(),
-            messages = messages,
+            privilegedBadges = listOf(),
+            i18n = i18n,
             pointsForEachVote = 5,
             extensionProvider = mockk()
         )

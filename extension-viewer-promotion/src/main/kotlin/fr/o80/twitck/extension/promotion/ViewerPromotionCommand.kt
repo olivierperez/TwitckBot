@@ -2,7 +2,7 @@ package fr.o80.twitck.extension.promotion
 
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.PointsManager
+import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -17,8 +17,8 @@ class ViewerPromotionCommand(
     private val channel: String,
     private val storage: StorageExtension,
     private val sound: SoundExtension,
-    private val points: PointsManager,
-    private val messages: ViewerPromotionMessages
+    private val points: PointsExtension,
+    private val i18n: ViewerPromotionI18n
 ) {
 
     private val namespace: String = ViewerPromotion::class.java.name
@@ -41,7 +41,7 @@ class ViewerPromotionCommand(
     private fun showUsage(messenger: Messenger, commandEvent: CommandEvent) {
         messenger.sendImmediately(
             commandEvent.channel,
-            messages.usage
+            i18n.usage
         )
     }
 
@@ -61,14 +61,14 @@ class ViewerPromotionCommand(
         val message = commandEvent.command.options.skip(1).joinToString(" ")
 
         if (viewerLogin == shoutOutLogin) {
-            val errorMessage = messages.noAutoShoutOut.replace("#USER#", viewerLogin)
+            val errorMessage = i18n.noAutoShoutOut.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
             sound.playNegative()
             return
         }
 
         if(!points.consumePoints(viewerLogin, RECORDING_COST)) {
-            val errorMessage = messages.noPointsEnough.replace("#USER#", viewerLogin)
+            val errorMessage = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
             sound.playNegative()
             return
@@ -76,7 +76,7 @@ class ViewerPromotionCommand(
 
         if (storage.hasUserInfo(shoutOutLogin)) {
             storage.putUserInfo(shoutOutLogin, namespace, SHOUT_OUT_COMMAND, message)
-            messenger.sendImmediately(channel, messages.shoutOutRecorded)
+            messenger.sendImmediately(channel, i18n.shoutOutRecorded)
         }
     }
 
@@ -85,14 +85,14 @@ class ViewerPromotionCommand(
         val shoutOutLogin = commandEvent.command.options[0]
 
         if (viewerLogin == shoutOutLogin) {
-            val errorMessage = messages.noAutoShoutOut.replace("#USER#", viewerLogin)
+            val errorMessage = i18n.noAutoShoutOut.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
             sound.playNegative()
             return
         }
 
         if(!points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
-            val message = messages.noPointsEnough.replace("#USER#", viewerLogin)
+            val message = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, message)
             return
         }

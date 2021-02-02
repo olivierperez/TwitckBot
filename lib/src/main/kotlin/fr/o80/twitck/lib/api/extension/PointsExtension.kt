@@ -1,6 +1,6 @@
 package fr.o80.twitck.lib.api.extension
 
-interface PointsManager {
+interface PointsExtension {
     val channel: String
     fun getPoints(login: String): Int
     fun addPoints(login: String, points: Int)

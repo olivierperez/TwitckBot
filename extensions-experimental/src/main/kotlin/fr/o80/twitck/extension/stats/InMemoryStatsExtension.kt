@@ -7,15 +7,15 @@ import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
-import fr.o80.twitck.lib.api.extension.Stat
-import fr.o80.twitck.lib.api.extension.TwitckExtension
+import fr.o80.twitck.lib.api.extension.StatsExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
+import fr.o80.twitck.lib.internal.service.ConfigService
 
-class StatsExtension(
+class InMemoryStatsExtension(
     private val channel: String,
     private val statsData: StatsData,
     private val statsCommand: StatsCommand
-) : Stat {
+) : StatsExtension {
 
     fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
         statsData.hit(
@@ -96,64 +96,44 @@ class StatsExtension(
         statsData.hit(namespace, key, extra)
     }
 
-    class Configuration {
+    companion object {
+        fun installer(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configService: ConfigService
+        ): StatsExtension {
+            val config = configService.getConfig("stats.json", StatsConfiguration::class)
 
-        @DslMarker
-        private annotation class Dsl
-
-        private var channel: String? = null
-
-        @Dsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        fun build(serviceLocator: ServiceLocator): StatsExtension {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${StatsExtension::class.simpleName}")
-
+            val channelName = config.channel
             val statsData = StatsData()
-            val logger = serviceLocator.loggerFactory.getLogger(StatsExtension::class)
+            val logger = serviceLocator.loggerFactory.getLogger(InMemoryStatsExtension::class)
 
             val statsCommand = StatsCommand(statsData, logger)
 
-            return StatsExtension(channelName, statsData, statsCommand)
-        }
-    }
-
-    companion object Extension : TwitckExtension<Configuration, StatsExtension> {
-        override fun install(
-            pipeline: Pipeline,
-            serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): StatsExtension {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { stats ->
-                    pipeline.requestChannel(stats.channel)
-                    pipeline.interceptCommandEvent { _, commandEvent ->
-                        stats.interceptCommandEvent(commandEvent)
-                    }
-                    pipeline.interceptFollowEvent { _, followsEvent ->
-                        stats.interceptFollowEvent(followsEvent)
-                    }
-                    pipeline.interceptJoinEvent { _, joinEvent ->
-                        stats.interceptJoinEvent(joinEvent)
-                    }
-                    pipeline.interceptMessageEvent { _, messageEvent ->
-                        stats.interceptMessageEvent(messageEvent)
-                    }
-                    pipeline.interceptSubscriptionEvent { _, subscriptionEvent ->
-                        stats.interceptSubscriptionEvent(subscriptionEvent)
-                    }
-                    pipeline.interceptWhisperEvent { _, whisperEvent ->
-                        stats.interceptWhisperEvent(whisperEvent)
-                    }
-                    pipeline.interceptCommandEvent { messenger, commandEvent ->
-                        stats.statsCommand.interceptCommandEvent(messenger, commandEvent)
-                    }
+            return InMemoryStatsExtension(channelName, statsData, statsCommand).also { stats ->
+                pipeline.requestChannel(stats.channel)
+                pipeline.interceptCommandEvent { _, commandEvent ->
+                    stats.interceptCommandEvent(commandEvent)
                 }
+                pipeline.interceptFollowEvent { _, followsEvent ->
+                    stats.interceptFollowEvent(followsEvent)
+                }
+                pipeline.interceptJoinEvent { _, joinEvent ->
+                    stats.interceptJoinEvent(joinEvent)
+                }
+                pipeline.interceptMessageEvent { _, messageEvent ->
+                    stats.interceptMessageEvent(messageEvent)
+                }
+                pipeline.interceptSubscriptionEvent { _, subscriptionEvent ->
+                    stats.interceptSubscriptionEvent(subscriptionEvent)
+                }
+                pipeline.interceptWhisperEvent { _, whisperEvent ->
+                    stats.interceptWhisperEvent(whisperEvent)
+                }
+                pipeline.interceptCommandEvent { messenger, commandEvent ->
+                    stats.statsCommand.interceptCommandEvent(messenger, commandEvent)
+                }
+            }
         }
     }
 

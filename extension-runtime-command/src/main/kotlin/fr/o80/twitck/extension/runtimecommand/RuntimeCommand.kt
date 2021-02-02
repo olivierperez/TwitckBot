@@ -2,17 +2,17 @@ package fr.o80.twitck.extension.runtimecommand
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
-import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.CoolDown
+import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.HelperExtension
+import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
-import fr.o80.twitck.lib.api.extension.TwitckExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.internal.service.ConfigService
 import java.time.Duration
-import java.util.Locale
+import java.util.*
 
 const val SCOPE_STREAM = "stream"
 const val SCOPE_PERMANENT = "permanent"
@@ -20,7 +20,7 @@ const val SCOPE_PERMANENT = "permanent"
 // TODO OPZ Extraire la partie gestion des commandes
 class RuntimeCommand(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>,
+    private val privilegedBadges: Collection<Badge>,
     private val extensionProvider: ExtensionProvider,
     private val logger: Logger
 ) {
@@ -33,7 +33,7 @@ class RuntimeCommand(
 
     private val runtimeCommands = mutableMapOf<String, String?>()
 
-    private fun onInstallationFinished() {
+    init {
         storage.getGlobalInfo(namespace)
             .filter { it.first.startsWith("Command//") }
             .forEach { runtimeCommands[it.first.substring("Command//".length)] = it.second }
@@ -91,7 +91,7 @@ class RuntimeCommand(
         }
     }
 
-    fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
+    private fun registerRuntimeCommand(newCommand: String, scope: String, message: String) {
         runtimeCommands[newCommand] = message
 
         if (scope == SCOPE_PERMANENT) {
@@ -100,62 +100,33 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.forEach(HelperExtension::class) { helper -> helper.registerCommand(newCommand) }
-    }
-
-    class Configuration {
-
-        @DslMarker
-        private annotation class RuntimeCommandDsl
-
-        private var channel: String? = null
-        private var badges: Array<out Badge>? = null
-
-        @RuntimeCommandDsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        @RuntimeCommandDsl
-        fun privilegedBadges(vararg badges: Badge) {
-            if (badges.isEmpty()) {
-                throw IllegalArgumentException("Impossible to set an empty list of privileged badges.")
-            }
-            this.badges = badges
-        }
-
-        fun build(serviceLocator: ServiceLocator): RuntimeCommand {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${RuntimeCommand::class.simpleName}")
-            val theBadges = badges ?: arrayOf(Badge.BROADCASTER)
-            return RuntimeCommand(
-                channelName,
-                theBadges,
-                serviceLocator.extensionProvider,
-                serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
-            )
+        extensionProvider.forEach(HelpExtension::class) { helper ->
+            helper.registerCommand(newCommand)
         }
     }
 
-    companion object Extension : TwitckExtension<Configuration, RuntimeCommand> {
-        override fun install(
+    companion object {
+        fun installer(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
+            configService: ConfigService
         ): RuntimeCommand {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { runtimeCommand ->
-                    pipeline.requestChannel(runtimeCommand.channel)
-                    pipeline.interceptCommandEvent { messenger, commandEvent ->
-                        runtimeCommand.interceptCommandEvent(
-                            messenger,
-                            commandEvent
-                        )
-                    }
-                    runtimeCommand.onInstallationFinished()
+            val config = configService.getConfig("runtime_commands.json", RuntimeCommandConfiguration::class)
+            return RuntimeCommand(
+                config.channel,
+                config.privilegedBadges,
+                serviceLocator.extensionProvider,
+                serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
+            ).also { runtimeCommand ->
+                pipeline.requestChannel(config.channel)
+                pipeline.interceptCommandEvent { messenger, commandEvent ->
+                    runtimeCommand.interceptCommandEvent(
+                        messenger,
+                        commandEvent
+                    )
                 }
+            }
         }
     }
+
 }

@@ -15,9 +15,9 @@ const val POINTS_COMMAND_2 = "!points_info"
 
 class PointsCommands(
     private val channel: String,
-    private val privilegedBadges: Array<out Badge>,
+    private val privilegedBadges: Collection<Badge>,
+    private val message: PointsI18n,
     private val bank: PointsBank,
-    private val message: Messages,
     private val logger: Logger,
     private val storage: StorageExtension
 ) {
@@ -99,6 +99,6 @@ class PointsCommands(
                 .replace("#POINTS#", points.toString())
         }
 
-        messenger.whisper(commandEvent.channel, commandEvent.viewer.login, msg)
+        messenger.sendImmediately(commandEvent.channel, msg)
     }
 }

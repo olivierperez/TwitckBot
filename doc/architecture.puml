@@ -1,0 +1,24 @@
+@startuml
+'https://plantuml.com/component-diagram
+
+
+package "Twitch" {
+    [Hooks]
+    [TwitchApi]
+    [IRC]
+}
+
+package "Domain" {
+    [Bot]
+
+    Bot <--> [ViewerPromotion]
+    Bot <--> [Welcome]
+    Bot <--> [RuntimeCommand]
+
+    Hooks ..> Bot
+    TwitchApi <-- Bot
+    IRC <--> Bot
+}
+
+
+@enduml

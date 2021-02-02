@@ -16,7 +16,7 @@ internal class ViewerTest {
             color = "transparent"
         )
 
-        val hasNoPrivileges = viewer hasNoPrivilegesOf arrayOf(Badge.BITS_LEADER, Badge.BROADCASTER)
+        val hasNoPrivileges = viewer hasNoPrivilegesOf listOf(Badge.BITS_LEADER, Badge.BROADCASTER)
 
         assertFalse(hasNoPrivileges, "Viewer has the privilege BIT_LEADER he should succeed the check")
     }
@@ -31,7 +31,7 @@ internal class ViewerTest {
             color = "transparent"
         )
 
-        val hasNoPrivileges = viewer hasNoPrivilegesOf arrayOf(Badge.FOUNDER, Badge.BROADCASTER)
+        val hasNoPrivileges = viewer hasNoPrivilegesOf listOf(Badge.FOUNDER, Badge.BROADCASTER)
 
         assertTrue(hasNoPrivileges, "Viewer has none of the required privileges")
     }

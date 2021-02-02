@@ -2,9 +2,13 @@ package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
-import fr.o80.twitck.lib.api.extension.*
+import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.extension.HelpExtension
+import fr.o80.twitck.lib.api.extension.PointsExtension
+import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
+import fr.o80.twitck.lib.internal.service.ConfigService
 import java.time.Duration
 
 class Rewards(
@@ -16,7 +20,7 @@ class Rewards(
 ) {
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelperExtension::class) { help ->
+        extensionProvider.forEach(HelpExtension::class) { help ->
             help.registerCommand("!claim")
         }
     }
@@ -30,58 +34,20 @@ class Rewards(
         if (rewardedPoints == 0) return
 
         talkingTimeChecker.executeIfNotCooldown(messageEvent.viewer.login) {
-            extensionProvider.forEach(PointsManager::class) { points ->
+            extensionProvider.forEach(PointsExtension::class) { points ->
                 points.addPoints(messageEvent.viewer.login, rewardedPoints)
             }
         }
     }
 
-    class Configuration {
-
-        @DslMarker
-        private annotation class Dsl
-
-        private var channel: String? = null
-
-        private var intervalBetweenTwoClaims: Duration = Duration.ofHours(12)
-        private var claimedPoints: Int = 0
-
-        private var intervalBetweenTwoTalkRewards: Duration = Duration.ofMinutes(15)
-        private var rewardedPoints: Int = 0
-
-        private var messages: Messages? = null
-
-        @Dsl
-        fun channel(channel: String) {
-            this.channel = channel
-        }
-
-        @Dsl
-        fun claim(points: Int, time: Duration) {
-            claimedPoints = points
-            intervalBetweenTwoClaims = time
-        }
-
-        @Dsl
-        fun rewardTalkativeViewers(points: Int, time: Duration) {
-            rewardedPoints = points
-            intervalBetweenTwoTalkRewards = time
-        }
-
-        @Dsl
-        fun messages(
-            viewerJustClaimed: String,
-        ) {
-            messages = Messages(
-                viewerJustClaimed = viewerJustClaimed
-            )
-        }
-
-        fun build(serviceLocator: ServiceLocator): Rewards {
-            val channelName = channel
-                ?: throw IllegalStateException("Channel must be set for the extension ${Rewards::class.simpleName}")
-            val theMessages = messages
-                ?: throw IllegalStateException("Messages must be set for the extension ${Rewards::class.simpleName}")
+    companion object {
+        fun installer(
+            pipeline: Pipeline,
+            serviceLocator: ServiceLocator,
+            configService: ConfigService
+        ): Rewards {
+            val config = configService.getConfig("rewards.json", RewardsConfiguration::class)
+            val channelName = config.channel
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
 
@@ -89,21 +55,21 @@ class Rewards(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "claimedAt",
-                interval = intervalBetweenTwoClaims
+                interval = Duration.ofSeconds(config.secondsBetweenTwoClaims)
             )
             val lastTalkChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "talkedRewardedAt",
-                interval = intervalBetweenTwoTalkRewards
+                interval = Duration.ofSeconds(config.secondsBetweenTwoTalkRewards)
             )
 
             val commands = RewardsCommands(
                 channel = channelName,
                 extensionProvider = serviceLocator.extensionProvider,
                 claimTimeChecker = lastClaimChecker,
-                claimedPoints = claimedPoints,
-                messages = theMessages
+                claimedPoints = config.claimedPoints,
+                i18n = config.i18n
             )
 
             return Rewards(
@@ -111,32 +77,19 @@ class Rewards(
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
                 talkingTimeChecker = lastTalkChecker,
-                rewardedPoints = rewardedPoints
-            )
-        }
-    }
-
-    companion object Extension : TwitckExtension<Configuration, Rewards> {
-        override fun install(
-            pipeline: Pipeline,
-            serviceLocator: ServiceLocator,
-            configure: Configuration.() -> Unit
-        ): Rewards {
-            return Configuration()
-                .apply(configure)
-                .build(serviceLocator)
-                .also { rewards ->
-                    pipeline.interceptCommandEvent { _, commandEvent ->
-                        rewards.commands.interceptCommandEvent(commandEvent)
-                    }
-                    pipeline.interceptMessageEvent { _, messageEvent ->
-                        rewards.interceptMessageEvent(messageEvent)
-                    }
-                    pipeline.requestChannel(rewards.channel)
-                    rewards.onInstallationFinished()
+                rewardedPoints = config.rewardedPoints
+            ).also { rewards ->
+                pipeline.requestChannel(rewards.channel)
+                pipeline.interceptCommandEvent { _, commandEvent ->
+                    rewards.commands.interceptCommandEvent(commandEvent)
                 }
+                pipeline.interceptMessageEvent { _, messageEvent ->
+                    rewards.interceptMessageEvent(messageEvent)
+                }
+                rewards.onInstallationFinished()
+            }
         }
-
     }
+
 }
 

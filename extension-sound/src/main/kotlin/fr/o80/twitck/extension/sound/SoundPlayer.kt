@@ -7,20 +7,16 @@ import javax.sound.sampled.FloatControl
 
 class SoundPlayer(
     private val logger: Logger,
-    private val sounds: MutableMap<String, SoundConfig>
+    private val sounds: Map<String, OneSound>
 ) {
 
     fun play(id: String) {
         val sound = sounds[id]
-        if (sound!= null) {
-            loadAndPlay(sound)
+        if (sound != null) {
+            loadAndPlay(sound.path, sound.gain)
         } else {
             logger.error("Sound \"$id\" is not defined!")
         }
-    }
-
-    private fun loadAndPlay(soundConfig: SoundConfig) {
-        loadAndPlay(soundConfig.file, soundConfig.gain)
     }
 
     private fun loadAndPlay(fileName: String, masterGain: Float) {

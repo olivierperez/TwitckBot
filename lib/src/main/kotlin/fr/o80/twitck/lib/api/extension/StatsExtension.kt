@@ -1,5 +1,5 @@
 package fr.o80.twitck.lib.api.extension
 
-interface Stat {
+interface StatsExtension {
     fun hit(namespace: String, key: String, extra: Map<String, Any>)
 }

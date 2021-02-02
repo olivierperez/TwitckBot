@@ -16,7 +16,7 @@ class PopupImageRenderer(
     private val width: Int,
     private val textRenderer: TextRenderer = TextRenderer(
         "fonts/Roboto-Black.ttf",
-        fontHeight = 70f
+        fontHeight = 55f
     ),
     private val textColor: Vertex3f,
     private val backgroundColor: Vertex3f,
