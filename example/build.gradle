@@ -23,6 +23,7 @@ dependencies {
     implementation project(':extension-repeat')
     implementation project(':extension-rewards')
     implementation project(':extension-runtime-command')
+    implementation project(':extension-sound')
     implementation project(':extension-storage')
     implementation project(':extension-viewer-promotion')
     implementation project(':extension-welcome')
