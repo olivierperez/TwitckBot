@@ -3,6 +3,7 @@ package fr.o80.twitck.lib.internal.service
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import fr.o80.twitck.lib.api.service.step.ActionStep
 import fr.o80.twitck.lib.api.service.step.CommandStep
 import fr.o80.twitck.lib.api.service.step.MessageStep
 import fr.o80.twitck.lib.api.service.step.OverlayStep
@@ -21,10 +22,11 @@ class ConfigServiceImpl(
 
     private val moshi = Moshi.Builder()
         .add(
-            PolymorphicJsonAdapterFactory.of(CommandStep::class.java, "type")
-                .withSubtype(SoundStep::class.java, CommandStep.Type.SOUND.value)
-                .withSubtype(OverlayStep::class.java, CommandStep.Type.OVERLAY.value)
-                .withSubtype(MessageStep::class.java, CommandStep.Type.MESSAGE.value)
+            PolymorphicJsonAdapterFactory.of(ActionStep::class.java, "type")
+                .withSubtype(CommandStep::class.java, ActionStep.Type.COMMAND.value)
+                .withSubtype(MessageStep::class.java, ActionStep.Type.MESSAGE.value)
+                .withSubtype(OverlayStep::class.java, ActionStep.Type.OVERLAY.value)
+                .withSubtype(SoundStep::class.java, ActionStep.Type.SOUND.value)
         )
         .build()
 

@@ -121,7 +121,8 @@ class UiWebSocket(
 
     private fun onCommand(command: String) {
         println("Command received from UI: $command")
-        commandTriggering.sendCommand(command)
+        // TODO Parser les options plutôt que de partir du principe qu'il n'y en a pas
+        commandTriggering.sendCommand(command, emptyList())
     }
 
     private fun onMessage(message: String) {

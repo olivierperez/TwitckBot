@@ -7,7 +7,6 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.internal.service.ConfigService
 
 class Market(
-    private val channel: String,
     extensionProvider: ExtensionProvider
 ) {
 
@@ -32,13 +31,14 @@ class Market(
                 config.i18n,
                 config.products,
                 logger,
-                serviceLocator.extensionProvider
+                serviceLocator.extensionProvider,
+                serviceLocator.stepsExecutor
             )
+
             return Market(
-                config.channel,
                 serviceLocator.extensionProvider
-            ).also { market ->
-                pipeline.requestChannel(market.channel)
+            ).also {
+                pipeline.requestChannel(config.channel)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
             }
         }

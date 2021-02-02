@@ -47,8 +47,6 @@ class Main : CliktCommand() {
         hostName: String
     ): TwitckBot {
         println("Starting...")
-        // TODO OPZ Pouvoir configurer les extensions grâce à des fichiers de conf
-
         // TODO OPZ Extension ACL
         // TODO OPZ Extension Whisper
         // TODO OPZ Acheter une commande pour acheter la couleur du bot dans le chat
@@ -66,7 +64,7 @@ class Main : CliktCommand() {
             .install(InMemoryStatsExtension::installer)
             .install(DefaultPointsExtension::installer)
             .install(Rewards::installer)
-            .install(Market::installer) // TODO Refaire fonctionner !
+            .install(Market::installer)
             .install(Repeat::installer)
             .install(Welcome::installer)
             .install(ViewerPromotion::installer)

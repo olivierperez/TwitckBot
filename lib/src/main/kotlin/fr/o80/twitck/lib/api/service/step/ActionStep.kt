@@ -3,12 +3,13 @@ package fr.o80.twitck.lib.api.service.step
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
-sealed class CommandStep(
+sealed class ActionStep(
     @Json(name = "type")
     @Suppress("unused")
     val type: Type
 ) {
     enum class Type(val value: String) {
+        COMMAND("command"),
         SOUND("sound"),
         OVERLAY("overlay"),
         MESSAGE("message")
@@ -16,19 +17,24 @@ sealed class CommandStep(
 }
 
 @JsonClass(generateAdapter = true)
-class MessageStep(
+internal class MessageStep(
     val message: String
-) : CommandStep(Type.MESSAGE)
+) : ActionStep(Type.MESSAGE)
 
 @JsonClass(generateAdapter = true)
-class SoundStep(
+internal class SoundStep(
     @Json(name = "sound")
     val soundId: String
-) : CommandStep(Type.SOUND)
+) : ActionStep(Type.SOUND)
 
 @JsonClass(generateAdapter = true)
-class OverlayStep(
+internal class OverlayStep(
     val image: String,
     val text: String,
     val seconds: Long = 5
-) : CommandStep(Type.OVERLAY)
+) : ActionStep(Type.OVERLAY)
+
+@JsonClass(generateAdapter = true)
+internal class CommandStep(
+    val command: String
+) : ActionStep(Type.COMMAND)

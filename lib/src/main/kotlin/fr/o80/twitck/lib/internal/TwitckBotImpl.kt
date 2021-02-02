@@ -160,10 +160,10 @@ internal class TwitckBotImpl(
         logger.trace("$sender join the channel $channel")
     }
 
-    private fun listenCommandsFromExtension(command: String) {
+    private fun listenCommandsFromExtension(tag: String, options: List<String>) {
         commandDispatcher.dispatch(
             CommandEvent(
-                command = Command(command),
+                command = Command(tag, options),
                 messenger = messenger,
                 channel = "#${configuration.hostName}",
                 bits = 0,

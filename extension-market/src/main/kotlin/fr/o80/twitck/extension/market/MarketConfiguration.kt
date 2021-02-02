@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.market
 
 import com.squareup.moshi.JsonClass
+import fr.o80.twitck.lib.api.service.step.ActionStep
 
 @JsonClass(generateAdapter = true)
 class MarketConfiguration(
@@ -22,10 +23,5 @@ class MarketI18n(
 class MarketProduct(
     val name: String,
     val price: Int,
-    val type: ProductType,
-    val action: String
+    val steps: List<ActionStep>
 )
-
-enum class ProductType {
-    COMMAND, MESSAGE
-}
