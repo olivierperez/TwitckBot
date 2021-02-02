@@ -1,4 +1,4 @@
-package fr.o80.twitck.example
+package fr.o80.twitck.application
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.options.option
@@ -18,12 +18,9 @@ import fr.o80.twitck.extension.storage.InFileStorageExtension
 import fr.o80.twitck.extension.welcome.Welcome
 import fr.o80.twitck.lib.api.BotFactory
 import fr.o80.twitck.lib.api.TwitckBot
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
-import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.overlay.LwjglOverlay
 import fr.o80.twitck.poll.Poll
 import java.io.File
-import java.time.Duration
 
 fun main(args: Array<String>) = Main().main(args)
 
@@ -74,12 +71,4 @@ class Main : CliktCommand() {
             .install(Channel::installer)
             .create()
     }
-}
-
-private fun ExtensionProvider.showImage(imagePath: String, text: String) {
-    val path = javaClass.classLoader.getResourceAsStream(imagePath)
-        ?: throw IllegalArgumentException("Failed to load image for resources: $imagePath")
-
-    this.first(OverlayExtension::class)
-        .showImage(path, text, Duration.ofSeconds(5))
 }

@@ -1,0 +1,12 @@
+{
+  "extension": "Repeat",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "secondsBetweenRepeatedMessages": 900,
+    "messages": [
+      "Welcome to the place to be",
+      "Come say hi on discord: https://.../"
+    ]
+  }
+}

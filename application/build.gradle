@@ -1,5 +1,38 @@
-group 'fr.o80.twitck'
-version '1.0-SNAPSHOT'
+jar {
+    manifest {
+        attributes 'Main-Class': 'fr.o80.twitck.application.MainKt'
+    }
+    from {
+        configurations.compileClasspath.collect {it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect {it.isDirectory() ? it : zipTree(it) }
+    }
+    archiveName "TwitckBot.jar"
+}
+
+task prepareConfig(type: Copy) {
+    group "build"
+    from file("$rootDir/sample/config")
+    into file("$buildDir/libs/.config")
+}
+
+task prepareAssets(type: Copy) {
+    group "build"
+    from("$rootDir/sample/") {
+        include "fonts/"
+        include "TwitckBot.bat"
+        include "TwitckBot.sh"
+    }
+    into("$buildDir/libs/")
+}
+
+task release(type: Zip) {
+    group "build"
+    dependsOn "build", "prepareConfig", "prepareAssets"
+
+    from "$buildDir/libs"
+    archiveFileName = "TwitckBot-${project.version}.zip"
+    destinationDirectory = file("$buildDir/dist")
+}
 
 repositories {
     maven { url "https://jitpack.io" }

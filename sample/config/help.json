@@ -1,0 +1,10 @@
+{
+  "extension": "Help",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "commands": {
+      "!name": "You'll never learn my real name!!"
+    }
+  }
+}

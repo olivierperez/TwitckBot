@@ -15,8 +15,7 @@ class MarketI18n(
     val productNotFound: String,
     val usage: String,
     val weHaveThisProducts: String,
-    val youDontHaveEnoughPoints: String,
-    val yourPurchaseIsPending: String
+    val youDontHaveEnoughPoints: String
 )
 
 @JsonClass(generateAdapter = true)

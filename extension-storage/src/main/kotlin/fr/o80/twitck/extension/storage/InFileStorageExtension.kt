@@ -16,12 +16,15 @@ class InFileStorageExtension(
 ) : StorageExtension {
 
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val usersDirectory = File(outputDirectory, "users")
 
     private val lock = Any()
 
     init {
         if (!outputDirectory.exists())
             outputDirectory.mkdirs()
+        if (!usersDirectory.exists())
+            usersDirectory.mkdirs()
         if (!outputDirectory.isDirectory) {
             throw IllegalStateException("The path ${outputDirectory.absolutePath} is not a directory!")
         }
@@ -74,12 +77,16 @@ class InFileStorageExtension(
     private fun save(global: Global) {
         logger.trace("Saving global...")
         synchronized(lock) {
-            val globalFile = getGlobalFile()
-            val globalJson = moshi.adapter(Global::class.java).indent("  ").toJson(global)
-            globalFile.writer().use {
-                it.write(globalJson)
+            try {
+                val globalFile = getGlobalFile()
+                val globalJson = moshi.adapter(Global::class.java).indent("  ").toJson(global)
+                globalFile.writer().use {
+                    it.write(globalJson)
+                }
+                logger.trace("Global saved")
+            } catch (e: Exception) {
+                logger.error("Failed to save", e)
             }
-            logger.trace("Global saved")
         }
     }
 
@@ -99,12 +106,16 @@ class InFileStorageExtension(
     private fun save(user: User) {
         logger.debug("Saving user ${user.login}...")
         synchronized(lock) {
-            val userFile = getUserFile(user.login)
-            val userJson = moshi.adapter(User::class.java).indent("  ").toJson(user)
-            userFile.writer().use {
-                it.write(userJson)
+            try {
+                val userFile = getUserFile(user.login)
+                val userJson = moshi.adapter(User::class.java).indent("  ").toJson(user)
+                userFile.writer().use {
+                    it.write(userJson)
+                }
+                logger.trace("User ${user.login} saved")
+            } catch (e: Exception) {
+                logger.error("Failed to save", e)
             }
-            logger.trace("User ${user.login} saved")
         }
     }
 
@@ -112,7 +123,7 @@ class InFileStorageExtension(
         File(outputDirectory, "global.json")
 
     private fun getUserFile(login: String) =
-        File(outputDirectory, "users/${sanitizer(login)}.json")
+        File(usersDirectory, "${sanitizer(login)}.json")
 
     companion object {
         fun installer(
@@ -121,7 +132,10 @@ class InFileStorageExtension(
             configService: ConfigService
         ): StorageExtension {
             val theOutput =
-                configService.getConfig("storage.json", InFileStorageConfiguration::class).storageDirectory
+                configService.getConfig(
+                    "storage.json",
+                    InFileStorageConfiguration::class
+                ).storageDirectory
             val logger = serviceLocator.loggerFactory.getLogger(InFileStorageExtension::class)
 
             return InFileStorageExtension(File(theOutput), logger)

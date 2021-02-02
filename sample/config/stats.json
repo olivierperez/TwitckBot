@@ -1,0 +1,7 @@
+{
+  "extension": "Stats",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME"
+  }
+}

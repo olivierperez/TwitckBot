@@ -3,8 +3,6 @@ plugins {
     id "org.jetbrains.kotlin.kapt" version "1.4.21"
 }
 
-group "fr.o80.twitck"
-version "0.0.4"
 
 repositories {
     mavenCentral()
@@ -18,9 +16,13 @@ allprojects {
     apply plugin: "org.jetbrains.kotlin.jvm"
     apply plugin: "org.jetbrains.kotlin.kapt"
 
+    group "fr.o80.twitck"
+    version "0.1.0"
+
     repositories {
         mavenCentral()
     }
+
     dependencies {
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 

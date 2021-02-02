@@ -1,0 +1,40 @@
+{
+  "extension": "Channel",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "commands": {
+      "!celebrate": [
+        {
+          "type": "sound",
+          "sound": "celebration"
+        },
+        {
+          "type": "message",
+          "message": "Yay!"
+        },
+        {
+          "type": "overlay",
+          "image": "image/ouray.png",
+          "text": "Yata Yata Yata"
+        }
+      ],
+      "!youfailed": [
+        {
+          "type": "sound",
+          "sound": "negative"
+        }
+      ]
+    },
+    "follows": [
+      {
+        "type": "sound",
+        "sound": "celebration"
+      },
+      {
+        "type": "message",
+        "message": "Thanks #USER# for following the you-know-who streamer!"
+      }
+    ]
+  }
+}
