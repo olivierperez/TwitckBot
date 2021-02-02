@@ -5,11 +5,25 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class RewardsConfiguration(
     val channel: String,
-    val secondsBetweenTwoClaims: Long,
-    val claimedPoints: Int,
-    val secondsBetweenTwoTalkRewards: Long,
-    val rewardedPoints: Int,
+    val claim: RewardsClaim,
+    val talk: RewardsTalk,
     val i18n: RewardsI18n
+)
+
+@JsonClass(generateAdapter = true)
+class RewardsClaim(
+    val command: String = "!claim",
+    val reward: Int,
+    val secondsBetweenTwoClaims: Long,
+    val image: String,
+    val positiveSound: String = "positive",
+    val negativeSound: String = "negative"
+)
+
+@JsonClass(generateAdapter = true)
+class RewardsTalk(
+    val reward: Int,
+    val secondsBetweenTwoTalkRewards: Long
 )
 
 @JsonClass(generateAdapter = true)

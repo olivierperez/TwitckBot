@@ -16,12 +16,13 @@ class Rewards(
     private val commands: RewardsCommands,
     private val extensionProvider: ExtensionProvider,
     private val talkingTimeChecker: StorageFlagTimeChecker,
-    private val rewardedPoints: Int
+    private val rewardedPoints: Int,
+    private val claimConfig: RewardsClaim
 ) {
 
-    private fun onInstallationFinished() {
+    init {
         extensionProvider.forEach(HelpExtension::class) { help ->
-            help.registerCommand("!claim")
+            help.registerCommand(claimConfig.command)
         }
     }
 
@@ -55,20 +56,20 @@ class Rewards(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "claimedAt",
-                interval = Duration.ofSeconds(config.secondsBetweenTwoClaims)
+                interval = Duration.ofSeconds(config.claim.secondsBetweenTwoClaims)
             )
             val lastTalkChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "talkedRewardedAt",
-                interval = Duration.ofSeconds(config.secondsBetweenTwoTalkRewards)
+                interval = Duration.ofSeconds(config.talk.secondsBetweenTwoTalkRewards)
             )
 
             val commands = RewardsCommands(
                 channel = channelName,
                 extensionProvider = serviceLocator.extensionProvider,
                 claimTimeChecker = lastClaimChecker,
-                claimedPoints = config.claimedPoints,
+                claimConfig = config.claim,
                 i18n = config.i18n
             )
 
@@ -77,7 +78,8 @@ class Rewards(
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
                 talkingTimeChecker = lastTalkChecker,
-                rewardedPoints = config.rewardedPoints
+                rewardedPoints = config.talk.reward,
+                claimConfig = config.claim
             ).also { rewards ->
                 pipeline.requestChannel(rewards.channel)
                 pipeline.interceptCommandEvent { _, commandEvent ->
@@ -86,7 +88,6 @@ class Rewards(
                 pipeline.interceptMessageEvent { _, messageEvent ->
                     rewards.interceptMessageEvent(messageEvent)
                 }
-                rewards.onInstallationFinished()
             }
         }
     }
