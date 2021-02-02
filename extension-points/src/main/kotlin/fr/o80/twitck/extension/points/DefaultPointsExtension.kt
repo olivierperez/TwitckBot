@@ -1,7 +1,6 @@
 package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
@@ -48,7 +47,7 @@ class DefaultPointsExtension(
 
             val pointsCommands = PointsCommands(
                 config.channel,
-                config.badges.map { Badge.fromValue(it) },
+                config.privilegedBadges,
                 config.i18n,
                 bank,
                 logger,
