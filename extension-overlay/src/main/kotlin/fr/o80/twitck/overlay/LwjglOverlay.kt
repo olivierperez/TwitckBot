@@ -9,6 +9,7 @@ import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
 import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
+import java.io.File
 import java.io.InputStream
 import java.time.Duration
 
@@ -58,12 +59,24 @@ class LwjglOverlay(
         informationRenderer.popAlert(text, duration)
     }
 
-    override fun showImage(path: InputStream, duration: Duration) {
-        popupImageRenderer.setImage(path, null, duration)
+    override fun showImage(path: String, duration: Duration) {
+        val imageStream = getImageStream(path)
+        popupImageRenderer.setImage(imageStream, null, duration)
     }
 
-    override fun showImage(path: InputStream, text: String, duration: Duration) {
-        popupImageRenderer.setImage(path, text, duration)
+    override fun showImage(path: String, text: String, duration: Duration) {
+        val imageStream = getImageStream(path)
+        popupImageRenderer.setImage(imageStream, text, duration)
+    }
+
+    private fun getImageStream(path: String): InputStream {
+        val imageFile = File(path)
+        return if (imageFile.isFile && imageFile.canRead()) {
+            imageFile.inputStream()
+        } else {
+            LwjglOverlay::class.java.classLoader.getResourceAsStream(path)
+                ?: throw IllegalArgumentException("Failed to load image for resources: $path")
+        }
     }
 
     private fun start() {

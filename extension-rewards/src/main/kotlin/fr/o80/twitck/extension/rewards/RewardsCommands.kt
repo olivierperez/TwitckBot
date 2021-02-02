@@ -62,10 +62,8 @@ class RewardsCommands(
     }
 
     private fun displayCoinAndMessage(message: String) {
-        val coinInputStream = javaClass.classLoader.getResourceAsStream("image/coin.png")
-            ?: throw IllegalArgumentException("Failed to load image for resources Coin")
         extensionProvider.first(OverlayExtension::class)
-            .showImage(coinInputStream, message, Duration.ofSeconds(5))
+            .showImage("image/coin.png", message, Duration.ofSeconds(5))
     }
 
 }
