@@ -36,19 +36,19 @@ thanks to `.json` files in the `.config` directory.
 |---------|-----------|-------------|
 |Channel|Basic reactions to events or commands executed by the viewers.|[documentation](doc/config/Channel.md)|
 |Help|`!help` command to help the viewers to know what they can do.|[documentation](doc/config/Help.md)|
-|Market|A market place where the viewers can "buy" things with your points system.|[documentation](doc/config/Market.md)|
+|Market|A marketplace where the viewers can "buy" things with your points system.|[documentation](doc/config/Market.md)|
 |Overlay|An overlay to show on top of your stream.|[documentation](doc/config/Overlay.md)|
 |Points|The points system managed by the bot.|[documentation](doc/config/Points.md)|
 |Poll|A poll mechanism to asked community their opinion.|[documentation](doc/config/Poll.md)|
+|RemoteActions|*Under development!!* Provide a UI for the streamer to interact with his bot.|[documentation](doc/config/RemoteActions.md)|
 |Repeat|The bot will say one of predefined sentences every X minutes. Useful to give information about a Discord server for instance.|[documentation](doc/config/Repeat.md)|
-|RemoteActions|*Under development!!* will provide a UI for the streamer to interact with his bot.|[documentation](doc/config/RemoteActions.md)|
 |Rewards|Reward with points the activity of the viewers.|[documentation](doc/config/Rewards.md)|
-|RuntimeCommand|Let you configure some command while your are in the middle of a streaming.|[documentation](doc/config/RuntimeCommand.md)|
+|RuntimeCommand|Let you configure some commands while you are in the middle of a streaming.|[documentation](doc/config/RuntimeCommand.md)|
 |Sound|Configure the funny sounds you need.|[documentation](doc/config/Sound.md)|
+|Stats|*Under development!!* Store stats of what the bot have seen during your stream.|[documentation](doc/config/Stats.md)|
 |Storage|Store information useful for your stream.|[documentation](doc/config/Storage.md)|
 |ViewerPromotion|Some of your viewers deserve to be promoted.|[documentation](doc/config/ViewerPromotion.md)|
 |Welcome|Welcome the newcomers with funny sentences with their names in it.|[documentation](doc/config/Welcome.md)|
-|Stats|*Under development!!* Store stats of what the bot have seen during your stream.|[documentation](doc/config/Stats.md)|
 
 # ▶ Run
 
