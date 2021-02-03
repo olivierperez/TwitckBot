@@ -1,0 +1,7 @@
+{
+  "extension": "Storage",
+  "enabled": true,
+  "data": {
+    "storageDirectory": ".db/"
+  }
+}

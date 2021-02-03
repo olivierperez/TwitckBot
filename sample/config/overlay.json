@@ -1,0 +1,7 @@
+{
+  "extension": "Overlay",
+  "enabled": true,
+  "data": {
+    "informationText": "Yo the internets!"
+  }
+}

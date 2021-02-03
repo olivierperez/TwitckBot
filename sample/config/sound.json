@@ -1,0 +1,28 @@
+{
+  "extension": "Sound",
+  "enabled": true,
+  "data": {
+    "celebration": {
+      "path": "audio/celebration.wav",
+      "gain": 1
+    },
+    "negative": {
+      "path": "audio/fail.wav",
+      "gain": 1
+    },
+    "positive": {
+      "path": "audio/up.wav",
+      "gain": 1
+    },
+    "raid": {
+      "path": "audio/raid.wav",
+      "gain": 1
+    },
+    "custom": {
+      "buy": {
+        "path": "audio/coin.wav",
+        "gain": 1
+      }
+    }
+  }
+}

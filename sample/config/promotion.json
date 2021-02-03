@@ -1,0 +1,23 @@
+{
+  "extension": "Promotion",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "secondsBetweenTwoPromotions": 7200,
+    "daysSinceLastVideoToPromote": 120,
+    "ignoreViewers": [
+      "lurxx",
+      "anotherttvviewer",
+      "letsdothis_streamers"
+    ],
+    "promotionMessages": [
+      "#USER# stream in category #GAME#, go see him right now #URL#"
+    ],
+    "i18n": {
+      "usage": "Usage: !shoutout <login>",
+      "noPointsEnough": "#USER# you don't have enough points",
+      "noAutoShoutOut": "Smart #USER#...",
+      "shoutOutRecorded": "Message received!"
+    }
+  }
+}

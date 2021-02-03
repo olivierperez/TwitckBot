@@ -1,0 +1,18 @@
+{
+  "extension": "Points",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "privilegedBadges": [
+      "BROADCASTER",
+      "MODERATOR"
+    ],
+    "i18n": {
+      "destinationViewerDoesNotExist": "Recipient is no-one",
+      "pointsTransferred": "Points sent from #FROM# to #TO#",
+      "notEnoughPoints": "Not enough point #FROM#",
+      "viewerHasNoPoints": "#USER# has no points",
+      "viewerHasPoints": "#USER# has #POINTS# points"
+    }
+  }
+}

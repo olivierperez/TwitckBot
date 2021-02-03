@@ -13,7 +13,7 @@ class RewardsCommands(
     private val channel: String,
     private val extensionProvider: ExtensionProvider,
     private val claimTimeChecker: TimeChecker,
-    private val claimedPoints: Int,
+    private val claimConfig: RewardsClaim,
     private val i18n: RewardsI18n
 ) {
 
@@ -22,26 +22,26 @@ class RewardsCommands(
             return commandEvent
 
         when (commandEvent.command.tag) {
-            "!claim" -> claim(commandEvent.viewer)
+            claimConfig.command -> claim(commandEvent.viewer)
         }
 
         return commandEvent
     }
 
     private fun claim(viewer: Viewer) {
-        if (claimedPoints == 0) return
+        if (claimConfig.reward == 0) return
 
         claimTimeChecker.executeIfNotCooldown(viewer.login) {
             val ownedPoints = extensionProvider.provide(PointsExtension::class)
                 .filter { it.channel == channel }
                 .onEach { pointsManager ->
-                    pointsManager.addPoints(viewer.login, claimedPoints)
+                    pointsManager.addPoints(viewer.login, claimConfig.reward)
                 }
                 .sumBy { pointsManager -> pointsManager.getPoints(viewer.login) }
 
             val message = i18n.viewerJustClaimed
                 .replace("#USER#", viewer.displayName)
-                .replace("#NEW_POINTS#", claimedPoints.toString())
+                .replace("#NEW_POINTS#", claimConfig.reward.toString())
                 .replace("#OWNED_POINTS#", ownedPoints.toString())
 
             playCoin()
@@ -53,19 +53,17 @@ class RewardsCommands(
 
     private fun playCoin() {
         extensionProvider.first(SoundExtension::class)
-            .playPositive()
+            .play(claimConfig.positiveSound)
     }
 
     private fun playFail() {
         extensionProvider.first(SoundExtension::class)
-            .playNegative()
+            .play(claimConfig.negativeSound)
     }
 
     private fun displayCoinAndMessage(message: String) {
-        val coinInputStream = javaClass.classLoader.getResourceAsStream("image/coin.png")
-            ?: throw IllegalArgumentException("Failed to load image for resources Coin")
         extensionProvider.first(OverlayExtension::class)
-            .showImage(coinInputStream, message, Duration.ofSeconds(5))
+            .showImage(claimConfig.image, message, Duration.ofSeconds(5))
     }
 
 }

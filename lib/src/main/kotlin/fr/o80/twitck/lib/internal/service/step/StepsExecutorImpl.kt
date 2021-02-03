@@ -57,11 +57,8 @@ internal class StepsExecutorImpl(
     }
 
     private fun show(step: OverlayStep) {
-        val inputStream = javaClass.classLoader.getResourceAsStream(step.image)
-            ?: throw IllegalArgumentException("Failed to load image for resources: ${step.image}")
-
         extensionProvider.first(OverlayExtension::class)
-            .showImage(inputStream, step.text, Duration.ofSeconds(step.seconds))
+            .showImage(step.image, step.text, Duration.ofSeconds(step.seconds))
     }
 
     private fun play(step: SoundStep) {

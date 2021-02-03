@@ -1,4 +1,4 @@
-package fr.o80.twitck.example
+package fr.o80.twitck.application
 
 fun banner() {
     println()

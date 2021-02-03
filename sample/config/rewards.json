@@ -1,0 +1,22 @@
+{
+  "extension": "Rewards",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "talk": {
+      "reward": 5,
+      "secondsBetweenTwoTalkRewards": 300
+    },
+    "claim": {
+      "command": "!claim",
+      "reward": 15,
+      "secondsBetweenTwoClaims": 1200,
+      "image": "image/coin.png",
+      "positiveSound": "buy",
+      "negativeSound": "negative"
+    },
+    "i18n": {
+      "viewerJustClaimed": "#USER# vient de collecter #NEW_POINTS# codes source et en possède donc #OWNED_POINTS#"
+    }
+  }
+}

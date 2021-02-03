@@ -1,0 +1,21 @@
+{
+  "extension": "Poll",
+  "enabled": true,
+  "data": {
+    "channel": "#YOUR_CHANNEL_NAME",
+    "privilegedBadges": [
+      "BROADCASTER",
+      "MODERATOR"
+    ],
+    "pointsEarnPerVote": 25,
+    "i18n": {
+      "errorCreationPollUsage": "To create a poll: \"!poll <duration> <question>\"",
+      "errorDurationIsMissing": "You have to choose a duration!",
+      "newPoll": "New poll: #TITLE# Use !vote to vote",
+      "pollHasJustFinished": "End of poll. #TITLE# #RESULTS#",
+      "currentPollResult": "Poll is still opened... #TITLE# #RESULTS#",
+      "oneResultFormat": "#ANSWER# (#COUNT#)",
+      "pollHasNoVotes": "No-one answered to the question #TITLE#"
+    }
+  }
+}

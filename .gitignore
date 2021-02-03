@@ -2,7 +2,6 @@
 .config/
 .idea/
 .gradle/
-.storage/
 .storage*/
 build/
 logs/
