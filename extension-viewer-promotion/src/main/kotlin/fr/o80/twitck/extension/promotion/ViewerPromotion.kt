@@ -72,7 +72,7 @@ class ViewerPromotion(
             serviceLocator: ServiceLocator,
             configService: ConfigService
         ): ViewerPromotion {
-            val config = configService.getConfig("promotion.json", ViewerPromotionConfiguration::class)
+            val config = configService.getConfig("viewer_promotion.json", ViewerPromotionConfiguration::class)
 
             val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
             val points = serviceLocator.extensionProvider.first(PointsExtension::class)
