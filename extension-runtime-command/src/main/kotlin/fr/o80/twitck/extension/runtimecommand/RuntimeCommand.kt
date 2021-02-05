@@ -34,9 +34,14 @@ class RuntimeCommand(
     private val runtimeCommands = mutableMapOf<String, String?>()
 
     init {
+        val help = extensionProvider.first(HelpExtension::class)
         storage.getGlobalInfo(namespace)
             .filter { it.first.startsWith("Command//") }
-            .forEach { runtimeCommands[it.first.substring("Command//".length)] = it.second }
+            .forEach {
+                val commandTag = it.first.substring("Command//".length)
+                runtimeCommands[commandTag] = it.second
+                help.registerCommand(commandTag)
+            }
     }
 
     private fun interceptCommandEvent(
