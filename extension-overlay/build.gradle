@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(':lib')
+    implementation project(":lib")
 
     implementation 'org.lwjgl:lwjgl:3.2.1'
     implementation 'org.lwjgl.osgi:org.lwjgl.glfw:3.2.1.2'

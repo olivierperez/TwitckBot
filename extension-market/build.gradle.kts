@@ -3,5 +3,5 @@ repositories {
 }
 
 dependencies {
-    implementation project(':lib')
+    implementation(project(":lib"))
 }
