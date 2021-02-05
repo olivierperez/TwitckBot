@@ -1,9 +1,5 @@
-repositories {
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
-    compileOnly project(":lib")
+    compileOnly(project(":lib"))
 
     implementation("com.github.olivierperez.KotlinSlobs:lib:1.2")
 

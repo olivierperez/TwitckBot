@@ -1,6 +1,7 @@
 package fr.o80.twitck.overlay.graphics
 
 import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.utils.use
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import fr.o80.twitck.overlay.graphics.renderer.Renderer
