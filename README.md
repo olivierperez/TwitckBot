@@ -52,10 +52,24 @@ thanks to `.json` files in the `.config` directory.
 
 # ▶ Run
 
+## ngrok requirement
+
+**ngrok** is required by TwitckBot in order to react to events like: someone follows you,
+someone subscribed to your channel. You have to start it before TwitckBot, otherwise the
+bot won't start.
+
+tips: the command might help you `ngrok http 80 -authtoken <YOUR_NGROK_TOKEN>`
+
+## Start TwitckBot
+
+1. Double click the "TwitckBot.bat" (or "TwitckBot.sh" on Linux)
+2. Wait to see a big "Ready to go!"...
+3. TwitckBot is up and running, type a command (`!help` for instance) in Twitch chat
+
 ## 📄 License
 
 ```
-Copyright (C) 2020 Olivier Perez.
+Copyright (C) 2021 Olivier Perez.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
