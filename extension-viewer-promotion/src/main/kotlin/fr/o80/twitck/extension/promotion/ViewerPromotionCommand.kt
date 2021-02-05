@@ -16,8 +16,8 @@ const val SHOUT_OUT_COST = 50
 class ViewerPromotionCommand(
     private val channel: String,
     private val storage: StorageExtension,
-    private val sound: SoundExtension,
-    private val points: PointsExtension,
+    private val sound: SoundExtension?,
+    private val points: PointsExtension?,
     private val i18n: ViewerPromotionI18n
 ) {
 
@@ -63,14 +63,14 @@ class ViewerPromotionCommand(
         if (viewerLogin == shoutOutLogin) {
             val errorMessage = i18n.noAutoShoutOut.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
-            sound.playNegative()
+            sound?.playNegative()
             return
         }
 
-        if(!points.consumePoints(viewerLogin, RECORDING_COST)) {
+        if(points != null && !points.consumePoints(viewerLogin, RECORDING_COST)) {
             val errorMessage = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
-            sound.playNegative()
+            sound?.playNegative()
             return
         }
 
@@ -87,11 +87,11 @@ class ViewerPromotionCommand(
         if (viewerLogin == shoutOutLogin) {
             val errorMessage = i18n.noAutoShoutOut.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
-            sound.playNegative()
+            sound?.playNegative()
             return
         }
 
-        if(!points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
+        if(points != null && !points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
             val message = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, message)
             return

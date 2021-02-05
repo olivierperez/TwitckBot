@@ -41,13 +41,18 @@ class Repeat(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): Repeat {
+        ): Repeat? {
             val config = configService.getConfig("repeat.json", RepeatConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
+            serviceLocator.loggerFactory.getLogger(Repeat::class)
+                .info("Installing Repeat extension...")
 
             return Repeat(
-                config.channel,
-                Duration.ofSeconds(config.secondsBetweenRepeatedMessages),
-                config.messages
+                config.data.channel,
+                Duration.ofSeconds(config.data.secondsBetweenRepeatedMessages),
+                config.data.messages
             ).also { repeat ->
                     pipeline.interceptMessageEvent(repeat::interceptMessageEvent)
                     pipeline.requestChannel(repeat.channel)

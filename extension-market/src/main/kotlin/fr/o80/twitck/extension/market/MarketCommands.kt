@@ -2,7 +2,6 @@ package fr.o80.twitck.extension.market
 
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -14,13 +13,9 @@ class MarketCommands(
     private val i18n: MarketI18n,
     private val products: List<MarketProduct>,
     private val logger: Logger,
-    private val extensionProvider: ExtensionProvider,
+    private val pointsExtension: PointsExtension,
     private val stepsExecutor: StepsExecutor
 ) {
-
-    private val pointsExtension: PointsExtension by lazy {
-        extensionProvider.provide(PointsExtension::class).first()
-    }
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {
         when (commandEvent.command.tag) {

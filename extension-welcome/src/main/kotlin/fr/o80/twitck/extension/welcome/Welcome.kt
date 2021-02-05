@@ -9,6 +9,7 @@ import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.JoinEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.bean.event.RaidEvent
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -29,7 +30,7 @@ class Welcome(
     private val messagesForBroadcaster: List<String>,
     private val welcomeTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
-    private val sound: SoundExtension,
+    private val sound: SoundExtension?,
     private val logger: Logger
 ) {
 
@@ -56,7 +57,7 @@ class Welcome(
         logger.error("channel => $channel")
         handleNewViewer(raidEvent.channel, raidEvent.viewer, messenger)
         thanksForRaiding(raidEvent, messenger)
-        sound.playRaid()
+        sound?.playRaid()
         return raidEvent
     }
 
@@ -118,50 +119,55 @@ class Welcome(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): Welcome {
+        ): Welcome? {
             val config = configService.getConfig("welcome.json", WelcomeConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
-            val sound = serviceLocator.extensionProvider.first(SoundExtension::class)
+            val logger = serviceLocator.loggerFactory.getLogger(Welcome::class)
+            logger.info("Installing Welcome extension...")
+
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("Weclome", "Storage")
+            val sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
 
             val welcomeTimeChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Welcome::class.java.name,
                 flag = "welcomedAt",
-                interval = Duration.ofSeconds(config.secondsBetweenWelcomes)
+                interval = Duration.ofSeconds(config.data.secondsBetweenWelcomes)
             )
 
-            val logger = serviceLocator.loggerFactory.getLogger(Welcome::class)
 
             return Welcome(
-                channel = config.channel,
-                streamId = config.streamId,
-                ignoredLogins = config.ignoreViewers,
-                messagesForFollowers = config.messages.forFollowers,
-                messagesForViewers = config.messages.forViewers,
-                messagesForBroadcaster = config.messages.forBroadcaster,
+                channel = config.data.channel,
+                streamId = config.data.streamId,
+                ignoredLogins = config.data.ignoreViewers,
+                messagesForFollowers = config.data.messages.forFollowers,
+                messagesForViewers = config.data.messages.forViewers,
+                messagesForBroadcaster = config.data.messages.forBroadcaster,
                 welcomeTimeChecker = welcomeTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 sound = sound,
                 logger = logger
             ).also { welcome ->
 
-                if (config.reactTo.commands) {
+                if (config.data.reactTo.commands) {
                     pipeline.interceptCommandEvent { messenger, commandEvent ->
                         welcome.interceptCommandEvent(messenger, commandEvent)
                     }
                 }
-                if (config.reactTo.joins) {
+                if (config.data.reactTo.joins) {
                     pipeline.interceptJoinEvent { messenger, joinEvent ->
                         welcome.interceptJoinEvent(messenger, joinEvent)
                     }
                 }
-                if (config.reactTo.messages) {
+                if (config.data.reactTo.messages) {
                     pipeline.interceptMessageEvent { messenger, messageEvent ->
                         welcome.interceptMessageEvent(messenger, messageEvent)
                     }
                 }
-                if (config.reactTo.raids) {
+                if (config.data.reactTo.raids) {
                     pipeline.interceptRaidEvent { messenger, raid ->
                         welcome.interceptRaidEvent(messenger, raid)
                     }

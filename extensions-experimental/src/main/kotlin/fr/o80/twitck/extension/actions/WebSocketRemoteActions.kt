@@ -3,6 +3,7 @@ package fr.o80.twitck.extension.actions
 import fr.o80.slobs.AsyncSlobsClient
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
@@ -29,22 +30,29 @@ class WebSocketRemoteActions(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): WebSocketRemoteActions {
-            val config = configService.getConfig("remote_actions.json", WebSocketRemoteActionsConfiguration::class)
+        ): WebSocketRemoteActions? {
+            val config = configService.getConfig(
+                "remote_actions.json",
+                WebSocketRemoteActionsConfiguration::class
+            )
+                ?: return null
 
             val logger = serviceLocator.loggerFactory.getLogger(WebSocketRemoteActions::class)
-            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            logger.info("Installing RemoteActions extension...")
+
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("RemoteActions", "Storage")
 
             val store = RemoteActionStore(storage)
 
             val slobsClient = AsyncSlobsClient(
-               config.slobsHost,
-               config.slobsPort,
-               config.slobsToken
+                config.data.slobsHost,
+                config.data.slobsPort,
+                config.data.slobsToken
             )
 
             val webSocket = UiWebSocket(
-                config.channel,
+                config.data.channel,
                 store,
                 slobsClient,
                 serviceLocator.commandTriggering,

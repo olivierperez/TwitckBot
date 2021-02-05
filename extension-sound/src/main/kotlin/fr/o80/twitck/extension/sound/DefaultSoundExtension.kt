@@ -34,17 +34,22 @@ class DefaultSoundExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): SoundExtension {
+        ): SoundExtension? {
             val config = configService.getConfig("sound.json", SoundConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
             val logger = serviceLocator.loggerFactory.getLogger(DefaultSoundExtension::class)
+            logger.info("Installing Sound extension...")
+
             val sounds = mutableMapOf<String, OneSound>().apply {
-                config.custom.forEach { (id, oneSound) ->
+                config.data.custom.forEach { (id, oneSound) ->
                     put(id, oneSound)
                 }
-                put("celebration", config.celebration)
-                put("negative", config.negative)
-                put("positive", config.positive)
-                put("raid", config.raid)
+                put("celebration", config.data.celebration)
+                put("negative", config.data.negative)
+                put("positive", config.data.positive)
+                put("raid", config.data.raid)
             }
 
             val soundPlayer = SoundPlayer(logger, sounds)

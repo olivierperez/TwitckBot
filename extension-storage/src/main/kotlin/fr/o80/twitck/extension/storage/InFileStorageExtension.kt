@@ -130,15 +130,21 @@ class InFileStorageExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): StorageExtension {
-            val theOutput =
-                configService.getConfig(
-                    "storage.json",
-                    InFileStorageConfiguration::class
-                ).storageDirectory
-            val logger = serviceLocator.loggerFactory.getLogger(InFileStorageExtension::class)
+        ): StorageExtension? {
+            val config = configService.getConfig(
+                "storage.json",
+                InFileStorageConfiguration::class
+            )
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            return InFileStorageExtension(File(theOutput), logger)
+            val logger = serviceLocator.loggerFactory.getLogger(InFileStorageExtension::class)
+            logger.info("Installing Storage extension...")
+
+            return InFileStorageExtension(
+                outputDirectory = File(config.data.storageDirectory),
+                logger = logger
+            )
         }
     }
 

@@ -2,9 +2,12 @@ package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
+import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
+import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
@@ -46,40 +49,49 @@ class Rewards(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): Rewards {
+        ): Rewards? {
             val config = configService.getConfig("rewards.json", RewardsConfiguration::class)
-            val channelName = config.channel
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            serviceLocator.loggerFactory.getLogger(Rewards::class)
+                .info("Installing Rewards extension...")
+
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("Reward", "Storage")
+            val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
+                ?: throw ExtensionDependencyException("Reward", "PointsExtension")
 
             val lastClaimChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "claimedAt",
-                interval = Duration.ofSeconds(config.claim.secondsBetweenTwoClaims)
+                interval = Duration.ofSeconds(config.data.claim.secondsBetweenTwoClaims)
             )
             val lastTalkChecker = StorageFlagTimeChecker(
                 storage = storage,
                 namespace = Rewards::class.java.name,
                 flag = "talkedRewardedAt",
-                interval = Duration.ofSeconds(config.talk.secondsBetweenTwoTalkRewards)
+                interval = Duration.ofSeconds(config.data.talk.secondsBetweenTwoTalkRewards)
             )
 
             val commands = RewardsCommands(
-                channel = channelName,
-                extensionProvider = serviceLocator.extensionProvider,
+                channel = config.data.channel,
                 claimTimeChecker = lastClaimChecker,
-                claimConfig = config.claim,
-                i18n = config.i18n
+                claimConfig = config.data.claim,
+                i18n = config.data.i18n,
+                points = points,
+                overlay = serviceLocator.extensionProvider.firstOrNull(OverlayExtension::class),
+                sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
             )
 
             return Rewards(
-                channel = channelName,
+                channel = config.data.channel,
                 commands = commands,
                 extensionProvider = serviceLocator.extensionProvider,
                 talkingTimeChecker = lastTalkChecker,
-                rewardedPoints = config.talk.reward,
-                claimConfig = config.claim
+                rewardedPoints = config.data.talk.reward,
+                claimConfig = config.data.claim
             ).also { rewards ->
                 pipeline.requestChannel(rewards.channel)
                 pipeline.interceptCommandEvent { _, commandEvent ->

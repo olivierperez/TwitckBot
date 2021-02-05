@@ -20,8 +20,8 @@ const val SCOPE_PERMANENT = "permanent"
 class RuntimeCommand(
     private val channel: String,
     private val privilegedBadges: Collection<Badge>,
-    private val storage: StorageExtension,
-    private val help: HelpExtension,
+    private val storage: StorageExtension?,
+    private val help: HelpExtension?,
     private val logger: Logger
 ) {
 
@@ -30,13 +30,15 @@ class RuntimeCommand(
     private val runtimeCommands = mutableMapOf<String, String?>()
 
     init {
-        storage.getGlobalInfo(namespace)
-            .filter { it.first.startsWith("Command//") }
-            .forEach {
-                val commandTag = it.first.substring("Command//".length)
-                runtimeCommands[commandTag] = it.second
-                help.registerCommand(commandTag)
-            }
+        storage?.run {
+            getGlobalInfo(namespace)
+                .filter { it.first.startsWith("Command//") }
+                .forEach {
+                    val commandTag = it.first.substring("Command//".length)
+                    runtimeCommands[commandTag] = it.second
+                    help?.registerCommand(commandTag)
+                }
+        }
     }
 
     private fun interceptCommandEvent(
@@ -95,12 +97,16 @@ class RuntimeCommand(
         runtimeCommands[newCommand] = message
 
         if (scope == SCOPE_PERMANENT) {
-            storage.putGlobalInfo(namespace, "Command//$newCommand", message)
+            if (storage!= null) {
+                storage.putGlobalInfo(namespace, "Command//$newCommand", message)
+            } else {
+                logger.error("You're trying to store a Permanent command but you haven't configured a Storage extension")
+            }
         }
     }
 
     private fun registerToHelper(newCommand: String) {
-        help.registerCommand(newCommand)
+        help?.registerCommand(newCommand)
     }
 
     companion object {
@@ -108,16 +114,23 @@ class RuntimeCommand(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): RuntimeCommand {
+        ): RuntimeCommand? {
             val config = configService.getConfig("runtime_commands.json", RuntimeCommandConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
+            val logger = serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
+
             return RuntimeCommand(
-                config.channel,
-                config.privilegedBadges,
-                serviceLocator.extensionProvider.first(StorageExtension::class),
-                serviceLocator.extensionProvider.first(HelpExtension::class),
-                serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
+                config.data.channel,
+                config.data.privilegedBadges,
+                storage,
+                help,
+                logger
             ).also { runtimeCommand ->
-                pipeline.requestChannel(config.channel)
+                pipeline.requestChannel(config.data.channel)
                 pipeline.interceptCommandEvent { messenger, commandEvent ->
                     runtimeCommand.interceptCommandEvent(
                         messenger,

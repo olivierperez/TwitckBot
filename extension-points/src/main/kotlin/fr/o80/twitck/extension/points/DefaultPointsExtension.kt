@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
@@ -38,23 +39,28 @@ class DefaultPointsExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): PointsExtension {
+        ): PointsExtension? {
             val config = configService.getConfig("points.json", PointsConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
+            val logger = serviceLocator.loggerFactory.getLogger(DefaultPointsExtension::class)
+            logger.info("Installing Help extension...")
 
             val bank = PointsBank(serviceLocator.extensionProvider)
-            val logger = serviceLocator.loggerFactory.getLogger(DefaultPointsExtension::class)
-            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("Points", "Storage")
 
             val pointsCommands = PointsCommands(
-                config.channel,
-                config.privilegedBadges,
-                config.i18n,
+                config.data.channel,
+                config.data.privilegedBadges,
+                config.data.i18n,
                 bank,
                 logger,
                 storage
             )
             return DefaultPointsExtension(
-                config.channel,
+                config.data.channel,
                 serviceLocator.extensionProvider,
                 bank
             )
