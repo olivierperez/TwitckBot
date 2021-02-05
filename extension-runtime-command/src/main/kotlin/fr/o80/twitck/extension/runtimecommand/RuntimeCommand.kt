@@ -4,7 +4,6 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
@@ -21,13 +20,10 @@ const val SCOPE_PERMANENT = "permanent"
 class RuntimeCommand(
     private val channel: String,
     private val privilegedBadges: Collection<Badge>,
-    private val extensionProvider: ExtensionProvider,
+    private val storage: StorageExtension,
+    private val help: HelpExtension,
     private val logger: Logger
 ) {
-
-    private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class).first()
-    }
 
     private val namespace: String = RuntimeCommand::class.java.name
 
@@ -36,7 +32,11 @@ class RuntimeCommand(
     init {
         storage.getGlobalInfo(namespace)
             .filter { it.first.startsWith("Command//") }
-            .forEach { runtimeCommands[it.first.substring("Command//".length)] = it.second }
+            .forEach {
+                val commandTag = it.first.substring("Command//".length)
+                runtimeCommands[commandTag] = it.second
+                help.registerCommand(commandTag)
+            }
     }
 
     private fun interceptCommandEvent(
@@ -100,9 +100,7 @@ class RuntimeCommand(
     }
 
     private fun registerToHelper(newCommand: String) {
-        extensionProvider.forEach(HelpExtension::class) { helper ->
-            helper.registerCommand(newCommand)
-        }
+        help.registerCommand(newCommand)
     }
 
     companion object {
@@ -115,7 +113,8 @@ class RuntimeCommand(
             return RuntimeCommand(
                 config.channel,
                 config.privilegedBadges,
-                serviceLocator.extensionProvider,
+                serviceLocator.extensionProvider.first(StorageExtension::class),
+                serviceLocator.extensionProvider.first(HelpExtension::class),
                 serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
             ).also { runtimeCommand ->
                 pipeline.requestChannel(config.channel)
