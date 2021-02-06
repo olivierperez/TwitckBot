@@ -71,12 +71,19 @@ class DefaultHelpExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): HelpExtension {
+        ): HelpExtension? {
             val config = configService.getConfig("help.json", HelpConfiguration::class)
-            val channelName = config.channel
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            return DefaultHelpExtension(channelName, config.commands).also { help ->
-                pipeline.requestChannel(channelName)
+            serviceLocator.loggerFactory.getLogger(DefaultHelpExtension::class)
+                .info("Installing Help extension...")
+
+            return DefaultHelpExtension(
+                config.data.channel,
+                config.data.commands
+            ).also { help ->
+                pipeline.requestChannel(config.data.channel)
                 pipeline.interceptCommandEvent(help::interceptCommandEvent)
             }
         }

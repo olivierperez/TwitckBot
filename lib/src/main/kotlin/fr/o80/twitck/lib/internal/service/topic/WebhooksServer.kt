@@ -2,9 +2,9 @@ package fr.o80.twitck.lib.internal.service.topic
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.NewFollowers
 import fr.o80.twitck.lib.api.bean.StreamsChanged
+import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.subscription.NewSubscription
 import fr.o80.twitck.lib.api.bean.subscription.Notification
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
@@ -14,20 +14,14 @@ import fr.o80.twitck.lib.api.service.log.LoggerFactory
 import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
 import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
 import fr.o80.twitck.lib.utils.json.LocalDateTimeAdapter
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.application.install
-import io.ktor.features.DoubleReceive
-import io.ktor.http.ContentType
-import io.ktor.request.path
-import io.ktor.request.receiveText
-import io.ktor.response.respondText
-import io.ktor.routing.Routing
-import io.ktor.routing.get
-import io.ktor.routing.post
-import io.ktor.routing.routing
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.application.*
+import io.ktor.features.*
+import io.ktor.http.*
+import io.ktor.request.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -95,15 +89,24 @@ class WebhooksServer(
     private suspend fun onNewSubscription(call: ApplicationCall, body: String) {
         logger.debug("Twitch notified subscriptions")
         withContext(Dispatchers.IO) {
-            val subscriptionEvents = moshi.adapter(TwitchSubscriptionEvents::class.java).fromJson(body)!!
+            val subscriptionEvents =
+                moshi.adapter(TwitchSubscriptionEvents::class.java).fromJson(body)!!
             logger.debug("Subscription events, parsed: $subscriptionEvents")
 
             val eventsByType = subscriptionEvents.data.groupBy { it.type }
             eventsByType["subscriptions.subscribe"]
-                ?.let { events -> SubscriptionEvent(NewSubscription, events.map { event -> event.data }) }
+                ?.let { events ->
+                    SubscriptionEvent(
+                        NewSubscription,
+                        events.map { event -> event.data })
+                }
                 ?.also { subscriptionsDispatcher.dispatch(it) }
             eventsByType["subscriptions.notification"]
-                ?.let { events -> SubscriptionEvent(Notification, events.map { event -> event.data }) }
+                ?.let { events ->
+                    SubscriptionEvent(
+                        Notification,
+                        events.map { event -> event.data })
+                }
                 ?.also { subscriptionsDispatcher.dispatch(it) }
 
             eventsByType.entries

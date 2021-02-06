@@ -20,9 +20,9 @@ class StepParam(
     companion object {
         fun fromCommand(commandEvent: CommandEvent, skipOptions: Int = 0): StepParam {
             return StepParam(
-                    commandEvent.channel,
-                    commandEvent.viewer.displayName,
-                    commandEvent.command.options.skip(skipOptions)
+                commandEvent.channel,
+                commandEvent.viewer.displayName,
+                commandEvent.command.options.skip(skipOptions)
             )
         }
     }

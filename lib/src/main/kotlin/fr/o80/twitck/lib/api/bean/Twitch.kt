@@ -2,7 +2,7 @@ package fr.o80.twitck.lib.api.bean
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import java.util.Date
+import java.util.*
 
 @JsonClass(generateAdapter = true)
 data class Follower(

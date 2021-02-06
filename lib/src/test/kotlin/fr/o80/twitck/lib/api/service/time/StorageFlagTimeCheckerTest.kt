@@ -91,6 +91,13 @@ class StorageFlagTimeCheckerTest {
 
         timeChecker.handled("a login")
 
-        verify { storage.putUserInfo("a login", "the namespace", "the flag", "2020-09-15T17:23:15") }
+        verify {
+            storage.putUserInfo(
+                "a login",
+                "the namespace",
+                "the flag",
+                "2020-09-15T17:23:15"
+            )
+        }
     }
 }

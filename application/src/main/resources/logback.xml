@@ -16,8 +16,8 @@
 
 
     <root level="TRACE">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="FILE" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </root>
 
     <logger name="NETWORK" level="INFO"/>

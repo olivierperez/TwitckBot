@@ -101,12 +101,16 @@ class InMemoryStatsExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): StatsExtension {
+        ): StatsExtension? {
             val config = configService.getConfig("stats.json", StatsConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            val channelName = config.channel
-            val statsData = StatsData()
             val logger = serviceLocator.loggerFactory.getLogger(InMemoryStatsExtension::class)
+            logger.info("Installing StatsExtension extension...")
+
+            val channelName = config.data.channel
+            val statsData = StatsData()
 
             val statsCommand = StatsCommand(statsData, logger)
 

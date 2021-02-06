@@ -17,7 +17,7 @@ import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.EntityUtils
-import java.util.Date
+import java.util.*
 
 class TwitchApiImpl(
     private val oauthToken: String,
@@ -78,7 +78,12 @@ class TwitchApiImpl(
         return body
     }
 
-    override fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String {
+    override fun subscribeTo(
+        topic: String,
+        callbackUrl: String,
+        leaseSeconds: Long,
+        secret: String
+    ): String {
         val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
 
         val request = HttpPost("https://api.twitch.tv/helix/webhooks/hub")
@@ -86,7 +91,13 @@ class TwitchApiImpl(
                 addHeader("Client-ID", clientId)
                 addHeader("Authorization", "Bearer $oauthToken")
                 addHeader("Content-Type", "application/json")
-                val payload = buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "subscribe", secret)
+                val payload = buildTopicSubscriptionPayload(
+                    callbackUrl,
+                    topic,
+                    leaseSeconds,
+                    "subscribe",
+                    secret
+                )
                 entity = StringEntity(payload)
             }
 
@@ -102,7 +113,13 @@ class TwitchApiImpl(
                 addHeader("Client-ID", clientId)
                 addHeader("Authorization", "Bearer $oauthToken")
                 addHeader("Content-Type", "application/json")
-                val payload = buildTopicSubscriptionPayload(callbackUrl, topic, leaseSeconds, "unsubscribe", "")
+                val payload = buildTopicSubscriptionPayload(
+                    callbackUrl,
+                    topic,
+                    leaseSeconds,
+                    "unsubscribe",
+                    ""
+                )
                 entity = StringEntity(payload)
             }
 

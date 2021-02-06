@@ -15,9 +15,9 @@ class TopicManager(
     private val logger = loggerFactory.getLogger(TopicManager::class)
 
     fun subscribe() {
-            val callbackUrl = ngrokTunnel.getOrOpenTunnel()
-            webhooksServer.start()
-            subscribeToTopics(callbackUrl)
+        val callbackUrl = ngrokTunnel.getOrOpenTunnel()
+        webhooksServer.start()
+        subscribeToTopics(callbackUrl)
     }
 
     private fun subscribeToTopics(callbackUrl: String) {

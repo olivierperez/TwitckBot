@@ -1,6 +1,7 @@
 package fr.o80.twitck.poll
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.internal.service.ConfigService
 
@@ -11,19 +12,26 @@ class Poll {
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): Poll {
+        ): Poll? {
             val config = configService.getConfig("poll.json", PollConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
+            serviceLocator.loggerFactory.getLogger(Poll::class)
+                .info("Installing Poll extension...")
+
+            val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
 
             val commands = PollCommands(
-                channel = config.channel,
-                privilegedBadges = config.privilegedBadges,
-                i18n = config.i18n,
-                pointsForEachVote = config.pointsEarnPerVote,
-                extensionProvider = serviceLocator.extensionProvider
+                channel = config.data.channel,
+                privilegedBadges = config.data.privilegedBadges,
+                i18n = config.data.i18n,
+                pointsForEachVote = config.data.pointsEarnPerVote,
+                points = points
             )
 
             return Poll().also {
-                pipeline.requestChannel(config.channel)
+                pipeline.requestChannel(config.data.channel)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
             }
         }
