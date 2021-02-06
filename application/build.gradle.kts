@@ -4,6 +4,7 @@ dependencies {
     implementation(project(":extension-channel"))
     implementation(project(":extension-help"))
     implementation(project(":extension-market"))
+    implementation(project(":extension-ngrok"))
     implementation(project(":extension-overlay"))
     implementation(project(":extension-points"))
     implementation(project(":extension-poll"))

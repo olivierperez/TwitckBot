@@ -7,6 +7,7 @@ import fr.o80.twitck.extension.actions.WebSocketRemoteActions
 import fr.o80.twitck.extension.channel.Channel
 import fr.o80.twitck.extension.help.DefaultHelpExtension
 import fr.o80.twitck.extension.market.Market
+import fr.o80.twitck.extension.ngrok.NgrokTunnelExtension
 import fr.o80.twitck.extension.points.DefaultPointsExtension
 import fr.o80.twitck.extension.promotion.ViewerPromotion
 import fr.o80.twitck.extension.repeat.Repeat
@@ -69,6 +70,7 @@ class Main : CliktCommand() {
             .install(Poll::installer)
             .install(WebSocketRemoteActions::installer)
             .install(Channel::installer)
+            .install(NgrokTunnelExtension::installer)
             .create()
     }
 }
