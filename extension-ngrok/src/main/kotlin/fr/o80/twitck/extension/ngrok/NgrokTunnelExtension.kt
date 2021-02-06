@@ -7,15 +7,10 @@ import fr.o80.twitck.lib.internal.service.ConfigService
 
 class NgrokTunnelExtension(
     name: String,
-    port: Int,
-    ngrokProcess: NgrokProcess
+    port: Int
 ) : TunnelExtension {
 
     private val ngrokTunnel = NgrokTunnel(name, port)
-
-    init {
-        ngrokProcess.launch()
-    }
 
     override fun getTunnelUrl(): String {
         return ngrokTunnel.getOrOpenTunnel()
@@ -34,16 +29,15 @@ class NgrokTunnelExtension(
             val logger = serviceLocator.loggerFactory.getLogger(NgrokTunnelExtension::class)
             logger.info("Installing Ngrok extension...")
 
-            val ngrokProcess = NgrokProcess(
+            NgrokProcess(
                 config.data.path,
                 config.data.token,
                 logger
-            )
+            ).launch()
 
             return NgrokTunnelExtension(
                 config.data.name,
-                config.data.port,
-                ngrokProcess
+                config.data.port
             )
         }
     }
