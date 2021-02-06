@@ -21,7 +21,8 @@ inline fun <T : AutoCloseable?, R> T.use(block: (T) -> R): R {
 }
 
 fun AutoCloseable?.closeFinally(cause: Throwable?) = when {
-    this == null -> {}
+    this == null -> {
+    }
     cause == null -> close()
     else ->
         try {

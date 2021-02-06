@@ -6,14 +6,12 @@ import fr.o80.twitck.lib.api.service.CommandTriggeringImpl
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
 import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
-import fr.o80.twitck.lib.api.service.step.StepsExecutor
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
 import fr.o80.twitck.lib.internal.service.ConfigService
 import fr.o80.twitck.lib.internal.service.ConfigServiceImpl
 import fr.o80.twitck.lib.internal.service.ExtensionProviderImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl
-import fr.o80.twitck.lib.internal.service.step.StepsExecutorImpl
 import java.io.File
 
 fun interface Installer<T> {
@@ -21,7 +19,7 @@ fun interface Installer<T> {
         pipeline: Pipeline,
         serviceLocator: ServiceLocator,
         configService: ConfigService
-    ): T
+    ): T?
 }
 
 class BotFactory(
@@ -49,19 +47,13 @@ class BotFactory(
         val configService: ConfigService = ConfigServiceImpl(configDirectory)
         val extensionProvider = ExtensionProviderImpl()
         val twitchApi = TwitchApiImpl(oauthToken, loggerFactory)
-        val stepsExecutor: StepsExecutor = StepsExecutorImpl(
-            extensionProvider,
-            commandTriggering,
-            commandParser
-        )
 
         val serviceLocator: ServiceLocator = ServiceLocatorImpl(
             extensionProvider = extensionProvider,
             loggerFactory = loggerFactory,
             twitchApi = twitchApi,
             commandTriggering = commandTriggering,
-            commandParser = commandParser,
-            stepsExecutor = stepsExecutor
+            commandParser = commandParser
         )
 
         installers.forEach { installer ->

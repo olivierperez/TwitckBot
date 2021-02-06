@@ -1,7 +1,7 @@
 package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
@@ -10,7 +10,7 @@ import fr.o80.twitck.lib.internal.service.ConfigService
 
 class DefaultPointsExtension(
     override val channel: String,
-    private val extensionProvider: ExtensionProvider,
+    private val help: HelpExtension?,
     private val bank: PointsBank
 ) : PointsExtension {
 
@@ -27,9 +27,9 @@ class DefaultPointsExtension(
     }
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelpExtension::class) { help ->
-            help.registerCommand(POINTS_COMMAND)
-            help.registerCommand(POINTS_GIVE_COMMAND)
+        help?.run {
+            registerCommand(POINTS_COMMAND)
+            registerCommand(POINTS_GIVE_COMMAND)
         }
     }
 
@@ -38,24 +38,30 @@ class DefaultPointsExtension(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): PointsExtension {
+        ): PointsExtension? {
             val config = configService.getConfig("points.json", PointsConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
 
-            val bank = PointsBank(serviceLocator.extensionProvider)
             val logger = serviceLocator.loggerFactory.getLogger(DefaultPointsExtension::class)
-            val storage = serviceLocator.extensionProvider.first(StorageExtension::class)
+            logger.info("Installing Help extension...")
 
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("Points", "Storage")
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
+
+            val bank = PointsBank(storage)
             val pointsCommands = PointsCommands(
-                config.channel,
-                config.privilegedBadges,
-                config.i18n,
+                config.data.channel,
+                config.data.privilegedBadges,
+                config.data.i18n,
                 bank,
                 logger,
                 storage
             )
             return DefaultPointsExtension(
-                config.channel,
-                serviceLocator.extensionProvider,
+                config.data.channel,
+                help,
                 bank
             )
                 .also { points ->

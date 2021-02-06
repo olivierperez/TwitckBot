@@ -16,7 +16,7 @@ class CoolDown(
     val duration: Duration
 ) {
     companion object {
-        fun ofSeconds(seconds: Long) : CoolDown {
+        fun ofSeconds(seconds: Long): CoolDown {
             return CoolDown(Duration.ofSeconds(seconds))
         }
     }

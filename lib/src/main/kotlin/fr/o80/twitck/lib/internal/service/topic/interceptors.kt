@@ -2,14 +2,10 @@ package fr.o80.twitck.lib.internal.service.topic
 
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.Do
-import io.ktor.application.ApplicationCallPipeline
-import io.ktor.application.call
-import io.ktor.request.receiveText
-import io.ktor.routing.Route
-import io.ktor.routing.RouteSelector
-import io.ktor.routing.RouteSelectorEvaluation
-import io.ktor.routing.RoutingResolveContext
-import io.ktor.util.toMap
+import io.ktor.application.*
+import io.ktor.request.*
+import io.ktor.routing.*
+import io.ktor.util.*
 
 fun Route.protectedBySignature(logger: Logger, secret: String, route: Route.() -> Unit): Route {
     val checkSignature = CheckSignature(secret)

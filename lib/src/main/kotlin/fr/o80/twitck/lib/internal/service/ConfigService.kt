@@ -13,7 +13,7 @@ import java.io.File
 import kotlin.reflect.KClass
 
 interface ConfigService {
-    fun <T : Any> getConfig(file: String, clazz: KClass<T>): T
+    fun <T : Any> getConfig(file: String, clazz: KClass<T>): ExtensionConfig<T>?
 }
 
 class ConfigServiceImpl(
@@ -30,10 +30,10 @@ class ConfigServiceImpl(
         )
         .build()
 
-    override fun <T : Any> getConfig(file: String, clazz: KClass<T>): T {
+    override fun <T : Any> getConfig(file: String, clazz: KClass<T>): ExtensionConfig<T>? {
         val types = Types.newParameterizedType(ExtensionConfig::class.java, clazz.java)
         return moshi.adapter<ExtensionConfig<T>>(types)!!
-            .fromJson(File(configDirectory, file).readText())!!.data
+            .fromJson(File(configDirectory, file).readText())
     }
 
 }

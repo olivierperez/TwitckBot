@@ -1,7 +1,13 @@
 package fr.o80.twitck.lib.internal
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.handler.*
+import fr.o80.twitck.lib.api.handler.CommandHandler
+import fr.o80.twitck.lib.api.handler.FollowsHandler
+import fr.o80.twitck.lib.api.handler.JoinHandler
+import fr.o80.twitck.lib.api.handler.MessageHandler
+import fr.o80.twitck.lib.api.handler.RaidHandler
+import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
+import fr.o80.twitck.lib.api.handler.WhisperHandler
 
 internal interface PipelineProvider {
     val commandHandlers: MutableList<CommandHandler>

@@ -1,7 +1,7 @@
 package fr.o80.twitck.lib.api.service
 
 import fr.o80.twitck.lib.api.bean.Command
-import java.util.Locale
+import java.util.*
 
 class CommandParser {
 

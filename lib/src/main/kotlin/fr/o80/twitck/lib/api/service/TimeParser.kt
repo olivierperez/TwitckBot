@@ -10,7 +10,8 @@ class TimeParser {
 
     private val simpleDuration = "^\\d+$".toRegex()
 
-    private val complexDuration = "^(?:(\\d+)$HOURS)?(?:(\\d+)$MINUTES)?(?:(\\d+)$SECONDS)?$".toRegex()
+    private val complexDuration =
+        "^(?:(\\d+)$HOURS)?(?:(\\d+)$MINUTES)?(?:(\\d+)$SECONDS)?$".toRegex()
 
     /**
      * Try to parse the given [input] as a human-readable time, but return -1 if it failed.
@@ -24,11 +25,13 @@ class TimeParser {
     }
 
     private fun tryToParseComplexInput(input: String): Long? {
-        return complexDuration.matchEntire(input)?.takeIf { it.groupValues[0].isNotBlank() }?.let { matchResult ->
-            val hours = matchResult.groupValues[1].tryToLong() ?: 0
-            val minutes = matchResult.groupValues[2].tryToLong() ?: 0
-            val seconds = matchResult.groupValues[3].tryToLong() ?: 0
-            hours * 3600 + minutes * 60 + seconds
-        }
+        return complexDuration.matchEntire(input)
+            ?.takeIf { it.groupValues[0].isNotBlank() }
+            ?.let { matchResult ->
+                val hours = matchResult.groupValues[1].tryToLong() ?: 0
+                val minutes = matchResult.groupValues[2].tryToLong() ?: 0
+                val seconds = matchResult.groupValues[3].tryToLong() ?: 0
+                hours * 3600 + minutes * 60 + seconds
+            }
     }
 }

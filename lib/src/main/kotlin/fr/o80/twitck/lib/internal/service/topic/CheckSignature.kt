@@ -31,6 +31,8 @@ fun String.toSignature(secret: String): String {
 
 sealed class SignatureResult {
     object Valid : SignatureResult()
-    class Invalid(val signature: String, val computedSignature: String, val body: String) : SignatureResult()
+    class Invalid(val signature: String, val computedSignature: String, val body: String) :
+        SignatureResult()
+
     class Failed(val message: String) : SignatureResult()
 }

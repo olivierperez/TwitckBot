@@ -28,7 +28,7 @@ class PollCommandsTest {
             privilegedBadges = listOf(),
             i18n = i18n,
             pointsForEachVote = 5,
-            extensionProvider = mockk()
+            points = mockk()
         )
     }
 

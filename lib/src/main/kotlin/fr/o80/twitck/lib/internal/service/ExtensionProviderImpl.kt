@@ -8,9 +8,9 @@ class ExtensionProviderImpl : ExtensionProvider {
 
     private val extensions = mutableListOf<Any>()
 
-    override fun <T : Any> first(extensionInterface: KClass<T>): T =
-        extensions.first { extensionInterface.isInstance(it) }
-            .let { extension -> extensionInterface.cast(extension) }
+    override fun <T : Any> firstOrNull(extensionInterface: KClass<T>): T? =
+        extensions.firstOrNull { extensionInterface.isInstance(it) }
+            ?.let { extension -> extensionInterface.cast(extension) }
 
     override fun <T : Any> provide(extensionInterface: KClass<T>): List<T> =
         extensions

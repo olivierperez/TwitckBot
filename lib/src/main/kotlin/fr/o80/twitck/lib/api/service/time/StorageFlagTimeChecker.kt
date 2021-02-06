@@ -26,7 +26,8 @@ class StorageFlagTimeChecker(
     }
 
     internal fun couldExecute(login: String): Boolean {
-        val timeOfLastOccurrence = storage.getUserInfo(login, namespace, flag)?.parse() ?: return true
+        val timeOfLastOccurrence =
+            storage.getUserInfo(login, namespace, flag)?.parse() ?: return true
         val durationSinceLastOccurrence = Duration.between(timeOfLastOccurrence, now())
 
         return durationSinceLastOccurrence > interval

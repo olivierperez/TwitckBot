@@ -90,13 +90,17 @@ class LwjglOverlay(
             pipeline: Pipeline,
             serviceLocator: ServiceLocator,
             configService: ConfigService
-        ): OverlayExtension {
+        ): OverlayExtension? {
             val configuration = configService.getConfig("overlay.json", OverlayConfiguration::class)
+                ?.takeIf { it.enabled }
+                ?: return null
+
             val logger = serviceLocator.loggerFactory.getLogger(LwjglOverlay::class)
+            logger.info("Installing Overlay extension...")
 
             return LwjglOverlay(
                 windowName = "Streaming Overlay",
-                informationText = configuration.informationText,
+                informationText = configuration.data.informationText,
                 logger = logger
             ).also { overlay ->
                 overlay.start()

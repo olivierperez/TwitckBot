@@ -2,7 +2,6 @@ package fr.o80.twitck.extension.rewards
 
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
@@ -11,10 +10,12 @@ import java.time.Duration
 
 class RewardsCommands(
     private val channel: String,
-    private val extensionProvider: ExtensionProvider,
-    private val claimTimeChecker: TimeChecker,
     private val claimConfig: RewardsClaim,
-    private val i18n: RewardsI18n
+    private val i18n: RewardsI18n,
+    private val claimTimeChecker: TimeChecker,
+    private val points: PointsExtension,
+    private val overlay: OverlayExtension?,
+    private val sound: SoundExtension?
 ) {
 
     fun interceptCommandEvent(commandEvent: CommandEvent): CommandEvent {
@@ -32,17 +33,12 @@ class RewardsCommands(
         if (claimConfig.reward == 0) return
 
         claimTimeChecker.executeIfNotCooldown(viewer.login) {
-            val ownedPoints = extensionProvider.provide(PointsExtension::class)
-                .filter { it.channel == channel }
-                .onEach { pointsManager ->
-                    pointsManager.addPoints(viewer.login, claimConfig.reward)
-                }
-                .sumBy { pointsManager -> pointsManager.getPoints(viewer.login) }
+            points.addPoints(viewer.login, claimConfig.reward)
 
             val message = i18n.viewerJustClaimed
                 .replace("#USER#", viewer.displayName)
                 .replace("#NEW_POINTS#", claimConfig.reward.toString())
-                .replace("#OWNED_POINTS#", ownedPoints.toString())
+                .replace("#OWNED_POINTS#", points.getPoints(viewer.login).toString())
 
             playCoin()
             displayCoinAndMessage(message)
@@ -52,18 +48,15 @@ class RewardsCommands(
     }
 
     private fun playCoin() {
-        extensionProvider.first(SoundExtension::class)
-            .play(claimConfig.positiveSound)
+        sound?.play(claimConfig.positiveSound)
     }
 
     private fun playFail() {
-        extensionProvider.first(SoundExtension::class)
-            .play(claimConfig.negativeSound)
+        sound?.play(claimConfig.negativeSound)
     }
 
     private fun displayCoinAndMessage(message: String) {
-        extensionProvider.first(OverlayExtension::class)
-            .showImage(claimConfig.image, message, Duration.ofSeconds(5))
+        overlay?.showImage(claimConfig.image, message, Duration.ofSeconds(5))
     }
 
 }

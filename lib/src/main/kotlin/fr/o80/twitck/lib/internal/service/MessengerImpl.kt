@@ -16,7 +16,8 @@ class MessengerImpl(
     private val intervalBetweenPostponed: Duration = Duration.ofSeconds(30)
 ) : Messenger {
 
-    private val messagesToSend: PriorityBlockingQueue<PostponedMessage> = PriorityBlockingQueue(11, PostponedMessageComparator)
+    private val messagesToSend: PriorityBlockingQueue<PostponedMessage> =
+        PriorityBlockingQueue(11, PostponedMessageComparator)
 
     private var interrupted: Boolean = false
 
@@ -38,7 +39,12 @@ class MessengerImpl(
         bot.send(channel, content)
     }
 
-    override fun sendWhenAvailable(channel: String, content: String, importance: Importance, coolDown: CoolDown?) {
+    override fun sendWhenAvailable(
+        channel: String,
+        content: String,
+        importance: Importance,
+        coolDown: CoolDown?
+    ) {
         if (coolDownManager.isCoolingDown(COOL_DOWN_NAMESPACE, content)) return
         coolDownManager.startCoolDown(COOL_DOWN_NAMESPACE, content, coolDown)
 
