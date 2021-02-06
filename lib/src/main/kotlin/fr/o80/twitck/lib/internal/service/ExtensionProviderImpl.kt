@@ -9,18 +9,7 @@ class ExtensionProviderImpl : ExtensionProvider {
     private val extensions = mutableListOf<Any>()
 
     override fun <T : Any> firstOrNull(extensionInterface: KClass<T>): T? =
-        extensions.firstOrNull { extensionInterface.isInstance(it) }
-            ?.let { extension -> extensionInterface.cast(extension) }
-
-    override fun <T : Any> provide(extensionInterface: KClass<T>): List<T> =
-        extensions
-            .filter { extension -> extensionInterface.isInstance(extension) }
-            .map { extension -> extensionInterface.cast(extension) }
-
-    override fun <T : Any> forEach(extensionInterface: KClass<T>, block: (extension: T) -> Unit) {
-        provide(extensionInterface)
-            .forEach(block)
-    }
+        extensions.filterIsInstance(extensionInterface.java).firstOrNull()
 
     fun register(extension: Any) {
         extensions += extension

@@ -1,5 +1,4 @@
-package fr.o80.twitck.lib.internal.service.topic
-
+package fr.o80.twitck.extension.ngrok
 
 import com.mashape.unirest.http.HttpResponse
 import com.mashape.unirest.http.JsonNode
@@ -35,7 +34,6 @@ class NgrokTunnel(
             .header("Content-Type", "application/json; charset=utf8")
             .body(payload)
             .asJson()
-//        println(jsonResponse.rawBody.reader().readText())
         return jsonResponse.body.getObject().getString("public_url")
     }
 

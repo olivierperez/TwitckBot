@@ -1,11 +1,12 @@
 package fr.o80.twitck.lib.internal.service.topic
 
+import fr.o80.twitck.lib.api.extension.TunnelExtension
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.log.LoggerFactory
 
 class TopicManager(
     private val userId: String,
-    private val ngrokTunnel: NgrokTunnel,
+    private val tunnel: TunnelExtension,
     private val api: TwitchApi,
     private val secret: String,
     private val webhooksServer: WebhooksServer,
@@ -15,7 +16,7 @@ class TopicManager(
     private val logger = loggerFactory.getLogger(TopicManager::class)
 
     fun subscribe() {
-        val callbackUrl = ngrokTunnel.getOrOpenTunnel()
+        val callbackUrl = tunnel.getTunnelUrl()
         webhooksServer.start()
         subscribeToTopics(callbackUrl)
     }
