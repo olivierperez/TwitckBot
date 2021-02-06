@@ -1,16 +1,11 @@
 package fr.o80.twitck.extension.points
 
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.utils.tryToInt
 
 class PointsBank(
-    private val extensionProvider: ExtensionProvider
+    private val storage: StorageExtension
 ) {
-
-    private val storage: StorageExtension by lazy {
-        extensionProvider.provide(StorageExtension::class).first()
-    }
 
     private val namespace: String = DefaultPointsExtension::class.java.name
 

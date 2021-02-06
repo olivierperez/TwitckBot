@@ -119,9 +119,11 @@ class RuntimeCommand(
                 ?.takeIf { it.enabled }
                 ?: return null
 
+            val logger = serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
+            logger.info("Installing RuntimeCommand extension...")
+
             val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
             val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
-            val logger = serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
 
             return RuntimeCommand(
                 config.data.channel,

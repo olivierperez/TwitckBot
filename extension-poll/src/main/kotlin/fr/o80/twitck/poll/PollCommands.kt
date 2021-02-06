@@ -2,11 +2,10 @@ package fr.o80.twitck.poll
 
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.TimeParser
-import java.util.Timer
+import java.util.*
 import kotlin.concurrent.schedule
 
 class PollCommands(
@@ -14,7 +13,7 @@ class PollCommands(
     private val privilegedBadges: Collection<Badge>,
     private val i18n: PollI18n,
     private val pointsForEachVote: Int,
-    private val extensionProvider: ExtensionProvider,
+    private val points: PointsExtension?,
     private val timeParser: TimeParser = TimeParser()
 ) {
 
@@ -49,9 +48,7 @@ class PollCommands(
         val voteResult = currentPoll?.addVote(commandEvent.viewer.login, vote)
 
         if (voteResult == Vote.NEW_VOTE && pointsForEachVote > 0) {
-            extensionProvider.forEach(PointsExtension::class) { pointsManager ->
-                pointsManager.addPoints(commandEvent.viewer.login, pointsForEachVote)
-            }
+            points?.addPoints(commandEvent.viewer.login, pointsForEachVote)
         }
     }
 

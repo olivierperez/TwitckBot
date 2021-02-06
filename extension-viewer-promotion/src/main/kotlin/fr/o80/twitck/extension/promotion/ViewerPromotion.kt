@@ -5,7 +5,6 @@ import fr.o80.twitck.lib.api.bean.Importance
 import fr.o80.twitck.lib.api.bean.Video
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
@@ -27,13 +26,11 @@ class ViewerPromotion(
     private val promotionTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
     private val command: ViewerPromotionCommand,
-    private val extensionProvider: ExtensionProvider
+    help: HelpExtension?
 ) {
 
     init {
-        extensionProvider.forEach(HelpExtension::class) { help ->
-            help.registerCommand(SHOUT_OUT_COMMAND)
-        }
+        help?.registerCommand(SHOUT_OUT_COMMAND)
     }
 
     fun interceptMessageEvent(messenger: Messenger, messageEvent: MessageEvent): MessageEvent {
@@ -73,7 +70,10 @@ class ViewerPromotion(
             serviceLocator: ServiceLocator,
             configService: ConfigService
         ): ViewerPromotion? {
-            val config = configService.getConfig("viewer_promotion.json", ViewerPromotionConfiguration::class)
+            val config = configService.getConfig(
+                "viewer_promotion.json",
+                ViewerPromotionConfiguration::class
+            )
                 ?.takeIf { it.enabled }
                 ?: return null
 
@@ -82,6 +82,7 @@ class ViewerPromotion(
 
             val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
                 ?: throw ExtensionDependencyException("ViewerPromotion", "Storage")
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
             val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
             val sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
 
@@ -106,7 +107,7 @@ class ViewerPromotion(
                     points = points,
                     i18n = config.data.i18n
                 ),
-                extensionProvider = serviceLocator.extensionProvider
+                help = help
             ).also { viewerPromotion ->
                 pipeline.requestChannel(viewerPromotion.channel)
                 pipeline.interceptMessageEvent { messenger, messageEvent ->

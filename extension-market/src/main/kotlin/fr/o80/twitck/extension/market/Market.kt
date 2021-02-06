@@ -2,20 +2,19 @@ package fr.o80.twitck.extension.market
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.internal.service.ConfigService
 
 class Market(
-    extensionProvider: ExtensionProvider
+    help: HelpExtension?
 ) {
 
     init {
-        extensionProvider.forEach(HelpExtension::class) { helper ->
-            helper.registerCommand("!buy")
-            helper.registerCommand("!market")
+        help?.run {
+            registerCommand("!buy")
+            registerCommand("!market")
         }
     }
 
@@ -34,6 +33,7 @@ class Market(
 
             val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
                 ?: throw ExtensionDependencyException("Market", "Points")
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
 
             val commands = MarketCommands(
                 config.data.channel,
@@ -45,7 +45,7 @@ class Market(
             )
 
             return Market(
-                serviceLocator.extensionProvider
+                help
             ).also {
                 pipeline.requestChannel(config.data.channel)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)

@@ -2,7 +2,6 @@ package fr.o80.twitck.extension.points
 
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
@@ -11,7 +10,7 @@ import fr.o80.twitck.lib.internal.service.ConfigService
 
 class DefaultPointsExtension(
     override val channel: String,
-    private val extensionProvider: ExtensionProvider,
+    private val help: HelpExtension?,
     private val bank: PointsBank
 ) : PointsExtension {
 
@@ -28,9 +27,9 @@ class DefaultPointsExtension(
     }
 
     private fun onInstallationFinished() {
-        extensionProvider.forEach(HelpExtension::class) { help ->
-            help.registerCommand(POINTS_COMMAND)
-            help.registerCommand(POINTS_GIVE_COMMAND)
+        help?.run {
+            registerCommand(POINTS_COMMAND)
+            registerCommand(POINTS_GIVE_COMMAND)
         }
     }
 
@@ -47,10 +46,11 @@ class DefaultPointsExtension(
             val logger = serviceLocator.loggerFactory.getLogger(DefaultPointsExtension::class)
             logger.info("Installing Help extension...")
 
-            val bank = PointsBank(serviceLocator.extensionProvider)
             val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
                 ?: throw ExtensionDependencyException("Points", "Storage")
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
 
+            val bank = PointsBank(storage)
             val pointsCommands = PointsCommands(
                 config.data.channel,
                 config.data.privilegedBadges,
@@ -61,7 +61,7 @@ class DefaultPointsExtension(
             )
             return DefaultPointsExtension(
                 config.data.channel,
-                serviceLocator.extensionProvider,
+                help,
                 bank
             )
                 .also { points ->

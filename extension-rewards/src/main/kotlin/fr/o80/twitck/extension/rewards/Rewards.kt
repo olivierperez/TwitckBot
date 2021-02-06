@@ -3,7 +3,6 @@ package fr.o80.twitck.extension.rewards
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
@@ -16,17 +15,16 @@ import java.time.Duration
 
 class Rewards(
     private val channel: String,
-    private val commands: RewardsCommands,
-    private val extensionProvider: ExtensionProvider,
-    private val talkingTimeChecker: StorageFlagTimeChecker,
     private val rewardedPoints: Int,
-    private val claimConfig: RewardsClaim
+    private val claimConfig: RewardsClaim,
+    private val commands: RewardsCommands,
+    private val talkingTimeChecker: StorageFlagTimeChecker,
+    private val points: PointsExtension,
+    help: HelpExtension?
 ) {
 
     init {
-        extensionProvider.forEach(HelpExtension::class) { help ->
-            help.registerCommand(claimConfig.command)
-        }
+        help?.registerCommand(claimConfig.command)
     }
 
     fun interceptMessageEvent(messageEvent: MessageEvent): MessageEvent {
@@ -38,9 +36,7 @@ class Rewards(
         if (rewardedPoints == 0) return
 
         talkingTimeChecker.executeIfNotCooldown(messageEvent.viewer.login) {
-            extensionProvider.forEach(PointsExtension::class) { points ->
-                points.addPoints(messageEvent.viewer.login, rewardedPoints)
-            }
+            points.addPoints(messageEvent.viewer.login, rewardedPoints)
         }
     }
 
@@ -57,10 +53,13 @@ class Rewards(
             serviceLocator.loggerFactory.getLogger(Rewards::class)
                 .info("Installing Rewards extension...")
 
-            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
-                ?: throw ExtensionDependencyException("Reward", "Storage")
             val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
-                ?: throw ExtensionDependencyException("Reward", "PointsExtension")
+                ?: throw ExtensionDependencyException("Rewards", "Points")
+            val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
+                ?: throw ExtensionDependencyException("Rewards", "Storage")
+            val overlay = serviceLocator.extensionProvider.firstOrNull(OverlayExtension::class)
+            val sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
+            val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
 
             val lastClaimChecker = StorageFlagTimeChecker(
                 storage = storage,
@@ -77,21 +76,22 @@ class Rewards(
 
             val commands = RewardsCommands(
                 channel = config.data.channel,
-                claimTimeChecker = lastClaimChecker,
                 claimConfig = config.data.claim,
                 i18n = config.data.i18n,
+                claimTimeChecker = lastClaimChecker,
                 points = points,
-                overlay = serviceLocator.extensionProvider.firstOrNull(OverlayExtension::class),
-                sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
+                overlay = overlay,
+                sound = sound
             )
 
             return Rewards(
                 channel = config.data.channel,
-                commands = commands,
-                extensionProvider = serviceLocator.extensionProvider,
-                talkingTimeChecker = lastTalkChecker,
                 rewardedPoints = config.data.talk.reward,
-                claimConfig = config.data.claim
+                claimConfig = config.data.claim,
+                commands = commands,
+                talkingTimeChecker = lastTalkChecker,
+                help = help,
+                points = points
             ).also { rewards ->
                 pipeline.requestChannel(rewards.channel)
                 pipeline.interceptCommandEvent { _, commandEvent ->

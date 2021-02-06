@@ -10,9 +10,9 @@ import java.time.Duration
 
 class RewardsCommands(
     private val channel: String,
-    private val claimTimeChecker: TimeChecker,
     private val claimConfig: RewardsClaim,
     private val i18n: RewardsI18n,
+    private val claimTimeChecker: TimeChecker,
     private val points: PointsExtension,
     private val overlay: OverlayExtension?,
     private val sound: SoundExtension?

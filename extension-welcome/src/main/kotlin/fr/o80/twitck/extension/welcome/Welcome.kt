@@ -128,7 +128,7 @@ class Welcome(
             logger.info("Installing Welcome extension...")
 
             val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
-                ?: throw ExtensionDependencyException("Weclome", "Storage")
+                ?: throw ExtensionDependencyException("Welcome", "Storage")
             val sound = serviceLocator.extensionProvider.firstOrNull(SoundExtension::class)
 
             val welcomeTimeChecker = StorageFlagTimeChecker(
@@ -137,7 +137,6 @@ class Welcome(
                 flag = "welcomedAt",
                 interval = Duration.ofSeconds(config.data.secondsBetweenWelcomes)
             )
-
 
             return Welcome(
                 channel = config.data.channel,

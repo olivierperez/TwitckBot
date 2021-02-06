@@ -35,6 +35,7 @@ class WebSocketRemoteActions(
                 "remote_actions.json",
                 WebSocketRemoteActionsConfiguration::class
             )
+                ?.takeIf { it.enabled }
                 ?: return null
 
             val logger = serviceLocator.loggerFactory.getLogger(WebSocketRemoteActions::class)
