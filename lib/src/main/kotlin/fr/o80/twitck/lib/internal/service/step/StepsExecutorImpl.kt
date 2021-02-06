@@ -1,6 +1,5 @@
 package fr.o80.twitck.lib.internal.service.step
 
-import fr.o80.twitck.lib.api.extension.ExtensionProvider
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.CommandParser
@@ -21,8 +20,8 @@ internal class StepsExecutorImpl(
     private val commandParser: CommandParser,
     private val stepFormatter: StepFormatter,
     private val logger: Logger,
-    private val overlay : OverlayExtension?,
-    private val sound : SoundExtension?,
+    private val overlay: OverlayExtension?,
+    private val sound: SoundExtension?,
 ) : StepsExecutor {
 
     override fun execute(

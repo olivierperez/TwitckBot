@@ -18,7 +18,10 @@ internal class ViewerTest {
 
         val hasNoPrivileges = viewer hasNoPrivilegesOf listOf(Badge.BITS_LEADER, Badge.BROADCASTER)
 
-        assertFalse(hasNoPrivileges, "Viewer has the privilege BIT_LEADER he should succeed the check")
+        assertFalse(
+            hasNoPrivileges,
+            "Viewer has the privilege BIT_LEADER he should succeed the check"
+        )
     }
 
     @Test

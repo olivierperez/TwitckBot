@@ -97,7 +97,7 @@ class RuntimeCommand(
         runtimeCommands[newCommand] = message
 
         if (scope == SCOPE_PERMANENT) {
-            if (storage!= null) {
+            if (storage != null) {
                 storage.putGlobalInfo(namespace, "Command//$newCommand", message)
             } else {
                 logger.error("You're trying to store a Permanent command but you haven't configured a Storage extension")
@@ -115,9 +115,10 @@ class RuntimeCommand(
             serviceLocator: ServiceLocator,
             configService: ConfigService
         ): RuntimeCommand? {
-            val config = configService.getConfig("runtime_commands.json", RuntimeCommandConfiguration::class)
-                ?.takeIf { it.enabled }
-                ?: return null
+            val config =
+                configService.getConfig("runtime_commands.json", RuntimeCommandConfiguration::class)
+                    ?.takeIf { it.enabled }
+                    ?: return null
 
             val logger = serviceLocator.loggerFactory.getLogger(RuntimeCommand::class)
             logger.info("Installing RuntimeCommand extension...")

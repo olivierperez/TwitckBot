@@ -4,8 +4,6 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.Paths
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.FloatControl
 

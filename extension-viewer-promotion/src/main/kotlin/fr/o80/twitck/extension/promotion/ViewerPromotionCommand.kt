@@ -67,7 +67,7 @@ class ViewerPromotionCommand(
             return
         }
 
-        if(points != null && !points.consumePoints(viewerLogin, RECORDING_COST)) {
+        if (points != null && !points.consumePoints(viewerLogin, RECORDING_COST)) {
             val errorMessage = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, errorMessage)
             sound?.playNegative()
@@ -91,7 +91,7 @@ class ViewerPromotionCommand(
             return
         }
 
-        if(points != null && !points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
+        if (points != null && !points.consumePoints(viewerLogin, SHOUT_OUT_COST)) {
             val message = i18n.noPointsEnough.replace("#USER#", viewerLogin)
             messenger.sendImmediately(channel, message)
             return

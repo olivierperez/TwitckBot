@@ -45,7 +45,10 @@ class PointsCommands(
         if (command.options.size == 2) {
             val login = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${commandEvent.viewer.displayName} try to add $points to $login")
+            logger.command(
+                command,
+                "${commandEvent.viewer.displayName} try to add $points to $login"
+            )
 
             points?.let {
                 bank.addPoints(login, points)
@@ -59,12 +62,18 @@ class PointsCommands(
             val fromLogin = commandEvent.viewer.login
             val toLogin = command.options[0].sanitizeLogin()
             val points = command.options[1].tryToInt()
-            logger.command(command, "${commandEvent.viewer.displayName} try to transfer $points to $toLogin")
+            logger.command(
+                command,
+                "${commandEvent.viewer.displayName} try to transfer $points to $toLogin"
+            )
 
             if (toLogin == fromLogin) return
             if (points == null) return
             if (!storage.hasUserInfo(toLogin)) {
-                messenger.sendImmediately(commandEvent.channel, message.destinationViewerDoesNotExist)
+                messenger.sendImmediately(
+                    commandEvent.channel,
+                    message.destinationViewerDoesNotExist
+                )
                 return
             }
 
@@ -87,7 +96,10 @@ class PointsCommands(
         val command = commandEvent.command
         val points = bank.getPoints(commandEvent.viewer.login)
 
-        logger.command(command, "${commandEvent.viewer.displayName} requested points info ($points)")
+        logger.command(
+            command,
+            "${commandEvent.viewer.displayName} requested points info ($points)"
+        )
 
         val msg = if (points == 0) {
             message.viewerHasNoPoints

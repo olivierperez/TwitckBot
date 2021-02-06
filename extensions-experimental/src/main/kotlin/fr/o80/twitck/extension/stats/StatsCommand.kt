@@ -28,7 +28,10 @@ class StatsCommand(
 
     private fun handleStatCommand(messenger: Messenger, commandEvent: CommandEvent) {
         if (commandEvent.command.options.isEmpty()) {
-            messenger.sendImmediately(commandEvent.channel, "Usage !stat <name> [possibly more options]")
+            messenger.sendImmediately(
+                commandEvent.channel,
+                "Usage !stat <name> [possibly more options]"
+            )
             return
         }
 

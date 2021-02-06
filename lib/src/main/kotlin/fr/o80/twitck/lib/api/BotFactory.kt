@@ -1,22 +1,17 @@
 package fr.o80.twitck.lib.api
 
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
-import fr.o80.twitck.lib.api.extension.OverlayExtension
-import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.CommandTriggeringImpl
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
 import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
-import fr.o80.twitck.lib.api.service.step.StepsExecutor
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
 import fr.o80.twitck.lib.internal.service.ConfigService
 import fr.o80.twitck.lib.internal.service.ConfigServiceImpl
 import fr.o80.twitck.lib.internal.service.ExtensionProviderImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl
-import fr.o80.twitck.lib.internal.service.step.StepFormatter
-import fr.o80.twitck.lib.internal.service.step.StepsExecutorImpl
 import java.io.File
 
 fun interface Installer<T> {

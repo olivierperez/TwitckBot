@@ -54,9 +54,9 @@ class Repeat(
                 Duration.ofSeconds(config.data.secondsBetweenRepeatedMessages),
                 config.data.messages
             ).also { repeat ->
-                    pipeline.interceptMessageEvent(repeat::interceptMessageEvent)
-                    pipeline.requestChannel(repeat.channel)
-                }
+                pipeline.interceptMessageEvent(repeat::interceptMessageEvent)
+                pipeline.requestChannel(repeat.channel)
+            }
         }
     }
 
