@@ -4,7 +4,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-orange.svg?style=flat-square)](http://makeapullrequest.com)
 [![Last release](https://jitpack.io/v/olivierperez/TwitckBot.svg?style=flat-square)](https://jitpack.io/#olivierperez/TwitckBot)
 
-Every streamer need a sidekick, some that is by his side when he streams. TwitckBot is this sidekick, always by your side day and night.
+Every streamer need a sidekick, someone that is by his side when he streams. TwitckBot is this sidekick, always by your side day and night.
 
 On top of that, if you are a developer you can use TwitckBot as a foundation to develop your own Twitch Bot.
 
