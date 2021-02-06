@@ -6,6 +6,8 @@ import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.TwitckConfiguration
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
+import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
+import fr.o80.twitck.lib.api.extension.TunnelExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
@@ -24,7 +26,6 @@ import fr.o80.twitck.lib.internal.service.line.LineInterpreters
 import fr.o80.twitck.lib.internal.service.line.PrivMsgLineInterpreter
 import fr.o80.twitck.lib.internal.service.line.RaidInterpreter
 import fr.o80.twitck.lib.internal.service.line.WhisperLineInterpreter
-import fr.o80.twitck.lib.internal.service.topic.NgrokTunnel
 import fr.o80.twitck.lib.internal.service.topic.SecretHolder
 import fr.o80.twitck.lib.internal.service.topic.TopicManager
 import fr.o80.twitck.lib.internal.service.topic.WebhooksServer
@@ -85,7 +86,8 @@ internal class TwitckBotImpl(
     private val topicManager = TopicManager(
         userId = hostUserId,
         api = configuration.twitchApi,
-        ngrokTunnel = NgrokTunnel("TwitckBot", 8080),
+        tunnel = configuration.extensionProvider.firstOrNull(TunnelExtension::class)
+            ?: throw ExtensionDependencyException("TwitckBot", "Tunnel"),
         secret = SecretHolder.secret,
         webhooksServer = WebhooksServer(
             followsDispatcher = FollowsDispatcher(messenger, configuration.followsHandlers),
