@@ -11,7 +11,7 @@ class InformationRenderer(
     private val backgroundColor: Vertex3f,
     private val borderColor: Vertex3f,
     private val textColor: Vertex3f,
-    private val textRenderer: TextRenderer = TextRenderer("fonts/Roboto-Light.ttf")
+    private val textRenderer: TextRenderer = TextRenderer("fonts/Roboto-Light.ttf", fontHeight = 30f)
 ) : Renderer {
 
     private var informationText: String? = null

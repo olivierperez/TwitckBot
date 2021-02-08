@@ -2,6 +2,11 @@
   "extension": "Overlay",
   "enabled": true,
   "data": {
-    "informationText": "Yo the internets!"
+    "informationText": "Yo the internets!",
+    "style": {
+      "borderColor": "#080111",
+      "backgroundColor": "#220632",
+      "textColor": "#FFF9D9"
+    }
   }
 }

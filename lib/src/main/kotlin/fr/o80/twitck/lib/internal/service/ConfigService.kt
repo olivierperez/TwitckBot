@@ -3,6 +3,7 @@ package fr.o80.twitck.lib.internal.service
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import fr.o80.twitck.lib.api.bean.Color
 import fr.o80.twitck.lib.api.service.step.ActionStep
 import fr.o80.twitck.lib.api.service.step.CommandStep
 import fr.o80.twitck.lib.api.service.step.MessageStep
@@ -28,6 +29,7 @@ class ConfigServiceImpl(
                 .withSubtype(OverlayStep::class.java, ActionStep.Type.OVERLAY.value)
                 .withSubtype(SoundStep::class.java, ActionStep.Type.SOUND.value)
         )
+        .add(ColorAdapter())
         .build()
 
     override fun <T : Any> getConfig(file: String, clazz: KClass<T>): ExtensionConfig<T>? {
