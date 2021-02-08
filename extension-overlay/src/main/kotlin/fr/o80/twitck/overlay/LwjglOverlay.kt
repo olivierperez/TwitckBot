@@ -1,6 +1,7 @@
 package fr.o80.twitck.overlay
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.Color
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
@@ -15,16 +16,17 @@ import java.time.Duration
 
 class LwjglOverlay(
     windowName: String,
-    informationText: String?,
-    logger: Logger
+    informativeText: InformativeText?,
+    logger: Logger,
+    style: OverlayStyle
 ) : OverlayExtension {
 
     private val width = 1920
     private val height = 1080
     private val greenBackgroundColor = Vertex3f(0f, 0.6f, 0f)
-    private val textBackgroundColor = Vertex3f(0.8f, 0.8f, 0.8f)
-    private val borderColor = Vertex3f(0.5f, 0.5f, 0.5f)
-    private val textColor = Vertex3f(0.1f, 0.1f, 0.1f)
+    private val textBackgroundColor = style.backgroundColor.toVertex3f()
+    private val borderColor = style.borderColor.toVertex3f()
+    private val textColor = style.textColor.toVertex3f()
 
     private val overlay = OverlayWindow(
         title = windowName,
@@ -35,13 +37,16 @@ class LwjglOverlay(
         logger
     )
 
-    private val informationRenderer = InformationRenderer(
-        height = height,
-        width = width,
-        backgroundColor = textBackgroundColor,
-        borderColor = borderColor,
-        textColor = textColor
-    )
+    private val informationRenderer: InformationRenderer? = informativeText?.let {
+        InformationRenderer(
+            height = height,
+            width = width,
+            backgroundColor = textBackgroundColor,
+            borderColor = borderColor,
+            textColor = textColor,
+            anchor = informativeText.anchor
+        )
+    }
 
     private val popupImageRenderer = PopupImageRenderer(
         height = height,
@@ -52,11 +57,11 @@ class LwjglOverlay(
     )
 
     init {
-        informationRenderer.setText(informationText)
+        informationRenderer?.setText(informativeText?.text)
     }
 
     override fun alert(text: String, duration: Duration) {
-        informationRenderer.popAlert(text, duration)
+        informationRenderer?.popAlert(text, duration)
     }
 
     override fun showImage(path: String, duration: Duration) {
@@ -81,7 +86,7 @@ class LwjglOverlay(
 
     private fun start() {
         Thread(overlay).start()
-        overlay.registerRender(informationRenderer)
+        informationRenderer?.let { overlay.registerRender(it) }
         overlay.registerRender(popupImageRenderer)
     }
 
@@ -91,7 +96,7 @@ class LwjglOverlay(
             serviceLocator: ServiceLocator,
             configService: ConfigService
         ): OverlayExtension? {
-            val configuration = configService.getConfig("overlay.json", OverlayConfiguration::class)
+            val config = configService.getConfig("overlay.json", OverlayConfiguration::class)
                 ?.takeIf { it.enabled }
                 ?: return null
 
@@ -100,7 +105,8 @@ class LwjglOverlay(
 
             return LwjglOverlay(
                 windowName = "Streaming Overlay",
-                informationText = configuration.data.informationText,
+                informativeText = config.data.informativeText,
+                style = config.data.style,
                 logger = logger
             ).also { overlay ->
                 overlay.start()
@@ -108,4 +114,12 @@ class LwjglOverlay(
         }
     }
 
+}
+
+private fun Color.toVertex3f(): Vertex3f {
+    return Vertex3f(
+        red / 255f,
+        green / 255f,
+        blue / 255f
+    )
 }
