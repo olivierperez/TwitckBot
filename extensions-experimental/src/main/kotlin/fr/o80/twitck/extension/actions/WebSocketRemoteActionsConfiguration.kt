@@ -7,5 +7,6 @@ class WebSocketRemoteActionsConfiguration(
     val channel: String,
     val slobsHost: String,
     val slobsPort: Int,
-    val slobsToken: String
+    val slobsToken: String,
+    val actionsPort: Int
 )

@@ -4,7 +4,8 @@
   "data": {
     "channel": "#YOUR_CHANNEL_NAME",
     "slobsHost": "127.0.0.1",
-    "slobsPort": "59650",
-    "slobsToken": "<YOUR_STREAMLAB_OBS_TOKEN>"
+    "slobsPort": 59650,
+    "slobsToken": "<YOUR_STREAMLAB_OBS_TOKEN>",
+    "actionsPort": 9013
   }
 }
