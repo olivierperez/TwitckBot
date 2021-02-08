@@ -1,5 +1,5 @@
 {
-  "extension": "DefaultSoundExtension",
+  "extension": "Ngrok",
   "enabled": true,
   "data": {
     "path": "<PATH/TO/ngrok.exe>",

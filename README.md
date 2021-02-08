@@ -37,6 +37,7 @@ thanks to `.json` files in the `.config` directory.
 |Channel|Basic reactions to events or commands executed by the viewers.|-|-|[documentation](doc/config/Channel.md)|
 |Help|`!help` command to help the viewers to know what they can do.|-|-|[documentation](doc/config/Help.md)|
 |Market|A marketplace where the viewers can "buy" things with your points system.|-|Help</br>Points|[documentation](doc/config/Market.md)|
+|Ngrok|Auto-start ngrok when TwitckBot starts.|-|-|[documentation](doc/config/Ngrok.md)|
 |Overlay|An overlay to show on top of your stream.|-|-|[documentation](doc/config/Overlay.md)|
 |Points|The points system managed by the bot.|Storage|Help|[documentation](doc/config/Points.md)|
 |Poll|A poll mechanism to asked community their opinion.|-|Points|[documentation](doc/config/Poll.md)|
@@ -51,16 +52,6 @@ thanks to `.json` files in the `.config` directory.
 |Welcome|Welcome the newcomers with funny sentences with their names in it.|Storage|Sound|[documentation](doc/config/Welcome.md)|
 
 # ▶ Run
-
-## ngrok requirement
-
-**ngrok** is required by TwitckBot in order to react to events like: someone follows you,
-someone subscribed to your channel. You have to start it before TwitckBot, otherwise the
-bot won't start.
-
-tips: the command might help you `ngrok http 80 -authtoken <YOUR_NGROK_TOKEN>`
-
-## Start TwitckBot
 
 1. Double click the "TwitckBot.bat" (or "TwitckBot.sh" on Linux)
 2. Wait to see a big "Ready to go!"...
