@@ -16,7 +16,7 @@ import java.time.Duration
 
 class LwjglOverlay(
     windowName: String,
-    informationText: String?,
+    informativeText: InformativeText?,
     logger: Logger,
     style: OverlayStyle
 ) : OverlayExtension {
@@ -37,13 +37,16 @@ class LwjglOverlay(
         logger
     )
 
-    private val informationRenderer = InformationRenderer(
-        height = height,
-        width = width,
-        backgroundColor = textBackgroundColor,
-        borderColor = borderColor,
-        textColor = textColor
-    )
+    private val informationRenderer: InformationRenderer? = informativeText?.let {
+        InformationRenderer(
+            height = height,
+            width = width,
+            backgroundColor = textBackgroundColor,
+            borderColor = borderColor,
+            textColor = textColor,
+            anchor = informativeText.anchor
+        )
+    }
 
     private val popupImageRenderer = PopupImageRenderer(
         height = height,
@@ -54,11 +57,11 @@ class LwjglOverlay(
     )
 
     init {
-        informationRenderer.setText(informationText)
+        informationRenderer?.setText(informativeText?.text)
     }
 
     override fun alert(text: String, duration: Duration) {
-        informationRenderer.popAlert(text, duration)
+        informationRenderer?.popAlert(text, duration)
     }
 
     override fun showImage(path: String, duration: Duration) {
@@ -83,7 +86,7 @@ class LwjglOverlay(
 
     private fun start() {
         Thread(overlay).start()
-        overlay.registerRender(informationRenderer)
+        informationRenderer?.let { overlay.registerRender(it) }
         overlay.registerRender(popupImageRenderer)
     }
 
@@ -102,7 +105,7 @@ class LwjglOverlay(
 
             return LwjglOverlay(
                 windowName = "Streaming Overlay",
-                informationText = config.data.informationText,
+                informativeText = config.data.informativeText,
                 style = config.data.style,
                 logger = logger
             ).also { overlay ->

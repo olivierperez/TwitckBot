@@ -2,7 +2,10 @@
   "extension": "Overlay",
   "enabled": true,
   "data": {
-    "informationText": "Yo the internets!",
+    "informativeText": {
+      "text": "Yo les internets c'est Olivier !",
+      "anchor": "BottomRight"
+    },
     "style": {
       "borderColor": "#080111",
       "backgroundColor": "#220632",
