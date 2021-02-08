@@ -54,6 +54,7 @@ class WebSocketRemoteActions(
 
             val webSocket = UiWebSocket(
                 config.data.channel,
+                config.data.actionsPort,
                 store,
                 slobsClient,
                 serviceLocator.commandTriggering,
