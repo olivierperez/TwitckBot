@@ -11,8 +11,9 @@ sealed class ActionStep(
     enum class Type(val value: String) {
         COMMAND("command"),
         SOUND("sound"),
-        OVERLAY("overlay"),
-        MESSAGE("message")
+        OVERLAY_POPUP("overlay"),
+        MESSAGE("message"),
+        OVERLAY_EVENT("overlay_event")
     }
 }
 
@@ -28,11 +29,16 @@ internal class SoundStep(
 ) : ActionStep(Type.SOUND)
 
 @JsonClass(generateAdapter = true)
-internal class OverlayStep(
+internal class OverlayPopupStep(
     val image: String,
     val text: String,
     val seconds: Long = 5
-) : ActionStep(Type.OVERLAY)
+) : ActionStep(Type.OVERLAY_POPUP)
+
+@JsonClass(generateAdapter = true)
+internal class OverlayEventStep(
+    val text: String
+) : ActionStep(Type.OVERLAY_EVENT)
 
 @JsonClass(generateAdapter = true)
 internal class CommandStep(
