@@ -31,16 +31,16 @@ tasks.withType<Jar> {
         attributes("Main-Class" to "fr.o80.twitck.application.MainKt")
     }
     from(
-        configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) } +
-            configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
+        configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) },
+        configurations.compileClasspath.get().map { if (it.isDirectory) it else zipTree(it) }
     )
-    archiveName = "TwitckBot.jar"
+    archiveFileName.set("TwitckBot.jar")
 }
 
 tasks.create("prepareConfig", Copy::class) {
     group = "build"
     from(file("$rootDir/sample/config"))
-    into(file("$buildDir/libs/.config"))
+    into(file("$buildDir/libs/config"))
 }
 
 tasks.create("prepareAssets", Copy::class) {
@@ -59,6 +59,6 @@ tasks.create("release", Zip::class) {
 
     from("$buildDir/libs")
 
-    archiveName = "TwitckBot-${project.version}.zip"
-    destinationDir = file("$buildDir/dist")
+    archiveBaseName.set("TwitckBot")
+    destinationDirectory.set(File(buildDir, "dist"))
 }
