@@ -6,6 +6,12 @@
       "text": "Yo les internets c'est Olivier !",
       "anchor": "BottomRight"
     },
+    "events": {
+      "x": 1400,
+      "y": 370,
+      "width": 520,
+      "height": 400
+    },
     "style": {
       "borderColor": "#080111",
       "backgroundColor": "#220632",

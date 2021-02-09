@@ -1,13 +1,14 @@
 package fr.o80.twitck.overlay
 
 import fr.o80.twitck.lib.api.Pipeline
-import fr.o80.twitck.lib.api.bean.Color
+import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.service.ConfigService
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
+import fr.o80.twitck.overlay.graphics.renderer.EventsRenderer
 import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
 import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
 import java.io.File
@@ -17,6 +18,7 @@ import java.time.Duration
 class LwjglOverlay(
     windowName: String,
     informativeText: InformativeText?,
+    private val eventsConfiguration: EventsConfiguration?,
     logger: Logger,
     style: OverlayStyle
 ) : OverlayExtension {
@@ -46,6 +48,21 @@ class LwjglOverlay(
             textColor = textColor,
             anchor = informativeText.anchor
         )
+    }
+
+    private val eventsHolder = EventsHolder()
+    private val eventsRenderer: EventsRenderer? = eventsConfiguration?.let {
+        EventsRenderer(
+            style,
+            eventsConfiguration
+        )
+    }
+
+    override fun onEvent(event: OverlayEvent) {
+        eventsConfiguration?.let {
+            eventsHolder.record(event)
+            eventsRenderer?.update(eventsHolder.events)
+        }
     }
 
     private val popupImageRenderer = PopupImageRenderer(
@@ -86,6 +103,7 @@ class LwjglOverlay(
 
     private fun start() {
         Thread(overlay).start()
+        eventsRenderer?.let { overlay.registerRender(it) }
         informationRenderer?.let { overlay.registerRender(it) }
         overlay.registerRender(popupImageRenderer)
     }
@@ -107,6 +125,7 @@ class LwjglOverlay(
                 windowName = "Streaming Overlay",
                 informativeText = config.data.informativeText,
                 style = config.data.style,
+                eventsConfiguration = config.data.events,
                 logger = logger
             ).also { overlay ->
                 overlay.start()
@@ -114,12 +133,4 @@ class LwjglOverlay(
         }
     }
 
-}
-
-private fun Color.toVertex3f(): Vertex3f {
-    return Vertex3f(
-        red / 255f,
-        green / 255f,
-        blue / 255f
-    )
 }
