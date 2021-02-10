@@ -29,11 +29,11 @@ class NgrokTunnelExtension(
             val logger = serviceLocator.loggerFactory.getLogger(NgrokTunnelExtension::class)
             logger.info("Installing Ngrok extension...")
 
-            NgrokProcess(
-                config.data.path,
-                config.data.token,
-                logger
-            ).launch()
+//            NgrokProcess(
+//                config.data.path,
+//                config.data.token,
+//                logger
+//            ).launch()
 
             return NgrokTunnelExtension(
                 config.data.name,

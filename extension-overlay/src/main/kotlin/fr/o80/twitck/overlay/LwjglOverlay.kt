@@ -6,11 +6,12 @@ import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.overlay.events.EventsHolder
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
-import fr.o80.twitck.overlay.graphics.renderer.EventsRenderer
-import fr.o80.twitck.overlay.graphics.renderer.InformationRenderer
-import fr.o80.twitck.overlay.graphics.renderer.PopupImageRenderer
+import fr.o80.twitck.overlay.events.EventsLayer
+import fr.o80.twitck.overlay.informative.InformativeLayer
+import fr.o80.twitck.overlay.popup.PopupImageLayer
 import java.io.File
 import java.io.InputStream
 import java.time.Duration
@@ -39,8 +40,8 @@ class LwjglOverlay(
         logger
     )
 
-    private val informationRenderer: InformationRenderer? = informativeText?.let {
-        InformationRenderer(
+    private val informativeLayer: InformativeLayer? = informativeText?.let {
+        InformativeLayer(
             height = height,
             width = width,
             backgroundColor = textBackgroundColor,
@@ -51,21 +52,14 @@ class LwjglOverlay(
     }
 
     private val eventsHolder = EventsHolder(8)
-    private val eventsRenderer: EventsRenderer? = eventsConfiguration?.let {
-        EventsRenderer(
+    private val eventsLayer: EventsLayer? = eventsConfiguration?.let {
+        EventsLayer(
             style,
             eventsConfiguration
         )
     }
 
-    override fun onEvent(event: OverlayEvent) {
-        eventsConfiguration?.let {
-            eventsHolder.record(event)
-            eventsRenderer?.update(eventsHolder.events)
-        }
-    }
-
-    private val popupImageRenderer = PopupImageRenderer(
+    private val popupImageLayer = PopupImageLayer(
         height = height,
         width = width,
         backgroundColor = textBackgroundColor,
@@ -74,21 +68,28 @@ class LwjglOverlay(
     )
 
     init {
-        informationRenderer?.setText(informativeText?.text)
+        informativeLayer?.setText(informativeText?.text)
     }
 
     override fun alert(text: String, duration: Duration) {
-        informationRenderer?.popAlert(text, duration)
+        informativeLayer?.popAlert(text, duration)
+    }
+
+    override fun onEvent(event: OverlayEvent) {
+        eventsConfiguration?.let {
+            eventsHolder.record(event)
+            eventsLayer?.update(eventsHolder.events)
+        }
     }
 
     override fun showImage(path: String, duration: Duration) {
         val imageStream = getImageStream(path)
-        popupImageRenderer.setImage(imageStream, null, duration)
+        popupImageLayer.setImage(imageStream, null, duration)
     }
 
     override fun showImage(path: String, text: String, duration: Duration) {
         val imageStream = getImageStream(path)
-        popupImageRenderer.setImage(imageStream, text, duration)
+        popupImageLayer.setImage(imageStream, text, duration)
     }
 
     private fun getImageStream(path: String): InputStream {
@@ -103,9 +104,9 @@ class LwjglOverlay(
 
     private fun start() {
         Thread(overlay).start()
-        eventsRenderer?.let { overlay.registerRender(it) }
-        informationRenderer?.let { overlay.registerRender(it) }
-        overlay.registerRender(popupImageRenderer)
+        eventsLayer?.let { overlay.registerRender(it) }
+        informativeLayer?.let { overlay.registerRender(it) }
+        overlay.registerRender(popupImageLayer)
     }
 
     companion object {

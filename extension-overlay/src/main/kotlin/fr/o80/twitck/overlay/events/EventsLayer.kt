@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.events
 
 import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.overlay.EventsConfiguration
@@ -6,16 +6,18 @@ import fr.o80.twitck.overlay.OverlayStyle
 import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
+import fr.o80.twitck.overlay.graphics.Layer
+import fr.o80.twitck.overlay.graphics.renderer.TextRenderer
 import fr.o80.twitck.overlay.toVertex3f
 
-class EventsRenderer(
+class EventsLayer(
     private val style: OverlayStyle,
     private val config: EventsConfiguration,
     private val textRenderer: TextRenderer = TextRenderer(
         "fonts/Roboto-Light.ttf",
         fontHeight = 30f
     )
-) : Renderer {
+) : Layer {
 
     private var events: List<OverlayEvent> = emptyList()
 

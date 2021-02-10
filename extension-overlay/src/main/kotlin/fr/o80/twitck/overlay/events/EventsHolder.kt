@@ -1,4 +1,4 @@
-package fr.o80.twitck.overlay
+package fr.o80.twitck.overlay.events
 
 import fr.o80.twitck.lib.api.extension.OverlayEvent
 import java.util.*
