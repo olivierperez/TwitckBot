@@ -3,11 +3,11 @@ package fr.o80.twitck.lib.internal.service
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
-import fr.o80.twitck.lib.api.bean.Color
 import fr.o80.twitck.lib.api.service.step.ActionStep
 import fr.o80.twitck.lib.api.service.step.CommandStep
 import fr.o80.twitck.lib.api.service.step.MessageStep
-import fr.o80.twitck.lib.api.service.step.OverlayStep
+import fr.o80.twitck.lib.api.service.step.OverlayEventStep
+import fr.o80.twitck.lib.api.service.step.OverlayPopupStep
 import fr.o80.twitck.lib.api.service.step.SoundStep
 import fr.o80.twitck.lib.internal.bean.ExtensionConfig
 import java.io.File
@@ -26,7 +26,8 @@ class ConfigServiceImpl(
             PolymorphicJsonAdapterFactory.of(ActionStep::class.java, "type")
                 .withSubtype(CommandStep::class.java, ActionStep.Type.COMMAND.value)
                 .withSubtype(MessageStep::class.java, ActionStep.Type.MESSAGE.value)
-                .withSubtype(OverlayStep::class.java, ActionStep.Type.OVERLAY.value)
+                .withSubtype(OverlayPopupStep::class.java, ActionStep.Type.OVERLAY_POPUP.value)
+                .withSubtype(OverlayEventStep::class.java, ActionStep.Type.OVERLAY_EVENT.value)
                 .withSubtype(SoundStep::class.java, ActionStep.Type.SOUND.value)
         )
         .add(ColorAdapter())

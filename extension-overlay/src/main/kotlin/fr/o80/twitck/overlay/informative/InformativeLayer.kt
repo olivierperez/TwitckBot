@@ -1,13 +1,15 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.informative
 
 import fr.o80.twitck.overlay.Anchor
+import fr.o80.twitck.overlay.graphics.Layer
 import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
+import fr.o80.twitck.overlay.graphics.renderer.TextRenderer
 import java.time.Duration
 import java.time.Instant
 
-class InformationRenderer(
+class InformativeLayer(
     private val height: Int,
     private val width: Int,
     private val backgroundColor: Vertex3f,
@@ -18,7 +20,7 @@ class InformationRenderer(
         fontHeight = 30f
     ),
     private val anchor: Anchor
-) : Renderer {
+) : Layer {
 
     private var informationText: String? = null
 

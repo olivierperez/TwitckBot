@@ -43,7 +43,7 @@ A marketplace where the viewers can "buy" things with your points system.
 `// 3` This block defines one product available in your marketplace, you can configure several
 products below. Each product have to define : a name, a price and a list of things to do.
 
-`// 4` The steps are the things to do when someone bought the product. In the example above, two
+`// 4` The steps are the things to do when someone bought the product (see [Action steps](/doc/ActionSteps.md)).. In the example above, two
 things will happen:
 1. Execution of the command on behalf of the streamer
 2. A sound (configure in Sound extension) will be played

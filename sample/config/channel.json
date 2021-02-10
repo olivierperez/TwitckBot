@@ -14,7 +14,7 @@
           "message": "Yay!"
         },
         {
-          "type": "overlay",
+          "type": "overlay_popup",
           "image": "image/ouray.png",
           "text": "Yata Yata Yata"
         }
@@ -34,6 +34,10 @@
       {
         "type": "message",
         "message": "Thanks #USER# for following the you-know-who streamer!"
+      },
+      {
+        "type": "overlay_event",
+        "text": "#USER# just followed"
       }
     ]
   }

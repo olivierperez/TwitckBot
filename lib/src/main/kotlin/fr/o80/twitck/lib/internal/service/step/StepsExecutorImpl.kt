@@ -1,5 +1,6 @@
 package fr.o80.twitck.lib.internal.service.step
 
+import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.service.CommandParser
@@ -9,10 +10,12 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.api.service.step.ActionStep
 import fr.o80.twitck.lib.api.service.step.CommandStep
 import fr.o80.twitck.lib.api.service.step.MessageStep
-import fr.o80.twitck.lib.api.service.step.OverlayStep
+import fr.o80.twitck.lib.api.service.step.OverlayEventStep
+import fr.o80.twitck.lib.api.service.step.OverlayPopupStep
 import fr.o80.twitck.lib.api.service.step.SoundStep
 import fr.o80.twitck.lib.api.service.step.StepParam
 import fr.o80.twitck.lib.api.service.step.StepsExecutor
+import fr.o80.twitck.lib.utils.Do
 import java.time.Duration
 
 internal class StepsExecutorImpl(
@@ -30,10 +33,11 @@ internal class StepsExecutorImpl(
         param: StepParam
     ) {
         steps.forEach { step ->
-            when (step) {
+            Do exhaustive when (step) {
                 is CommandStep -> execute(step, param)
                 is MessageStep -> send(step, messenger, param)
-                is OverlayStep -> show(step)
+                is OverlayPopupStep -> showPopup(step, param)
+                is OverlayEventStep -> showEvent(step, param)
                 is SoundStep -> play(step)
             }
         }
@@ -58,11 +62,27 @@ internal class StepsExecutorImpl(
         messenger.sendImmediately(param.channel, message)
     }
 
-    private fun show(step: OverlayStep) {
+    private fun showPopup(
+        step: OverlayPopupStep,
+        param: StepParam
+    ) {
         if (overlay == null) {
-            logger.error("Overlay steps require Overlay extension to work")
+            logger.error("Overlay popup steps require Overlay extension to work")
         } else {
-            overlay.showImage(step.image, step.text, Duration.ofSeconds(step.seconds))
+            val text = stepFormatter.format(step.text, param)
+            overlay.showImage(step.image, text, Duration.ofSeconds(step.seconds))
+        }
+    }
+
+    private fun showEvent(
+        step: OverlayEventStep,
+        param: StepParam
+    ) {
+        if (overlay == null) {
+            logger.error("Overlay event steps require Overlay extension to work")
+        } else {
+            val text = stepFormatter.format(step.text, param)
+            overlay.onEvent(OverlayEvent(text))
         }
     }
 

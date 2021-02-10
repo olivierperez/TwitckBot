@@ -6,6 +6,7 @@ import fr.o80.twitck.lib.api.bean.Color
 @JsonClass(generateAdapter = true)
 class OverlayConfiguration(
     val informativeText: InformativeText?,
+    val events: EventsConfiguration?,
     val style: OverlayStyle
 )
 
@@ -20,6 +21,17 @@ class OverlayStyle(
 class InformativeText(
     val text: String,
     val anchor: Anchor
+)
+
+@JsonClass(generateAdapter = true)
+class EventsConfiguration(
+    val x: Float,
+    val y: Float,
+    val width: Float,
+    val height: Float,
+    val fontSize: Float,
+    val blockMargin: Float,
+    val secondsToLeave: Long
 )
 
 enum class Anchor {

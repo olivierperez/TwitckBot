@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.welcome
 
 import com.squareup.moshi.JsonClass
+import fr.o80.twitck.lib.api.service.step.ActionStep
 
 @JsonClass(generateAdapter = true)
 class WelcomeConfiguration(
@@ -9,7 +10,8 @@ class WelcomeConfiguration(
     val secondsBetweenWelcomes: Long,
     val ignoreViewers: List<String>,
     val messages: WelcomeMessages,
-    val reactTo: WelcomeReactTo
+    val reactTo: WelcomeReactTo,
+    val onWelcome: List<ActionStep>
 )
 
 @JsonClass(generateAdapter = true)

@@ -33,7 +33,10 @@ Welcome the newcomers with funny sentences with their names in it.
             "messages": true,
             "commands": false,
             "raids": true
-        }
+        },
+        "onWelcome": [
+            // 6
+        ]
     }
 }
 
@@ -51,3 +54,5 @@ Welcome the newcomers with funny sentences with their names in it.
 for instance you can specify the messages for followers.
 
 `// 5` Define on which events you want to welcome your viewers.
+
+`// 6` Execute some things when someone is welcomed by TwitckBot (see [Action steps](/doc/ActionSteps.md)).

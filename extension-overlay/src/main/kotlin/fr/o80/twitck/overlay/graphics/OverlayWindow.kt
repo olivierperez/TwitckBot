@@ -4,7 +4,6 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.utils.use
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
-import fr.o80.twitck.overlay.graphics.renderer.Renderer
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.opengl.GL
@@ -27,8 +26,8 @@ class OverlayWindow(
 
     private var interrupted = false
 
-    private val renderersToInit: Queue<Renderer> = ConcurrentLinkedDeque()
-    private val renderers: MutableList<Renderer> = mutableListOf()
+    private val renderersToInit: Queue<Layer> = ConcurrentLinkedDeque()
+    private val layers: MutableList<Layer> = mutableListOf()
 
     override fun run() {
         configure()
@@ -126,7 +125,7 @@ class OverlayWindow(
     }
 
     private fun tickRenderers() {
-        renderers.forEach { it.tick() }
+        layers.forEach { it.tick() }
     }
 
     private fun initRenderers() {
@@ -141,16 +140,16 @@ class OverlayWindow(
         draw {
             clear(bgColor.x, bgColor.y, bgColor.z)
         }
-        renderers.forEach { it.render() }
+        layers.forEach { it.render() }
     }
 
     fun kill() {
         interrupted = true
     }
 
-    fun registerRender(renderer: Renderer) {
-        renderers.add(renderer)
-        renderersToInit.offer(renderer)
+    fun registerRender(layer: Layer) {
+        layers.add(layer)
+        renderersToInit.offer(layer)
     }
 
 }
