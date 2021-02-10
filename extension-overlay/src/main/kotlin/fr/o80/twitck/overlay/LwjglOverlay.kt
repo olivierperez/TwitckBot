@@ -50,7 +50,7 @@ class LwjglOverlay(
         )
     }
 
-    private val eventsHolder = EventsHolder()
+    private val eventsHolder = EventsHolder(8)
     private val eventsRenderer: EventsRenderer? = eventsConfiguration?.let {
         EventsRenderer(
             style,
