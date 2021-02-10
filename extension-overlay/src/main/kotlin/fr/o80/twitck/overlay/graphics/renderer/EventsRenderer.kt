@@ -17,10 +17,7 @@ class EventsRenderer(
     )
 ) : Renderer {
 
-    private var events: List<OverlayEvent> = listOf(
-        OverlayEvent("ExterN91 is helping"),
-        OverlayEvent("r0ulito just arrived"),
-    )
+    private var events: List<OverlayEvent> = emptyList()
 
     override fun init() {
         textRenderer.init()
@@ -47,12 +44,12 @@ class EventsRenderer(
     }
 
     fun update(events: List<OverlayEvent>) {
-        this.events = events
+        this.events = events.asReversed()
     }
 
     private fun Draw.drawEvents() {
         pushed {
-            translate(config.x, config.y, 0f)
+            translate(config.x, config.y + config.height, 0f)
 
             val blockHeight = 45f
             val verticalSpacing = 5f
@@ -61,9 +58,10 @@ class EventsRenderer(
             val textColor = style.textColor.toVertex3f()
 
             events.forEach { overlayEvent ->
+                translate(0f, -blockHeight, 0f)
                 drawBackground(bgColor, blockHeight)
                 drawText(textColor, overlayEvent)
-                translate(0f, blockHeight + verticalSpacing, 0f)
+                translate(0f, -verticalSpacing, 0f)
             }
         }
     }
