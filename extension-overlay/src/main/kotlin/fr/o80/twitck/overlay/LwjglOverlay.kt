@@ -11,10 +11,12 @@ import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.events.EventsLayer
 import fr.o80.twitck.overlay.informative.InformativeLayer
+import fr.o80.twitck.overlay.model.LwjglEvent
 import fr.o80.twitck.overlay.popup.PopupImageLayer
 import java.io.File
 import java.io.InputStream
 import java.time.Duration
+import java.time.Instant
 
 class LwjglOverlay(
     windowName: String,
@@ -77,7 +79,7 @@ class LwjglOverlay(
 
     override fun onEvent(event: OverlayEvent) {
         eventsConfiguration?.let {
-            eventsHolder.record(event)
+            eventsHolder.record(event.toLwjglEvent(eventsConfiguration.secondsToLeave))
             eventsLayer?.update(eventsHolder.events)
         }
     }
@@ -132,6 +134,14 @@ class LwjglOverlay(
                 overlay.start()
             }
         }
+    }
+
+    private fun OverlayEvent.toLwjglEvent(secondsToLeave: Long): LwjglEvent {
+        return LwjglEvent(
+            this.text,
+            Instant.now(),
+            Duration.ofSeconds(secondsToLeave)
+            )
     }
 
 }

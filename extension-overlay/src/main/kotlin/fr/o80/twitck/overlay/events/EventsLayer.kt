@@ -1,6 +1,5 @@
 package fr.o80.twitck.overlay.events
 
-import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.overlay.EventsConfiguration
 import fr.o80.twitck.overlay.OverlayStyle
 import fr.o80.twitck.overlay.graphics.Layer
@@ -8,7 +7,9 @@ import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import fr.o80.twitck.overlay.graphics.renderer.TextRenderer
+import fr.o80.twitck.overlay.model.LwjglEvent
 import fr.o80.twitck.overlay.toVertex3f
+import java.time.Instant
 
 class EventsLayer(
     private val style: OverlayStyle,
@@ -19,13 +20,15 @@ class EventsLayer(
     )
 ) : Layer {
 
-    private var events: List<OverlayEvent> = emptyList()
+    private var events: List<LwjglEvent> = emptyList()
 
     override fun init() {
         textRenderer.init()
     }
 
     override fun tick() {
+        val now = Instant.now()
+        events = events.filter { (it.since + it.duration).isAfter(now) }
     }
 
     override fun render() {
@@ -45,7 +48,7 @@ class EventsLayer(
         )
     }
 
-    fun update(events: List<OverlayEvent>) {
+    fun update(events: List<LwjglEvent>) {
         this.events = events.asReversed()
     }
 
@@ -78,7 +81,7 @@ class EventsLayer(
 
     private fun Draw.drawText(
         textColor: Vertex3f,
-        overlayEvent: OverlayEvent
+        overlayEvent: LwjglEvent
     ) {
         pushed {
             translate(config.blockMargin + 10f, 1f, 0f)

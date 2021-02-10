@@ -12,7 +12,8 @@
       "width": 520,
       "height": 400,
       "fontSize": 20,
-      "blockMargin": 10
+      "blockMargin": 10,
+      "secondsToLeave": 300
     },
     "style": {
       "borderColor": "#080111",
