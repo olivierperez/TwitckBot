@@ -14,7 +14,7 @@
           "message": "Yay!"
         },
         {
-          "type": "overlay",
+          "type": "overlay_popup",
           "image": "image/ouray.png",
           "text": "Yata Yata Yata"
         }
