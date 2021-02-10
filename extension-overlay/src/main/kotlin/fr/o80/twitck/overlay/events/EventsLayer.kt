@@ -3,10 +3,10 @@ package fr.o80.twitck.overlay.events
 import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.overlay.EventsConfiguration
 import fr.o80.twitck.overlay.OverlayStyle
+import fr.o80.twitck.overlay.graphics.Layer
 import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
-import fr.o80.twitck.overlay.graphics.Layer
 import fr.o80.twitck.overlay.graphics.renderer.TextRenderer
 import fr.o80.twitck.overlay.toVertex3f
 
@@ -15,7 +15,7 @@ class EventsLayer(
     private val config: EventsConfiguration,
     private val textRenderer: TextRenderer = TextRenderer(
         "fonts/Roboto-Light.ttf",
-        fontHeight = 30f
+        fontHeight = config.fontSize
     )
 ) : Layer {
 
@@ -51,9 +51,9 @@ class EventsLayer(
 
     private fun Draw.drawEvents() {
         pushed {
-            translate(config.x, config.y + config.height, 0f)
+            translate(config.x, config.y + config.height - config.blockMargin, 0f)
 
-            val blockHeight = 45f
+            val blockHeight = config.fontSize + 10f
             val verticalSpacing = 5f
 
             val bgColor = style.backgroundColor.toVertex3f()
@@ -73,7 +73,7 @@ class EventsLayer(
         blockHeight: Float
     ) {
         color(bgColor)
-        quad(0f, 0f, config.width, blockHeight)
+        quad(config.blockMargin, 0f, config.width - config.blockMargin, blockHeight)
     }
 
     private fun Draw.drawText(
@@ -81,7 +81,7 @@ class EventsLayer(
         overlayEvent: OverlayEvent
     ) {
         pushed {
-            translate(10f, 1f, 0f)
+            translate(config.blockMargin + 10f, 1f, 0f)
             color(textColor)
             textRenderer.render(overlayEvent.text)
         }

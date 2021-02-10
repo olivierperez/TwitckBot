@@ -10,7 +10,9 @@
       "x": 1400,
       "y": 370,
       "width": 520,
-      "height": 400
+      "height": 400,
+      "fontSize": 20,
+      "blockMargin": 10
     },
     "style": {
       "borderColor": "#080111",
