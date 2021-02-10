@@ -27,4 +27,4 @@ Basic reactions to events or commands executed by the viewers.
 `// 2` Execute some things when viewers enter the `!celebrate` command. Here you can choose the
 command name you want, and you can set several commands.
 
-`// 3` Execute some things when someone followed your channel.
+`// 3` Execute some things when someone followed your channel (see [Action steps](/doc/ActionSteps.md)).
