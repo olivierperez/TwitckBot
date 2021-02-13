@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit
 
 class NgrokProcess(
     private val pathToNgrok: String,
-    private val token: String,
     private val logger: Logger
 ) {
 
@@ -14,7 +13,7 @@ class NgrokProcess(
 
         try {
             logger.info("Starting ngrok...")
-            process = ProcessBuilder(pathToNgrok, "http", "80", "-authtoken", token)
+            process = ProcessBuilder(pathToNgrok, "start", "--none")
                 .redirectOutput(ProcessBuilder.Redirect.PIPE)
                 .redirectError(ProcessBuilder.Redirect.PIPE)
                 .start()
