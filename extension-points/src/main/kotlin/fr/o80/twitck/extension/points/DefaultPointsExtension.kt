@@ -6,7 +6,7 @@ import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class DefaultPointsExtension(
     override val channel: String,
@@ -52,7 +52,7 @@ class DefaultPointsExtension(
 
             val bank = PointsBank(storage)
             val pointsCommands = PointsCommands(
-                config.data.channel,
+                config.data.channel.name,
                 config.data.privilegedBadges,
                 config.data.i18n,
                 bank,
@@ -60,7 +60,7 @@ class DefaultPointsExtension(
                 storage
             )
             return DefaultPointsExtension(
-                config.data.channel,
+                config.data.channel.name,
                 help,
                 bank
             )

@@ -1,10 +1,11 @@
 package fr.o80.twitck.extension.promotion
 
 import com.squareup.moshi.JsonClass
+import fr.o80.twitck.lib.api.bean.ChannelName
 
 @JsonClass(generateAdapter = true)
 class ViewerPromotionConfiguration(
-    val channel: String,
+    val channel: ChannelName,
     val secondsBetweenTwoPromotions: Long,
     val daysSinceLastVideoToPromote: Long,
     val ignoreViewers: List<String>,

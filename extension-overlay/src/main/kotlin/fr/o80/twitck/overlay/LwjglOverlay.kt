@@ -5,7 +5,7 @@ import fr.o80.twitck.lib.api.extension.OverlayEvent
 import fr.o80.twitck.lib.api.extension.OverlayExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import fr.o80.twitck.overlay.events.EventsHolder
 import fr.o80.twitck.overlay.graphics.OverlayWindow
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f

@@ -15,12 +15,11 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.api.service.step.StepParam
 import fr.o80.twitck.lib.api.service.step.StepsExecutor
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import fr.o80.twitck.lib.api.service.time.TimeChecker
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import java.time.Duration
 
 class Welcome(
@@ -28,8 +27,7 @@ class Welcome(
     private val welcomeTimeChecker: TimeChecker,
     private val twitchApi: TwitchApi,
     private val sound: SoundExtension?,
-    private val stepsExecutor: StepsExecutor,
-    private val logger: Logger
+    private val stepsExecutor: StepsExecutor
 ) {
 
     private val followers: List<Follower> by lazy {
@@ -52,7 +50,6 @@ class Welcome(
     }
 
     fun interceptRaidEvent(messenger: Messenger, raidEvent: RaidEvent): RaidEvent {
-        logger.error("channel => ${config.channel}")
         handleNewViewer(raidEvent.channel, raidEvent.viewer, messenger)
         thanksForRaiding(raidEvent, messenger)
         sound?.playRaid()
@@ -60,7 +57,7 @@ class Welcome(
     }
 
     private fun handleNewViewer(channel: String, viewer: Viewer, messenger: Messenger) {
-        if (config.channel != channel)
+        if (config.channel.name != channel)
             return
 
         if (config.ignoreViewers.any { viewer.login.equals(it, true) }) {
@@ -78,7 +75,7 @@ class Welcome(
 
         welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
             welcomeViewer(channel, viewer, messenger)
-            val stepParam = StepParam(config.channel, viewer.displayName, emptyList())
+            val stepParam = StepParam(config.channel.name, viewer.displayName, emptyList())
             stepsExecutor.execute(config.onWelcome, messenger, stepParam)
         }
     }
@@ -143,8 +140,7 @@ class Welcome(
                 welcomeTimeChecker = welcomeTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 sound = sound,
-                stepsExecutor = serviceLocator.stepsExecutor,
-                logger = logger
+                stepsExecutor = serviceLocator.stepsExecutor
             ).also { welcome ->
 
                 if (config.data.reactTo.commands) {
@@ -167,7 +163,7 @@ class Welcome(
                         welcome.interceptRaidEvent(messenger, raid)
                     }
                 }
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
             }
         }
     }

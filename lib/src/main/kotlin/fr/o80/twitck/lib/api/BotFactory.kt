@@ -8,7 +8,7 @@ import fr.o80.twitck.lib.api.service.ServiceLocatorImpl
 import fr.o80.twitck.lib.api.service.log.Slf4jLoggerFactory
 import fr.o80.twitck.lib.internal.PipelineImpl
 import fr.o80.twitck.lib.internal.TwitckBotImpl
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import fr.o80.twitck.lib.internal.service.ConfigServiceImpl
 import fr.o80.twitck.lib.internal.service.ExtensionProviderImpl
 import fr.o80.twitck.lib.internal.service.TwitchApiImpl

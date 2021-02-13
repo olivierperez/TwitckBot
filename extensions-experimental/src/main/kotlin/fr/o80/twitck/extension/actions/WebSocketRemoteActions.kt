@@ -7,7 +7,7 @@ import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class WebSocketRemoteActions(
     private val uiWebSocket: UiWebSocket
@@ -53,7 +53,7 @@ class WebSocketRemoteActions(
             )
 
             val webSocket = UiWebSocket(
-                config.data.channel,
+                config.data.channel.name,
                 config.data.actionsPort,
                 store,
                 slobsClient,

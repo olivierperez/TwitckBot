@@ -2,10 +2,11 @@ package fr.o80.twitck.extension.points
 
 import com.squareup.moshi.JsonClass
 import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.ChannelName
 
 @JsonClass(generateAdapter = true)
 class PointsConfiguration(
-    val channel: String,
+    val channel: ChannelName,
     val privilegedBadges: Collection<Badge>,
     val i18n: PointsI18n
 )

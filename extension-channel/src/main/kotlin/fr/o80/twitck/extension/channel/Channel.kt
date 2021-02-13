@@ -3,7 +3,7 @@ package fr.o80.twitck.extension.channel
 import fr.o80.twitck.extension.channel.config.ChannelConfiguration
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class Channel {
 
@@ -22,7 +22,7 @@ class Channel {
             val follows = ChannelFollows(config.data.follows, serviceLocator.stepsExecutor)
 
             return Channel().also {
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
                 pipeline.interceptFollowEvent(follows::interceptFollowEvent)
 //                pipeline.interceptJoinEvent(channel::interceptJoinEvent)
