@@ -7,7 +7,7 @@ A marketplace where the viewers can "buy" things with your points system.
     "extension": "Market",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "i18n": { // 2
             "productNotFound": "The product doesn't exist!",
             "usage": "Usage of !buy => !buy <produit> <paramètres>",

@@ -2,7 +2,7 @@
   "extension": "Points",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "privilegedBadges": [
       "BROADCASTER",
       "MODERATOR"

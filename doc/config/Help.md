@@ -7,7 +7,7 @@
   "extension": "Help",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME", // 1
+    "channel": "#<YOUR_CHANNEL_NAME>", // 1
     "commands": {
       "!name": "You'll never learn my real name!!" // 2
     }

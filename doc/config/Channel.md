@@ -7,7 +7,7 @@ Basic reactions to events or commands executed by the viewers.
   "extension": "Channel",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME", // 1
+    "channel": "#<YOUR_CHANNEL_NAME>", // 1
     "commands": {
       "!celebrate": [
         // 2

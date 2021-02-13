@@ -2,7 +2,7 @@
   "extension": "RuntimeCommand",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "privilegedBadges": [
       "BROADCASTER",
       "MODERATOR"

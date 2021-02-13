@@ -17,6 +17,6 @@ Auto-start ngrok when TwitckBot starts.
 
 ## Explanation
 
-`// 1` Download the executable file of ngrok, and set its location here.
+`// 1` [Download the executable file of ngrok](https://ngrok.com/download) and set its location here.
 
 `// 2` Create an account on ngrok website and put your token here.
