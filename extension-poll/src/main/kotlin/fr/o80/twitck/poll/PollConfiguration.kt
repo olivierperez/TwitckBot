@@ -2,10 +2,11 @@ package fr.o80.twitck.poll
 
 import com.squareup.moshi.JsonClass
 import fr.o80.twitck.lib.api.bean.Badge
+import fr.o80.twitck.lib.api.bean.ChannelName
 
 @JsonClass(generateAdapter = true)
 class PollConfiguration(
-    val channel: String,
+    val channel: ChannelName,
     val privilegedBadges: List<Badge>,
     val pointsEarnPerVote: Int,
     val i18n: PollI18n

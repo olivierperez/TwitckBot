@@ -7,7 +7,7 @@ Some of your viewers deserve to be promoted.
     "extension": "Promotion",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "secondsBetweenTwoPromotions": 7200, // 2
         "daysSinceLastVideoToPromote": 120, // 3
         "ignoreViewers": [ // 4

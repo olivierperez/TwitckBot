@@ -2,7 +2,7 @@
   "extension": "Market",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "i18n": {
       "productNotFound": "The product doesn't exist!",
       "usage": "Usage of !buy => !buy <produit> <paramètres>",

@@ -7,7 +7,7 @@ Reward with points the activity of the viewers.
     "extension": "Rewards",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "talk": { // 2
             "reward": 5,
             "secondsBetweenTwoTalkRewards": 300

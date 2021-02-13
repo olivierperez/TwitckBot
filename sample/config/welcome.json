@@ -2,7 +2,7 @@
   "extension": "Welcome",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "streamId": "<Your streamer id>",
     "secondsBetweenWelcomes": 7200,
     "ignoreViewers": [

@@ -29,6 +29,7 @@ class WebhooksServer(
     private val followsDispatcher: FollowsDispatcher,
     private val subscriptionsDispatcher: SubscriptionsDispatcher,
     private val secret: String,
+    private val port: Int,
     loggerFactory: LoggerFactory
 ) {
 
@@ -40,7 +41,7 @@ class WebhooksServer(
         .build()
 
     fun start() {
-        embeddedServer(Netty, 8080) {
+        embeddedServer(Netty, port) {
             install(DoubleReceive)
             routing {
                 respondTo(Topic.FOLLOWS, ::onNewFollowers)

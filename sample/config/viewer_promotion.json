@@ -2,7 +2,7 @@
   "extension": "Promotion",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "secondsBetweenTwoPromotions": 7200,
     "daysSinceLastVideoToPromote": 120,
     "ignoreViewers": [

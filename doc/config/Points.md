@@ -7,7 +7,7 @@ The points system managed by the bot.
     "extension": "Points",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "privilegedBadges": [ // 2
             "BROADCASTER",
             "MODERATOR"

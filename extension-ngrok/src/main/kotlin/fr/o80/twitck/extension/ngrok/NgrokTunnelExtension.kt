@@ -3,7 +3,7 @@ package fr.o80.twitck.extension.ngrok
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.TunnelExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class NgrokTunnelExtension(
     name: String,

@@ -7,7 +7,7 @@ Let you configure some commands while you are in the middle of a streaming.
     "extension": "RuntimeCommand",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "privilegedBadges": [ // 2
             "BROADCASTER",
             "MODERATOR"

@@ -1,10 +1,11 @@
-package fr.o80.twitck.lib.internal.service
+package fr.o80.twitck.lib.internal.json
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 import fr.o80.twitck.lib.api.bean.Color
 
-class ColorAdapter {
+internal class ColorAdapter {
+
     @ToJson
     fun toJson(color: Color): String {
         val redStr = color.red.toString(16)

@@ -96,6 +96,7 @@ internal class TwitckBotImpl(
                 configuration.subscriptionsHandlers
             ),
             secret = SecretHolder.secret,
+            port = 9014,
             loggerFactory = configuration.loggerFactory
         ),
         loggerFactory = configuration.loggerFactory

@@ -8,8 +8,8 @@ import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.bean.event.WhisperEvent
 import fr.o80.twitck.lib.api.bean.subscription.SubscriptionEvent
 import fr.o80.twitck.lib.api.extension.StatsExtension
+import fr.o80.twitck.lib.api.service.ConfigService
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
 
 class InMemoryStatsExtension(
     private val channel: String,
@@ -109,12 +109,15 @@ class InMemoryStatsExtension(
             val logger = serviceLocator.loggerFactory.getLogger(InMemoryStatsExtension::class)
             logger.info("Installing StatsExtension extension...")
 
-            val channelName = config.data.channel
             val statsData = StatsData()
 
             val statsCommand = StatsCommand(statsData, logger)
 
-            return InMemoryStatsExtension(channelName, statsData, statsCommand).also { stats ->
+            return InMemoryStatsExtension(
+                config.data.channel.name,
+                statsData,
+                statsCommand
+            ).also { stats ->
                 pipeline.requestChannel(stats.channel)
                 pipeline.interceptCommandEvent { _, commandEvent ->
                     stats.interceptCommandEvent(commandEvent)

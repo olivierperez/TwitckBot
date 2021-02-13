@@ -3,7 +3,7 @@ package fr.o80.twitck.poll
 import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class Poll {
 
@@ -23,7 +23,7 @@ class Poll {
             val points = serviceLocator.extensionProvider.firstOrNull(PointsExtension::class)
 
             val commands = PollCommands(
-                channel = config.data.channel,
+                channel = config.data.channel.name,
                 privilegedBadges = config.data.privilegedBadges,
                 i18n = config.data.i18n,
                 pointsForEachVote = config.data.pointsEarnPerVote,
@@ -31,7 +31,7 @@ class Poll {
             )
 
             return Poll().also {
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
             }
         }

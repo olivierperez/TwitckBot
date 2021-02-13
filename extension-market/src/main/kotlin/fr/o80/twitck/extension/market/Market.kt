@@ -5,7 +5,7 @@ import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 
 class Market(
     help: HelpExtension?
@@ -36,7 +36,7 @@ class Market(
             val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
 
             val commands = MarketCommands(
-                config.data.channel,
+                config.data.channel.name,
                 config.data.i18n,
                 config.data.products,
                 logger,
@@ -47,7 +47,7 @@ class Market(
             return Market(
                 help
             ).also {
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
                 pipeline.interceptCommandEvent(commands::interceptCommandEvent)
             }
         }

@@ -2,7 +2,7 @@
   "extension": "Repeat",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "secondsBetweenRepeatedMessages": 900,
     "messages": [
       "Welcome to the place to be",
