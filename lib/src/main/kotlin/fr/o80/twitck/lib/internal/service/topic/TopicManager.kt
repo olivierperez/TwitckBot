@@ -16,21 +16,24 @@ class TopicManager(
     private val logger = loggerFactory.getLogger(TopicManager::class)
 
     fun subscribe() {
+        val previousCallbackUrl = tunnel.getPreviousUrl()
         val callbackUrl = tunnel.getTunnelUrl()
         webhooksServer.start()
-        subscribeToTopics(callbackUrl)
+        subscribeToTopics(previousCallbackUrl, callbackUrl)
     }
 
-    private fun subscribeToTopics(callbackUrl: String) {
+    private fun subscribeToTopics(previousCallbackUrl: String?, callbackUrl: String) {
         api.validate()
 
         Topic.values().forEach { topic ->
             logger.info("Subscribing to $topic...")
-            api.unsubscribeFrom(
-                topic = topic.topicUrl(userId),
-                callbackUrl = topic.callbackUrl(callbackUrl),
-                leaseSeconds = topic.leaseDuration.seconds
-            )
+            previousCallbackUrl?.let {
+                api.unsubscribeFrom(
+                    topic = topic.topicUrl(userId),
+                    callbackUrl = topic.callbackUrl(previousCallbackUrl),
+                    leaseSeconds = topic.leaseDuration.seconds
+                )
+            }
             api.subscribeTo(
                 topic = topic.topicUrl(userId),
                 callbackUrl = topic.callbackUrl(callbackUrl),
