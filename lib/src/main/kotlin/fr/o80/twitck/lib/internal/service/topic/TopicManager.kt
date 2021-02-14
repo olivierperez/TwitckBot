@@ -31,7 +31,8 @@ class TopicManager(
                 api.unsubscribeFrom(
                     topic = topic.topicUrl(userId),
                     callbackUrl = topic.callbackUrl(previousCallbackUrl),
-                    leaseSeconds = topic.leaseDuration.seconds
+                    leaseSeconds = topic.leaseDuration.seconds,
+                    secret = secret
                 )
             }
             api.subscribeTo(

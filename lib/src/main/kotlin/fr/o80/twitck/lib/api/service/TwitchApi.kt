@@ -12,6 +12,6 @@ interface TwitchApi {
     fun getChannel(channelId: String): Channel
     fun getVideos(channelId: String, limit: Int): List<Video>
     fun subscribeTo(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String
-    fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long): String
+    fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String
     fun validate(): ValidateResponse
 }

@@ -45,7 +45,6 @@ class NgrokTunnelExtension(
 
 //            NgrokProcess(
 //                config.data.path,
-//                config.data.token,
 //                logger
 //            ).launch()
 
