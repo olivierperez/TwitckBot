@@ -10,7 +10,7 @@ import fr.o80.twitck.lib.api.extension.SoundExtension
 import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import java.time.Duration
 
 class Rewards(
@@ -75,7 +75,7 @@ class Rewards(
             )
 
             val commands = RewardsCommands(
-                channel = config.data.channel,
+                channel = config.data.channel.name,
                 claimConfig = config.data.claim,
                 i18n = config.data.i18n,
                 claimTimeChecker = lastClaimChecker,
@@ -85,7 +85,7 @@ class Rewards(
             )
 
             return Rewards(
-                channel = config.data.channel,
+                channel = config.data.channel.name,
                 rewardedPoints = config.data.talk.reward,
                 claimConfig = config.data.claim,
                 commands = commands,

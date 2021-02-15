@@ -20,6 +20,7 @@ import java.time.Duration
 
 class UiWebSocket(
     private val channel: String,
+    private val port: Int,
     private val store: RemoteActionStore,
     private val slobsClient: SlobsClient,
     private val commandTriggering: CommandTriggering,
@@ -39,7 +40,7 @@ class UiWebSocket(
     }
 
     fun start() {
-        embeddedServer(Netty, 8181) {
+        embeddedServer(Netty, port) {
             install(WebSockets) {
                 pingPeriod = Duration.ofSeconds(15)
                 timeout = Duration.ofSeconds(15)

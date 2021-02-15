@@ -4,7 +4,7 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import java.time.Duration
 
 class Repeat(
@@ -50,7 +50,7 @@ class Repeat(
                 .info("Installing Repeat extension...")
 
             return Repeat(
-                config.data.channel,
+                config.data.channel.name,
                 Duration.ofSeconds(config.data.secondsBetweenRepeatedMessages),
                 config.data.messages
             ).also { repeat ->

@@ -32,7 +32,7 @@ class Main : CliktCommand() {
 
     override fun run() {
         val bot = configureBot(
-            oauthToken = oauthToken,
+            oauthToken = oauthToken.removePrefix("oauth:"),
             hostName = hostName
         )
 

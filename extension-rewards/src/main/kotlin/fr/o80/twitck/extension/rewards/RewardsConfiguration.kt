@@ -1,10 +1,11 @@
 package fr.o80.twitck.extension.rewards
 
 import com.squareup.moshi.JsonClass
+import fr.o80.twitck.lib.api.bean.ChannelName
 
 @JsonClass(generateAdapter = true)
 class RewardsConfiguration(
-    val channel: String,
+    val channel: ChannelName,
     val claim: RewardsClaim,
     val talk: RewardsTalk,
     val i18n: RewardsI18n

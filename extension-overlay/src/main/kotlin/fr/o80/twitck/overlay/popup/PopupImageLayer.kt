@@ -1,9 +1,11 @@
-package fr.o80.twitck.overlay.graphics.renderer
+package fr.o80.twitck.overlay.popup
 
+import fr.o80.twitck.overlay.graphics.Layer
 import fr.o80.twitck.overlay.graphics.ext.Draw
 import fr.o80.twitck.overlay.graphics.ext.Vertex3f
 import fr.o80.twitck.overlay.graphics.ext.draw
 import fr.o80.twitck.overlay.graphics.model.Image
+import fr.o80.twitck.overlay.graphics.renderer.TextRenderer
 import fr.o80.twitck.overlay.graphics.utils.LineSplitter
 import org.lwjgl.opengl.GL46
 import java.io.InputStream
@@ -11,7 +13,7 @@ import java.time.Duration
 import java.time.Instant
 import kotlin.math.ceil
 
-class PopupImageRenderer(
+class PopupImageLayer(
     private val height: Int,
     private val width: Int,
     private val textRenderer: TextRenderer = TextRenderer(
@@ -21,7 +23,7 @@ class PopupImageRenderer(
     private val textColor: Vertex3f,
     private val backgroundColor: Vertex3f,
     private val borderColor: Vertex3f
-) : Renderer {
+) : Layer {
 
     private var image: Image? = null
     private var text: String? = null

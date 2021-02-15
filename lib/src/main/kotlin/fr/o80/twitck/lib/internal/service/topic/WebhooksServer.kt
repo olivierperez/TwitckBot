@@ -29,6 +29,7 @@ class WebhooksServer(
     private val followsDispatcher: FollowsDispatcher,
     private val subscriptionsDispatcher: SubscriptionsDispatcher,
     private val secret: String,
+    private val port: Int,
     loggerFactory: LoggerFactory
 ) {
 
@@ -40,7 +41,7 @@ class WebhooksServer(
         .build()
 
     fun start() {
-        embeddedServer(Netty, 8080) {
+        embeddedServer(Netty, port) {
             install(DoubleReceive)
             routing {
                 respondTo(Topic.FOLLOWS, ::onNewFollowers)
@@ -72,6 +73,9 @@ class WebhooksServer(
             logger.info("Twitch challenged us for $mode on ${call.request.path()} with $challenge")
             call.respondText(challenge, contentType = ContentType.Text.Html)
         }
+        logger.trace(
+            "Parameters:\n" + call.parameters.entries()
+                .joinToString("\n") { it.key + "=" + it.value })
     }
 
     private suspend fun onNewFollowers(call: ApplicationCall, body: String) {

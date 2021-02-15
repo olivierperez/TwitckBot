@@ -7,7 +7,7 @@ Welcome the newcomers with funny sentences with their names in it.
     "extension": "Welcome",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "streamId": "<Your streamer id>", // 2
         "secondsBetweenWelcomes": 7200, // 3
         "ignoreViewers": [
@@ -33,7 +33,10 @@ Welcome the newcomers with funny sentences with their names in it.
             "messages": true,
             "commands": false,
             "raids": true
-        }
+        },
+        "onWelcome": [
+            // 6
+        ]
     }
 }
 
@@ -51,3 +54,5 @@ Welcome the newcomers with funny sentences with their names in it.
 for instance you can specify the messages for followers.
 
 `// 5` Define on which events you want to welcome your viewers.
+
+`// 6` Execute some things when someone is welcomed by TwitckBot (see [Action steps](/doc/ActionSteps.md)).

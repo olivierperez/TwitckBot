@@ -98,6 +98,7 @@ class TwitchApiImpl(
                     "subscribe",
                     secret
                 )
+                logger.trace("Subscription payload: $payload")
                 entity = StringEntity(payload)
             }
 
@@ -105,7 +106,7 @@ class TwitchApiImpl(
         return EntityUtils.toString(response.entity)
     }
 
-    override fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long): String {
+    override fun unsubscribeFrom(topic: String, callbackUrl: String, leaseSeconds: Long, secret: String): String {
         val clientId = clientId ?: throw IllegalStateException("Client not yet retrieved")
 
         val request = HttpPost("https://api.twitch.tv/helix/webhooks/hub")
@@ -118,8 +119,9 @@ class TwitchApiImpl(
                     topic,
                     leaseSeconds,
                     "unsubscribe",
-                    ""
+                    secret
                 )
+                logger.trace("Un-subscription payload: $payload")
                 entity = StringEntity(payload)
             }
 

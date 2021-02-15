@@ -4,9 +4,9 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.HelpExtension
+import fr.o80.twitck.lib.api.service.ConfigService
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
-import fr.o80.twitck.lib.internal.service.ConfigService
 import java.time.Duration
 
 class DefaultHelpExtension(
@@ -80,10 +80,10 @@ class DefaultHelpExtension(
                 .info("Installing Help extension...")
 
             return DefaultHelpExtension(
-                config.data.channel,
+                config.data.channel.name,
                 config.data.commands
             ).also { help ->
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
                 pipeline.interceptCommandEvent(help::interceptCommandEvent)
             }
         }

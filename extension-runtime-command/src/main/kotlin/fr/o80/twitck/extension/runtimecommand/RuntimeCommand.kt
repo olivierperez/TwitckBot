@@ -9,7 +9,7 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import java.time.Duration
 import java.util.*
 
@@ -127,13 +127,13 @@ class RuntimeCommand(
             val help = serviceLocator.extensionProvider.firstOrNull(HelpExtension::class)
 
             return RuntimeCommand(
-                config.data.channel,
+                config.data.channel.name,
                 config.data.privilegedBadges,
                 storage,
                 help,
                 logger
             ).also { runtimeCommand ->
-                pipeline.requestChannel(config.data.channel)
+                pipeline.requestChannel(config.data.channel.name)
                 pipeline.interceptCommandEvent { messenger, commandEvent ->
                     runtimeCommand.interceptCommandEvent(
                         messenger,

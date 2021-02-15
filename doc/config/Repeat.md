@@ -7,7 +7,7 @@ The bot will say one of predefined sentences every X minutes. Useful to give inf
     "extension": "Repeat",
     "enabled": true,
     "data": {
-        "channel": "#YOUR_CHANNEL_NAME", // 1
+        "channel": "#<YOUR_CHANNEL_NAME>", // 1
         "secondsBetweenRepeatedMessages": 900, // 2
         "messages": [ // 3
             "Welcome to the place to be",

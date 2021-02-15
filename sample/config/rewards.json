@@ -2,7 +2,7 @@
   "extension": "Rewards",
   "enabled": true,
   "data": {
-    "channel": "#YOUR_CHANNEL_NAME",
+    "channel": "#<YOUR_CHANNEL_NAME>",
     "talk": {
       "reward": 5,
       "secondsBetweenTwoTalkRewards": 300

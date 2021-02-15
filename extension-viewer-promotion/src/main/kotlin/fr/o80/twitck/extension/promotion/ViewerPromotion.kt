@@ -14,7 +14,7 @@ import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import fr.o80.twitck.lib.api.service.time.TimeChecker
-import fr.o80.twitck.lib.internal.service.ConfigService
+import fr.o80.twitck.lib.api.service.ConfigService
 import java.time.Duration
 import java.time.Instant
 
@@ -94,14 +94,14 @@ class ViewerPromotion(
             )
 
             return ViewerPromotion(
-                channel = config.data.channel,
+                channel = config.data.channel.name,
                 promotionMessages = config.data.promotionMessages,
                 ignoredLogins = config.data.ignoreViewers,
                 maxVideoAgeToPromote = Duration.ofDays(config.data.daysSinceLastVideoToPromote),
                 promotionTimeChecker = promotionTimeChecker,
                 twitchApi = serviceLocator.twitchApi,
                 command = ViewerPromotionCommand(
-                    channel = config.data.channel,
+                    channel = config.data.channel.name,
                     storage = storage,
                     sound = sound,
                     points = points,

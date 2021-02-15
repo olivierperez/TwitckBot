@@ -2,9 +2,5 @@
   "extension": "Ngrok",
   "enabled": true,
   "data": {
-    "path": "<PATH/TO/ngrok.exe>",
-    "token": "<YOUR_NGROK_TOKEN>",
-    "name": "TwitckBot",
-    "port": "8080"
   }
 }
