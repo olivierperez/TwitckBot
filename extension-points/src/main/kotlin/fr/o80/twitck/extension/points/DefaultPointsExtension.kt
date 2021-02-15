@@ -44,7 +44,7 @@ class DefaultPointsExtension(
                 ?: return null
 
             val logger = serviceLocator.loggerFactory.getLogger(DefaultPointsExtension::class)
-            logger.info("Installing Help extension...")
+            logger.info("Installing Points extension...")
 
             val storage = serviceLocator.extensionProvider.firstOrNull(StorageExtension::class)
                 ?: throw ExtensionDependencyException("Points", "Storage")

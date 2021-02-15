@@ -25,18 +25,23 @@ class TopicManager(
         api.validate()
 
         Topic.values().forEach { topic ->
-            logger.info("Subscribing to $topic...")
-            api.unsubscribeFrom(
-                topic = topic.topicUrl(userId),
-                callbackUrl = topic.callbackUrl(callbackUrl),
-                leaseSeconds = topic.leaseDuration.seconds
-            )
-            api.subscribeTo(
+            logger.info("Unsubscribing from $topic...")
+            val unsubscribeResponse = api.unsubscribeFrom(
                 topic = topic.topicUrl(userId),
                 callbackUrl = topic.callbackUrl(callbackUrl),
                 leaseSeconds = topic.leaseDuration.seconds,
                 secret = secret
             )
+            logger.trace("Unsubscribe response: \"$unsubscribeResponse\"")
+
+            logger.info("Subscribing to $topic...")
+            val subscribeResponse = api.subscribeTo(
+                topic = topic.topicUrl(userId),
+                callbackUrl = topic.callbackUrl(callbackUrl),
+                leaseSeconds = topic.leaseDuration.seconds,
+                secret = secret
+            )
+            logger.trace("Subscribe response: \"$subscribeResponse\"")
         }
     }
 }

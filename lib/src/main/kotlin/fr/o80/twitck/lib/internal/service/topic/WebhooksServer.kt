@@ -73,6 +73,9 @@ class WebhooksServer(
             logger.info("Twitch challenged us for $mode on ${call.request.path()} with $challenge")
             call.respondText(challenge, contentType = ContentType.Text.Html)
         }
+        logger.trace(
+            "Parameters:\n" + call.parameters.entries()
+                .joinToString("\n") { it.key + "=" + it.value })
     }
 
     private suspend fun onNewFollowers(call: ApplicationCall, body: String) {

@@ -12,15 +12,27 @@ On top of that, if you are a developer you can use TwitckBot as a foundation to 
 
 ## 🧲 Download
 
-**Download the zip file** of the last release from the [Releases page](https://github.com/olivierperez/TwitckBot/releases).
+**Download the zip file** of the last release from the
+[Releases page](https://github.com/olivierperez/TwitckBot/releases).
 
 **Unzip it** and go to the next chapter.
 
+## ⚙ Configure the ngrok file
+
+Ngrok is used to react to events of viewer following.
+So first: [download the executable file of ngrok](https://ngrok.com/download).
+
+Once downloaded, edit the ngrok file regarding your operating system:
+- Windows: **ngrok.bat**
+- Linux: **ngrok.sh**
+
+In this file, replace `<PATH\TO\ngrok.exe>` by the path of the previously downloaded `.exe` file.
+
 ## ⚙ Configure the launch file
 
-First things first, configure the launch file:
-- For Windows: **TwitckBot.bat**
-- For Linux: **TwitckBot.sh**
+Edit the TwitckBot launch file regarding your operating system:
+- Windows: **TwitckBot.bat**
+- Linux: **TwitckBot.sh**
 
 In this file, replace `<OAUTH_TOKEN>` by the token of your bot account (it can be your own account if want the bot talk on your behalf),
 and replace `<STREAMER_ACCOUNT_NAME>` by your own twitch account's name (even if the bot has its own account).
@@ -37,7 +49,7 @@ thanks to `.json` files in the `.config` directory.
 |Channel|Basic reactions to events or commands executed by the viewers.|-|-|[documentation](doc/config/Channel.md)|
 |Help|`!help` command to help the viewers to know what they can do.|-|-|[documentation](doc/config/Help.md)|
 |Market|A marketplace where the viewers can "buy" things with your points system.|-|Help</br>Points|[documentation](doc/config/Market.md)|
-|Ngrok|Auto-start ngrok when TwitckBot starts.|-|-|[documentation](doc/config/Ngrok.md)|
+|Ngrok|**Required** to react to events of viewer following.|-|-|[documentation](doc/config/Ngrok.md)|
 |Overlay|An overlay to show on top of your stream.|-|-|[documentation](doc/config/Overlay.md)|
 |Points|The points system managed by the bot.|Storage|Help|[documentation](doc/config/Points.md)|
 |Poll|A poll mechanism to asked community their opinion.|-|Points|[documentation](doc/config/Poll.md)|
@@ -53,9 +65,11 @@ thanks to `.json` files in the `.config` directory.
 
 # ▶ Run
 
-1. Double click the "TwitckBot.bat" (or "TwitckBot.sh" on Linux)
-2. Wait to see a big "Ready to go!"...
-3. TwitckBot is up and running, type a command (`!help` for instance) in Twitch chat
+1. Execute "ngrok.bat" (or "ngrok.sh" on Linux)
+   - please, avoid restarting it while you're still streaming
+2. Execute "TwitckBot.bat" (or "TwitckBot.sh" on Linux)
+3. Wait to see a big "Ready to go!"...
+4. TwitckBot is up and running, type a command (`!help` for instance) in Twitch chat
 
 ## 📄 License
 
