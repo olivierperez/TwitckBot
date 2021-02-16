@@ -40,7 +40,7 @@ tasks.withType<Jar> {
 tasks.create("prepareConfig", Copy::class) {
     group = "build"
     from(file("$rootDir/sample/config"))
-    into(file("$buildDir/libs/config"))
+    into(file("$buildDir/libs/.config"))
 }
 
 tasks.create("prepareAssets", Copy::class) {
@@ -49,6 +49,8 @@ tasks.create("prepareAssets", Copy::class) {
         include("fonts/")
         include("TwitckBot.bat")
         include("TwitckBot.sh")
+        include("ngrok.bat")
+        include("ngrok.sh")
     }
     into("$buildDir/libs/")
 }
