@@ -5,6 +5,7 @@ import fr.o80.slobs.SlobsClient
 import fr.o80.twitck.extension.actions.model.Config
 import fr.o80.twitck.extension.actions.model.RemoteAction
 import fr.o80.twitck.extension.actions.model.Scene
+import fr.o80.twitck.extension.actions.model.Status
 import fr.o80.twitck.lib.api.bean.CoolDown
 import fr.o80.twitck.lib.api.service.CommandTriggering
 import fr.o80.twitck.lib.api.service.Messenger
@@ -15,7 +16,11 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import java.time.Duration
 
 class UiWebSocket(
@@ -33,9 +38,24 @@ class UiWebSocket(
 
     internal var messenger: Messenger? = null
 
+    private val scope = CoroutineScope(Dispatchers.IO + Job())
+
     init {
-        runBlocking {
+        scope.launch {
             slobsClient.connect()
+
+            launch(Dispatchers.IO) {
+                while (true) {
+                    slobsClient.onSceneSwitched().consumeEach { scene ->
+                        println("Scene switched: ${scene.name}")
+                        val statusJson = getStatusJson(scene.id)
+                        dispatch { session ->
+                            session.send("""Status:$statusJson""")
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -101,12 +121,23 @@ class UiWebSocket(
     }
 
     private suspend fun onConfigRequested(session: DefaultWebSocketServerSession) {
+        session.send("Config:${getConfigJson()}")
+        session.send("Status:${getStatusJson(slobsClient.getActiveScene().id)}")
+    }
+
+    private suspend fun getConfigJson(): String? {
         val actions = store.getActions()
         val scenes = slobsClient.getScenes().map { Scene(it.id, it.name) }
 
         val config = Config(actions, scenes)
         val adapter = moshi.adapter(Config::class.java)
-        session.send("Config:${adapter.toJson(config)}")
+        return adapter.toJson(config)
+    }
+
+    private fun getStatusJson(sceneId: String): String? {
+        val status = Status(currentSceneId = sceneId)
+        val adapter = moshi.adapter(Status::class.java)
+        return adapter.toJson(status)
     }
 
     private suspend fun onNewAction(newActionJson: String) {
