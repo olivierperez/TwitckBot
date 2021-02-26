@@ -15,7 +15,9 @@ import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.time.Duration
 
 class UiWebSocket(
@@ -101,22 +103,28 @@ class UiWebSocket(
     }
 
     private suspend fun onConfigRequested(session: DefaultWebSocketServerSession) {
+        session.send("Config:${getConfigJson()}")
+    }
+
+    private suspend fun getConfigJson(): String? {
         val actions = store.getActions()
         val scenes = slobsClient.getScenes().map { Scene(it.id, it.name) }
 
         val config = Config(actions, scenes)
         val adapter = moshi.adapter(Config::class.java)
-        session.send("Config:${adapter.toJson(config)}")
+        return adapter.toJson(config)
     }
 
-    private suspend fun onNewAction(newActionJson: String) {
+    private suspend fun onNewAction(newActionJson: String) = withContext(Dispatchers.IO) {
         logger.debug("Someone requested the adding of action: $newActionJson")
         val adapter = moshi.adapter(RemoteAction::class.java)
         val action = adapter.fromJson(newActionJson)!!
         store.addAction(action)
 
+        val configJson = getConfigJson()
+
         dispatch { otherSession ->
-            otherSession.send(Frame.Text("Actions:${getActionsJson()}"))
+            otherSession.send("Config:$configJson")
         }
     }
 
@@ -133,11 +141,6 @@ class UiWebSocket(
 
     private suspend fun onScene(sceneId: String) {
         slobsClient.switchTo(sceneId)
-    }
-
-    private fun getActionsJson(): String {
-        val adapter = moshi.adapter(List::class.java)
-        return adapter.toJson(store.getActions())!!
     }
 
     private suspend fun dispatch(function: suspend (DefaultWebSocketServerSession) -> Unit) {
