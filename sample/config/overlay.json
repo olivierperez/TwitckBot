@@ -13,7 +13,8 @@
       "height": 400,
       "fontSize": 20,
       "blockMargin": 10,
-      "secondsToLeave": 300
+      "secondsToLeave": 300,
+      "showFrame": false
     },
     "style": {
       "borderColor": "#080111",

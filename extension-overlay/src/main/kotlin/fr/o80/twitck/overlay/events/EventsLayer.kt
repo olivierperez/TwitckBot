@@ -33,12 +33,12 @@ class EventsLayer(
 
     override fun render() {
         draw {
-            drawBorder()
+            if (config.showFrame) drawFrame()
             drawEvents()
         }
     }
 
-    private fun Draw.drawBorder() {
+    private fun Draw.drawFrame() {
         color(style.borderColor.toVertex3f())
         rect(
             config.x,

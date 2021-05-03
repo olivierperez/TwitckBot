@@ -31,7 +31,8 @@ class EventsConfiguration(
     val height: Float,
     val fontSize: Float,
     val blockMargin: Float,
-    val secondsToLeave: Long
+    val secondsToLeave: Long,
+    val showFrame: Boolean
 )
 
 enum class Anchor {

@@ -18,7 +18,8 @@ An overlay to show on top of your stream.
           "height": 400,
           "fontSize": 20,
           "blockMargin": 10,
-          "secondsToLeave": 300 // 4
+          "secondsToLeave": 300, // 4
+          "showFrame": false
       },
       "style": { // 5
           "borderColor": "#080111",
