@@ -5,10 +5,13 @@
         </encoder>
     </appender>
 
-    <timestamp key="bySecond" datePattern="yyyyMMdd"/>
-
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>logs/log-${bySecond}.txt</file>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/log.txt</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/log-%d{yyyyMMdd}.txt</fileNamePattern>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
         </encoder>
