@@ -8,5 +8,6 @@ import fr.o80.twitck.lib.api.service.step.ActionStep
 class ChannelConfiguration(
     val channel: ChannelName,
     val commands: Map<String, List<ActionStep>>,
-    val follows: List<ActionStep>
+    val follows: List<ActionStep>,
+    val bits: List<ActionStep>
 )

@@ -1,15 +1,16 @@
 package fr.o80.twitck.lib.internal.service.step
 
-import fr.o80.twitck.lib.api.service.step.StepParam
+import fr.o80.twitck.lib.api.service.step.StepParams
 
 class StepFormatter {
 
     private val indexedParamRegex = "#PARAM-(\\d+)#".toRegex()
 
-    fun format(input: String, param: StepParam): String =
+    fun format(input: String, params: StepParams): String =
         input
-            .formatFor(param.viewerName)
-            .formatWith(param.params)
+            .formatFor(params.viewerName)
+            .formatWith(params.params)
+            .formatWithBits(params.bits)
 
     private fun String.formatFor(viewerName: String): String =
         this.replace("#USER#", viewerName)
@@ -17,6 +18,10 @@ class StepFormatter {
     private fun String.formatWith(params: List<String>): String =
         this.replaceIndexedParams(params)
             .replaceFullLengthParams(params)
+
+    private fun String.formatWithBits(bits: Int?): String {
+        return bits?.let { this.replace("#BITS#", bits.toString()) } ?: this
+    }
 
     private fun String.replaceIndexedParams(params: List<String>) =
         indexedParamRegex.findAll(this)

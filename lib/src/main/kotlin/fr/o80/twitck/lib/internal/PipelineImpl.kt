@@ -1,6 +1,7 @@
 package fr.o80.twitck.lib.internal
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.handler.BitsHandler
 import fr.o80.twitck.lib.api.handler.CommandHandler
 import fr.o80.twitck.lib.api.handler.FollowsHandler
 import fr.o80.twitck.lib.api.handler.JoinHandler
@@ -10,6 +11,7 @@ import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
 
 internal interface PipelineProvider {
+    val bitsHandlers: MutableList<BitsHandler>
     val commandHandlers: MutableList<CommandHandler>
     val followsHandlers: MutableList<FollowsHandler>
     val joinHandlers: MutableList<JoinHandler>
@@ -23,6 +25,7 @@ internal interface PipelineProvider {
 }
 
 internal class PipelineImpl : Pipeline, PipelineProvider {
+    override val bitsHandlers: MutableList<BitsHandler> = mutableListOf()
     override val commandHandlers: MutableList<CommandHandler> = mutableListOf()
     override val followsHandlers: MutableList<FollowsHandler> = mutableListOf()
     override val joinHandlers: MutableList<JoinHandler> = mutableListOf()
@@ -33,6 +36,10 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
     override val whisperHandlers: MutableList<WhisperHandler> = mutableListOf()
 
     override val requestedChannels: MutableSet<String> = mutableSetOf()
+
+    override fun interceptBitsEvent(bitsHandler: BitsHandler) {
+        bitsHandlers += bitsHandler
+    }
 
     override fun interceptJoinEvent(joinHandler: JoinHandler) {
         joinHandlers += joinHandler

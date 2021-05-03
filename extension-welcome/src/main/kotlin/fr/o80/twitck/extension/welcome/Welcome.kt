@@ -15,7 +15,7 @@ import fr.o80.twitck.lib.api.extension.StorageExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.TwitchApi
-import fr.o80.twitck.lib.api.service.step.StepParam
+import fr.o80.twitck.lib.api.service.step.StepParams
 import fr.o80.twitck.lib.api.service.step.StepsExecutor
 import fr.o80.twitck.lib.api.service.time.StorageFlagTimeChecker
 import fr.o80.twitck.lib.api.service.time.TimeChecker
@@ -75,7 +75,7 @@ class Welcome(
 
         welcomeTimeChecker.executeIfNotCooldown(viewer.login) {
             welcomeViewer(channel, viewer, messenger)
-            val stepParam = StepParam(config.channel.name, viewer.displayName, emptyList())
+            val stepParam = StepParams(config.channel.name, viewer.displayName, emptyList())
             stepsExecutor.execute(config.onWelcome, messenger, stepParam)
         }
     }

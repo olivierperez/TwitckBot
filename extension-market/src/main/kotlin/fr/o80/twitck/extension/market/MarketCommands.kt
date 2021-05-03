@@ -5,7 +5,7 @@ import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.extension.PointsExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
-import fr.o80.twitck.lib.api.service.step.StepParam
+import fr.o80.twitck.lib.api.service.step.StepParams
 import fr.o80.twitck.lib.api.service.step.StepsExecutor
 
 class MarketCommands(
@@ -68,8 +68,8 @@ class MarketCommands(
             try {
                 logger.info("${commandEvent.viewer.displayName} just spend $price points for ${product.name}")
 
-                val param = StepParam.fromCommand(commandEvent, skipOptions = 1)
-                stepsExecutor.execute(product.steps, messenger, param)
+                val params = StepParams.fromCommand(commandEvent, skipOptions = 1)
+                stepsExecutor.execute(product.steps, messenger, params)
             } catch (e: Exception) {
                 logger.error("Failed to execute purchase!", e)
                 pointsExtension.addPoints(commandEvent.viewer.login, price)

@@ -3,18 +3,23 @@ package fr.o80.twitck.lib.internal.service.line
 import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.Viewer
+import fr.o80.twitck.lib.api.bean.event.BitsEvent
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
+import fr.o80.twitck.lib.api.service.log.Logger
+import fr.o80.twitck.lib.internal.handler.BitsDispatcher
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 
 internal class PrivMsgLineInterpreter(
     private val messenger: Messenger,
     private val commandParser: CommandParser,
+    private val bitsDispatcher: BitsDispatcher,
     private val messageDispatcher: MessageDispatcher,
-    private val commandDispatcher: CommandDispatcher
+    private val commandDispatcher: CommandDispatcher,
+    private val logger: Logger
 ) : LineInterpreter {
 
     private val regex =
@@ -41,6 +46,11 @@ internal class PrivMsgLineInterpreter(
             )
 
             val command = commandParser.parse(msg)
+
+            tags.bits.takeIf { it > 0 }?.let { bits ->
+                logger.debug("Bits have been detected: \n=>$viewer\n=>$tags\n===================")
+                dispatchBits(channel, bits, viewer)
+            }
 
             when {
                 command != null -> dispatchCommand(channel, command, tags, viewer)
@@ -78,6 +88,21 @@ internal class PrivMsgLineInterpreter(
                 channel,
                 msg,
                 tags.bits,
+                viewer
+            )
+        )
+    }
+
+    private fun dispatchBits(
+        channel: String,
+        bits: Int,
+        viewer: Viewer
+    ) {
+        bitsDispatcher.dispatch(
+            BitsEvent(
+                messenger,
+                channel,
+                bits,
                 viewer
             )
         )

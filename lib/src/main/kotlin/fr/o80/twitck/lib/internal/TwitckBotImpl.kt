@@ -11,6 +11,7 @@ import fr.o80.twitck.lib.api.extension.TunnelExtension
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.AutoJoiner
+import fr.o80.twitck.lib.internal.handler.BitsDispatcher
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
@@ -52,8 +53,10 @@ internal class TwitckBotImpl(
     private val privMsgLineHandler = PrivMsgLineInterpreter(
         messenger,
         configuration.commandParser,
+        BitsDispatcher(messenger, configuration.bitsHandlers),
         MessageDispatcher(messenger, configuration.messageHandlers),
-        commandDispatcher
+        commandDispatcher,
+        configuration.loggerFactory.getLogger(PrivMsgLineInterpreter::class)
     )
 
     private val raidInterpreter = RaidInterpreter(
