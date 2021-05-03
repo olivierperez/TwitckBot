@@ -7,6 +7,5 @@ data class MessageEvent(
     val messenger: Messenger,
     val channel: String,
     val message: String,
-    val bits: Int,
     val viewer: Viewer
 )

@@ -54,7 +54,7 @@ internal class PrivMsgLineInterpreter(
 
             when {
                 command != null -> dispatchCommand(channel, command, tags, viewer)
-                else -> dispatchMessage(channel, msg, tags, viewer)
+                else -> dispatchMessage(channel, msg, viewer)
             }
         }
     }
@@ -79,7 +79,6 @@ internal class PrivMsgLineInterpreter(
     private fun dispatchMessage(
         channel: String,
         msg: String,
-        tags: Map<String, String>,
         viewer: Viewer
     ) {
         messageDispatcher.dispatch(
@@ -87,7 +86,6 @@ internal class PrivMsgLineInterpreter(
                 messenger,
                 channel,
                 msg,
-                tags.bits,
                 viewer
             )
         )

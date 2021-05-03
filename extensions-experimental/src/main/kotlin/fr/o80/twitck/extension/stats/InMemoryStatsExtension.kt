@@ -1,6 +1,7 @@
 package fr.o80.twitck.extension.stats
 
 import fr.o80.twitck.lib.api.Pipeline
+import fr.o80.twitck.lib.api.bean.event.BitsEvent
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.FollowsEvent
 import fr.o80.twitck.lib.api.bean.event.JoinEvent
@@ -51,16 +52,20 @@ class InMemoryStatsExtension(
         return joinEvent
     }
 
-    fun interceptMessageEvent(messageEvent: MessageEvent): MessageEvent {
+    fun interceptBitsEvent(bitsEvent: BitsEvent): BitsEvent {
         statsData.hit(
             STATS_NAMESPACE,
             "bits",
             mapOf(
-                STAT_INFO_VIEWER to messageEvent.viewer.login,
-                STAT_INFO_COUNT to messageEvent.bits
+                STAT_INFO_VIEWER to bitsEvent.viewer.login,
+                STAT_INFO_COUNT to bitsEvent.bits
             )
         )
 
+        return bitsEvent
+    }
+
+    fun interceptMessageEvent(messageEvent: MessageEvent): MessageEvent {
         statsData.hit(
             STATS_NAMESPACE,
             "messages",
@@ -119,6 +124,9 @@ class InMemoryStatsExtension(
                 statsCommand
             ).also { stats ->
                 pipeline.requestChannel(stats.channel)
+                pipeline.interceptBitsEvent { _, messageEvent ->
+                    stats.interceptBitsEvent(messageEvent)
+                }
                 pipeline.interceptCommandEvent { _, commandEvent ->
                     stats.interceptCommandEvent(commandEvent)
                 }
