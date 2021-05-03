@@ -21,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.time.Duration
 
 class UiWebSocket(
@@ -98,19 +100,23 @@ class UiWebSocket(
                 onConfigRequested(session)
             }
             request.startsWith("AddAction:") -> {
-                val newActionJson = request.substring(10)
+                val newActionJson = request.removePrefix("AddAction:")
                 onNewAction(newActionJson)
             }
+            request.startsWith("GetImage:") -> {
+                val imageName = request.removePrefix("GetImage:")
+                onImageRequested(session, imageName)
+            }
             request.startsWith("Command:") -> {
-                val command = request.substring(8)
+                val command = request.removePrefix("Command:")
                 onCommand(command)
             }
             request.startsWith("Message:") -> {
-                val command = request.substring(8)
+                val command = request.removeSuffix("Message:")
                 onMessage(command)
             }
             request.startsWith("Scene:") -> {
-                val sceneId = request.substring(6)
+                val sceneId = request.removePrefix("Scene:")
                 onScene(sceneId)
             }
             else -> {
@@ -123,6 +129,23 @@ class UiWebSocket(
     private suspend fun onConfigRequested(session: DefaultWebSocketServerSession) {
         session.send("Config:${getConfigJson()}")
         session.send("Status:${getStatusJson(slobsClient.getActiveScene().id)}")
+    }
+
+    private suspend fun onImageRequested(
+        session: DefaultWebSocketServerSession,
+        imageName: String
+    ) {
+        logger.trace("Image has been requested: $imageName")
+        val file = File(imageName)
+        val bytes = file.readBytes()
+
+        val data = merge(
+            imageName.toByteArray(),
+            "?#:|".toByteArray(),
+            bytes
+        )
+
+        session.send(Frame.Binary(true, data))
     }
 
     private suspend fun getConfigJson(): String? {
