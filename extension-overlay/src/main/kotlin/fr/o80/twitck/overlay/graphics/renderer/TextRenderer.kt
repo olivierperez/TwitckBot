@@ -146,6 +146,7 @@ class TextRenderer(
             val factorY = 1.0f / contentScaleY
             var lineY = 0.0f
             GL46.glBindTexture(GL46.GL_TEXTURE_2D, textureId)
+            GL46.glPolygonMode(GL46.GL_BACK, GL46.GL_FILL)
             GL46.glBegin(GL46.GL_QUADS)
             var i = 0
             val to: Int = text.length

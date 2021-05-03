@@ -58,6 +58,7 @@ object Draw {
 
     @Drawer
     fun quad(a: Vertex3f, b: Vertex3f, c: Vertex3f, d: Vertex3f) {
+        GL46.glPolygonMode(GL46.GL_BACK, GL46.GL_FILL)
         GL46.glBegin(GL46.GL_QUADS)
         GL46.glVertex3f(a.x, a.y, a.z)
         GL46.glVertex3f(b.x, b.y, b.z)
@@ -100,10 +101,13 @@ object Draw {
 
     @Drawer
     fun rect(x1: Float, y1: Float, x2: Float, y2: Float) {
-        line(x1, y1, x2, y1)
-        line(x2, y1, x2, y2)
-        line(x2, y2, x1, y2)
-        line(x1, y2, x1, y1)
+        GL46.glPolygonMode(GL46.GL_BACK, GL46.GL_LINE)
+        GL46.glBegin(GL46.GL_POLYGON)
+        GL46.glVertex3f(x1, y1, 0f)
+        GL46.glVertex3f(x2, y1, 0f)
+        GL46.glVertex3f(x2, y2, 0f)
+        GL46.glVertex3f(x1, y2, 0f)
+        GL46.glEnd()
     }
 
     @Drawer
