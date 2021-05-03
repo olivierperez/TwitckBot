@@ -8,9 +8,10 @@ import fr.o80.twitck.lib.api.service.log.Logger
 import java.time.Duration
 
 private const val DEBUG = "debug"
-private const val VIEWER = "viewer"
+private const val BITS = "bits"
 private const val COMMANDS = "commands"
 private const val MESSAGES = "messages"
+private const val VIEWER = "viewer"
 
 class StatsCommand(
     private val statsData: StatsData,
@@ -36,29 +37,24 @@ class StatsCommand(
         }
 
         when (commandEvent.command.options[0]) {
-            MESSAGES -> handleMessagesStat(messenger, commandEvent.channel)
+            BITS -> handleBitsStat(messenger, commandEvent.channel, commandEvent)
             COMMANDS -> handleCommandsStat(messenger, commandEvent.channel)
-            VIEWER -> handleViewerStat(messenger, commandEvent)
             DEBUG -> handleDebugCommand(commandEvent)
+            MESSAGES -> handleMessagesStat(messenger, commandEvent.channel)
+            VIEWER -> handleViewerStat(messenger, commandEvent)
             else -> {
                 // noop for now
             }
         }
     }
 
-    private fun handleMessagesStat(messenger: Messenger, channel: String) {
-        statsData.get(STATS_NAMESPACE, MESSAGES)?.let { data ->
+    private fun handleBitsStat(messenger: Messenger, channel: String, commandEvent: CommandEvent) {
+        statsData.get(STATS_NAMESPACE, "bits")?.let { data ->
             val statCalculator = StatCalculator(data)
-            val messagesCount = statCalculator.count()
-            val minMsg = statCalculator.min(STAT_INFO_COUNT)?.let { "taille mini: $it" }
-            val maxMsg = statCalculator.max(STAT_INFO_COUNT)?.let { "taille maxi: $it" }
-            val avgMsg = statCalculator.avg(STAT_INFO_COUNT)?.let { "taille moyenne: $it" }
-            val extremesMsg =
-                if (minMsg != null && maxMsg != null)
-                    "[$minMsg, $maxMsg, $avgMsg]"
-                else
-                    ""
-            messenger.sendImmediately(channel, "Il y a eu $messagesCount messages $extremesMsg")
+            val totalBits = statCalculator
+                .filteredBy(STAT_INFO_VIEWER, commandEvent.viewer.login)
+                .sumOf(STAT_INFO_COUNT)
+            messenger.sendImmediately(channel, "Tu as bu $totalBits bits de cappuccino")
         }
     }
 
@@ -74,6 +70,29 @@ class StatsCommand(
                         "Command la plus utilisée : !${moreUsedCommand.key} ${moreUsedCommand.value}x"
                     )
                 }
+        }
+    }
+
+    private fun handleDebugCommand(commandEvent: CommandEvent) {
+        if (Badge.BROADCASTER !in commandEvent.viewer.badges)
+            return
+
+        logger.debug("\n---- Stats ----\n${statsData.getDebug()}\n---------------")
+    }
+
+    private fun handleMessagesStat(messenger: Messenger, channel: String) {
+        statsData.get(STATS_NAMESPACE, MESSAGES)?.let { data ->
+            val statCalculator = StatCalculator(data)
+            val messagesCount = statCalculator.count()
+            val minMsg = statCalculator.min(STAT_INFO_COUNT)?.let { "taille mini: $it" }
+            val maxMsg = statCalculator.max(STAT_INFO_COUNT)?.let { "taille maxi: $it" }
+            val avgMsg = statCalculator.avg(STAT_INFO_COUNT)?.let { "taille moyenne: $it" }
+            val extremesMsg =
+                if (minMsg != null && maxMsg != null)
+                    "[$minMsg, $maxMsg, $avgMsg]"
+                else
+                    ""
+            messenger.sendImmediately(channel, "Il y a eu $messagesCount messages $extremesMsg")
         }
     }
 
@@ -107,13 +126,6 @@ class StatsCommand(
                     }
             }
         }
-    }
-
-    private fun handleDebugCommand(commandEvent: CommandEvent) {
-        if (Badge.BROADCASTER !in commandEvent.viewer.badges)
-            return
-
-        logger.debug("\n---- Stats ----\n${statsData.getDebug()}\n---------------")
     }
 
 }
