@@ -6,6 +6,7 @@ import fr.o80.twitck.lib.api.handler.FollowsHandler
 import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.handler.MessageHandler
 import fr.o80.twitck.lib.api.handler.RaidHandler
+import fr.o80.twitck.lib.api.handler.RewardHandler
 import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
 
@@ -17,6 +18,7 @@ interface Pipeline {
     fun interceptMessageEvent(messageHandler: MessageHandler)
     fun interceptSubscriptionEvent(subscriptionsHandler: SubscriptionsHandler)
     fun interceptRaidEvent(raidHandler: RaidHandler)
+    fun interceptRewardEvent(rewardHandler: RewardHandler)
     fun interceptWhisperCommandEvent(commandHandler: CommandHandler)
     fun interceptWhisperEvent(whisperHandler: WhisperHandler)
     fun requestChannel(channel: String)

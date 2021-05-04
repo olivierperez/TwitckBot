@@ -38,6 +38,21 @@
           }
         ]
       }
+    ],
+    "rewards": [
+      {
+        "id": "1234abcd-ab12-cd34-ef56-0123456789abcdef",
+        "steps": [
+          {
+            "type": "command",
+            "command": "!cmd permanent !#USER# #MESSAGE#"
+          },
+          {
+            "type": "sound",
+            "sound": "positive"
+          }
+        ]
+      }
     ]
   }
 }

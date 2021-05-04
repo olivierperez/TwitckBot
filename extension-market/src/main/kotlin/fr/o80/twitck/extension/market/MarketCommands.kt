@@ -12,9 +12,9 @@ class MarketCommands(
     private val channel: String,
     private val i18n: MarketI18n,
     private val products: List<MarketProduct>,
-    private val logger: Logger,
     private val pointsExtension: PointsExtension,
-    private val stepsExecutor: StepsExecutor
+    private val stepsExecutor: StepsExecutor,
+    private val logger: Logger
 ) {
 
     fun interceptCommandEvent(messenger: Messenger, commandEvent: CommandEvent): CommandEvent {

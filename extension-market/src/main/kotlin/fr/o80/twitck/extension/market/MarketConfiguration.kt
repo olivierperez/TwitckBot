@@ -8,7 +8,8 @@ import fr.o80.twitck.lib.api.service.step.ActionStep
 class MarketConfiguration(
     val channel: ChannelName,
     val i18n: MarketI18n,
-    val products: List<MarketProduct>
+    val products: List<MarketProduct>,
+    val rewards: List<MarketReward>
 )
 
 @JsonClass(generateAdapter = true)
@@ -23,5 +24,11 @@ class MarketI18n(
 class MarketProduct(
     val name: String,
     val price: Int,
+    val steps: List<ActionStep>
+)
+
+@JsonClass(generateAdapter = true)
+class MarketReward(
+    val id: String,
     val steps: List<ActionStep>
 )

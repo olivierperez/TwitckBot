@@ -7,6 +7,7 @@ import fr.o80.twitck.lib.api.handler.FollowsHandler
 import fr.o80.twitck.lib.api.handler.JoinHandler
 import fr.o80.twitck.lib.api.handler.MessageHandler
 import fr.o80.twitck.lib.api.handler.RaidHandler
+import fr.o80.twitck.lib.api.handler.RewardHandler
 import fr.o80.twitck.lib.api.handler.SubscriptionsHandler
 import fr.o80.twitck.lib.api.handler.WhisperHandler
 
@@ -17,6 +18,7 @@ internal interface PipelineProvider {
     val joinHandlers: MutableList<JoinHandler>
     val messageHandlers: MutableList<MessageHandler>
     val raidHandlers: MutableList<RaidHandler>
+    val rewardHandlers: MutableList<RewardHandler>
     val subscriptionsHandlers: MutableList<SubscriptionsHandler>
     val whisperCommandHandlers: MutableList<CommandHandler>
     val whisperHandlers: MutableList<WhisperHandler>
@@ -31,6 +33,7 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
     override val joinHandlers: MutableList<JoinHandler> = mutableListOf()
     override val messageHandlers: MutableList<MessageHandler> = mutableListOf()
     override val raidHandlers: MutableList<RaidHandler> = mutableListOf()
+    override val rewardHandlers: MutableList<RewardHandler> = mutableListOf()
     override val subscriptionsHandlers: MutableList<SubscriptionsHandler> = mutableListOf()
     override val whisperCommandHandlers: MutableList<CommandHandler> = mutableListOf()
     override val whisperHandlers: MutableList<WhisperHandler> = mutableListOf()
@@ -41,6 +44,10 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
         bitsHandlers += bitsHandler
     }
 
+    override fun interceptCommandEvent(commandHandler: CommandHandler) {
+        commandHandlers += commandHandler
+    }
+
     override fun interceptJoinEvent(joinHandler: JoinHandler) {
         joinHandlers += joinHandler
     }
@@ -49,8 +56,12 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
         messageHandlers += messageHandler
     }
 
-    override fun interceptCommandEvent(commandHandler: CommandHandler) {
-        commandHandlers += commandHandler
+    override fun interceptRaidEvent(raidHandler: RaidHandler) {
+        raidHandlers += raidHandler
+    }
+
+    override fun interceptRewardEvent(rewardHandler: RewardHandler) {
+        rewardHandlers += rewardHandler
     }
 
     override fun interceptWhisperEvent(whisperHandler: WhisperHandler) {
@@ -67,10 +78,6 @@ internal class PipelineImpl : Pipeline, PipelineProvider {
 
     override fun interceptSubscriptionEvent(subscriptionsHandler: SubscriptionsHandler) {
         subscriptionsHandlers += subscriptionsHandler
-    }
-
-    override fun interceptRaidEvent(raidHandler: RaidHandler) {
-        raidHandlers += raidHandler
     }
 
     override fun requestChannel(channel: String) {

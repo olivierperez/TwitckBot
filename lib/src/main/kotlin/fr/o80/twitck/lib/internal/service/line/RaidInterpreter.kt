@@ -1,6 +1,5 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.bean.event.RaidEvent
 import fr.o80.twitck.lib.api.service.Messenger
@@ -17,13 +16,8 @@ class RaidInterpreter(
 
     override fun handle(line: String) {
         userNoticeRegex.find(line)?.let { matchResult ->
-            val rawTags = matchResult.groupValues[1]
+            val tags = Tags.from(matchResult.groupValues[1])
             val channel = matchResult.groupValues[2]
-
-            val tags = rawTags.split(";").map {
-                val (key, value) = it.split("=")
-                Pair(key, value)
-            }.toMap()
 
             if (tags.msgId == "raid") {
                 val viewer = Viewer(
@@ -39,7 +33,7 @@ class RaidInterpreter(
         }
     }
 
-    private fun dispatchRaid(channel: String, tags: Map<String, String>, viewer: Viewer) {
+    private fun dispatchRaid(channel: String, tags: Tags, viewer: Viewer) {
         val raidEvent = RaidEvent(
             messenger,
             channel,
@@ -53,28 +47,4 @@ class RaidInterpreter(
             raidEvent
         )
     }
-
-    private val Map<String, String>.badges: List<Badge>
-        get() = parseBadges(getValue("badges"))
-
-    private val Map<String, String>.color: String
-        get() = getValue("color")
-
-    private val Map<String, String>.displayName: String
-        get() = getValue("display-name")
-
-    private val Map<String, String>.userId: String
-        get() = getValue("user-id")
-
-    private val Map<String, String>.msgId: String?
-        get() = get("msg-id")
-
-    private val Map<String, String>.msgDisplayName: String
-        get() = getValue("msg-param-displayName")
-
-    private val Map<String, String>.msgLogin: String
-        get() = getValue("msg-param-login")
-
-    private val Map<String, String>.msgViewerCount: String
-        get() = getValue("msg-param-viewerCount")
 }

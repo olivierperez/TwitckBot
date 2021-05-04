@@ -21,32 +21,17 @@ internal class WhisperLineInterpreter(
 
     override fun handle(line: String) {
         regex.find(line)?.let { matchResult ->
-            val tags = matchResult.groupValues[1]
+            val tags = Tags.from(matchResult.groupValues[1])
             val user = matchResult.groupValues[2]
             val destination = matchResult.groupValues[3]
             val message = matchResult.groupValues[4]
 
-            var badges = listOf<Badge>()
-            var userId = ""
-            var color = ""
-            var displayName = ""
-
-            tags.split(";").forEach {
-                val (key, value) = it.split("=")
-                when (key) {
-                    "badges" -> badges = parseBadges(value)
-                    "user-id" -> userId = value
-                    "color" -> color = value
-                    "display-name" -> displayName = value
-                }
-            }
-
             val viewer = Viewer(
                 login = user,
-                displayName = displayName,
-                badges = badges,
-                userId = userId,
-                color = color
+                displayName = tags.displayName,
+                badges = tags.badges,
+                userId = tags.userId,
+                color = tags.color
             )
             val command = commandParser.parse(message)
 

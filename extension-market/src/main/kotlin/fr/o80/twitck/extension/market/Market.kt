@@ -4,8 +4,8 @@ import fr.o80.twitck.lib.api.Pipeline
 import fr.o80.twitck.lib.api.exception.ExtensionDependencyException
 import fr.o80.twitck.lib.api.extension.HelpExtension
 import fr.o80.twitck.lib.api.extension.PointsExtension
-import fr.o80.twitck.lib.api.service.ServiceLocator
 import fr.o80.twitck.lib.api.service.ConfigService
+import fr.o80.twitck.lib.api.service.ServiceLocator
 
 class Market(
     help: HelpExtension?
@@ -39,16 +39,26 @@ class Market(
                 config.data.channel.name,
                 config.data.i18n,
                 config.data.products,
-                logger,
                 points,
-                serviceLocator.stepsExecutor
+                serviceLocator.stepsExecutor,
+                logger
+            )
+            val rewards = MarketRewards(
+                config.data.rewards,
+                serviceLocator.stepsExecutor,
+                logger
             )
 
             return Market(
                 help
             ).also {
                 pipeline.requestChannel(config.data.channel.name)
-                pipeline.interceptCommandEvent(commands::interceptCommandEvent)
+                pipeline.interceptCommandEvent { messenger, commandEvent ->
+                    commands.interceptCommandEvent(messenger, commandEvent)
+                }
+                pipeline.interceptRewardEvent { messenger, rewardEvent ->
+                    rewards.interceptRewardEvent(messenger, rewardEvent)
+                }
             }
         }
     }

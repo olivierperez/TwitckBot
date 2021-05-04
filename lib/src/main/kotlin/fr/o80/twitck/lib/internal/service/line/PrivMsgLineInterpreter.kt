@@ -1,17 +1,18 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Command
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.bean.event.BitsEvent
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.MessageEvent
+import fr.o80.twitck.lib.api.bean.event.RewardEvent
 import fr.o80.twitck.lib.api.service.CommandParser
 import fr.o80.twitck.lib.api.service.Messenger
 import fr.o80.twitck.lib.api.service.log.Logger
 import fr.o80.twitck.lib.internal.handler.BitsDispatcher
 import fr.o80.twitck.lib.internal.handler.CommandDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
+import fr.o80.twitck.lib.internal.handler.RewardDispatcher
 
 internal class PrivMsgLineInterpreter(
     private val messenger: Messenger,
@@ -19,6 +20,7 @@ internal class PrivMsgLineInterpreter(
     private val bitsDispatcher: BitsDispatcher,
     private val messageDispatcher: MessageDispatcher,
     private val commandDispatcher: CommandDispatcher,
+    private val rewardDispatcher: RewardDispatcher,
     private val logger: Logger
 ) : LineInterpreter {
 
@@ -27,15 +29,10 @@ internal class PrivMsgLineInterpreter(
 
     override fun handle(line: String) {
         regex.find(line)?.let { matchResult ->
-            val rawTags = matchResult.groupValues[1]
+            val tags = Tags.from(matchResult.groupValues[1])
             val user = matchResult.groupValues[2]
             val channel = matchResult.groupValues[3]
-            val msg = matchResult.groupValues[4]
-
-            val tags = rawTags.split(";").map {
-                val (key, value) = it.split("=")
-                Pair(key, value)
-            }.toMap()
+            val message = matchResult.groupValues[4]
 
             val viewer = Viewer(
                 login = user,
@@ -45,24 +42,44 @@ internal class PrivMsgLineInterpreter(
                 color = tags.color
             )
 
-            val command = commandParser.parse(msg)
+            val command = commandParser.parse(message)
 
             tags.bits.takeIf { it > 0 }?.let { bits ->
                 logger.debug("Bits have been detected: \n=>$viewer\n=>$tags\n===================")
                 dispatchBits(channel, bits, viewer)
             }
 
+            tags.customRewardId?.let { rewardId ->
+                logger.debug("Reward claimed: $rewardId\n=>$viewer\n=>$tags\n===================")
+                dispatchReward(channel, rewardId, message, viewer)
+            }
+
             when {
                 command != null -> dispatchCommand(channel, command, tags, viewer)
-                else -> dispatchMessage(channel, msg, viewer)
+                else -> dispatchMessage(channel, message, viewer)
             }
         }
+    }
+
+    private fun dispatchBits(
+        channel: String,
+        bits: Int,
+        viewer: Viewer
+    ) {
+        bitsDispatcher.dispatch(
+            BitsEvent(
+                messenger,
+                channel,
+                bits,
+                viewer
+            )
+        )
     }
 
     private fun dispatchCommand(
         channel: String,
         command: Command,
-        tags: Map<String, String>,
+        tags: Tags,
         viewer: Viewer
     ) {
         commandDispatcher.dispatch(
@@ -91,46 +108,14 @@ internal class PrivMsgLineInterpreter(
         )
     }
 
-    private fun dispatchBits(
+    private fun dispatchReward(
         channel: String,
-        bits: Int,
+        rewardId: String,
+        message: String,
         viewer: Viewer
     ) {
-        bitsDispatcher.dispatch(
-            BitsEvent(
-                messenger,
-                channel,
-                bits,
-                viewer
-            )
+        rewardDispatcher.dispatch(
+            RewardEvent(messenger, channel, rewardId, message, viewer)
         )
     }
-
-    private val Map<String, String>.badges: List<Badge>
-        get() = parseBadges(getValue("badges"))
-
-    private val Map<String, String>.color: String
-        get() = getValue("color")
-
-    private val Map<String, String>.bits: Int
-        get() = get("bits")?.toInt() ?: 0
-
-    private val Map<String, String>.displayName: String
-        get() = getValue("display-name")
-
-    private val Map<String, String>.userId: String
-        get() = getValue("user-id")
-
-    private val Map<String, String>.msgId: String?
-        get() = get("msg-id")
-
-    private val Map<String, String>.msgDisplayName: String
-        get() = getValue("msg-param-displayName")
-
-    private val Map<String, String>.msgLogin: String
-        get() = getValue("msg-param-login")
-
-    private val Map<String, String>.msgViewerCount: String
-        get() = getValue("msg-param-viewerCount")
-
 }

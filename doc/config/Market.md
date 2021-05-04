@@ -29,6 +29,21 @@ A marketplace where the viewers can "buy" things with your points system.
                     }
                 ]
             }
+        ],
+        "rewards": [
+            { // 5
+                "id": "1234abcd-ab12-cd34-ef56-0123456789abcdef", // 6
+                "steps": [ // 7
+                    {
+                        "type": "command",
+                        "command": "!cmd permanent !#USER# #PARAMS#"
+                    },
+                    {
+                        "type": "sound",
+                        "sound": "positive"
+                    }
+                ]
+            }
         ]
     }
 }
@@ -47,6 +62,12 @@ products below. Each product have to define : a name, a price and a list of thin
 things will happen:
 1. Execution of the command on behalf of the streamer
 2. A sound (configure in Sound extension) will be played
+
+`// 5` This block defines the Twitch rewards available with channel points of Twitch.
+
+`// 6` The id of the Twitch reward (you can find it in the log of TwitckBot).
+
+`// 7` Same as `// 4`
 
 ## Provides
 

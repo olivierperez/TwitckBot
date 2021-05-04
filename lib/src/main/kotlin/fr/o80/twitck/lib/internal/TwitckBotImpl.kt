@@ -17,6 +17,7 @@ import fr.o80.twitck.lib.internal.handler.FollowsDispatcher
 import fr.o80.twitck.lib.internal.handler.JoinDispatcher
 import fr.o80.twitck.lib.internal.handler.MessageDispatcher
 import fr.o80.twitck.lib.internal.handler.RaidDispatcher
+import fr.o80.twitck.lib.internal.handler.RewardDispatcher
 import fr.o80.twitck.lib.internal.handler.SubscriptionsDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperCommandDispatcher
 import fr.o80.twitck.lib.internal.handler.WhisperDispatcher
@@ -56,6 +57,7 @@ internal class TwitckBotImpl(
         BitsDispatcher(messenger, configuration.bitsHandlers),
         MessageDispatcher(messenger, configuration.messageHandlers),
         commandDispatcher,
+        RewardDispatcher(messenger, configuration.rewardHandlers),
         configuration.loggerFactory.getLogger(PrivMsgLineInterpreter::class)
     )
 

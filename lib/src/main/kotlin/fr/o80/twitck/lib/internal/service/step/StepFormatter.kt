@@ -11,6 +11,7 @@ class StepFormatter {
             .formatFor(params.viewerName)
             .formatWith(params.params)
             .formatWithBits(params.bits)
+            .formatWithMessage(params.message)
 
     private fun String.formatFor(viewerName: String): String =
         this.replace("#USER#", viewerName)
@@ -21,6 +22,10 @@ class StepFormatter {
 
     private fun String.formatWithBits(bits: Int?): String {
         return bits?.let { this.replace("#BITS#", bits.toString()) } ?: this
+    }
+
+    private fun String.formatWithMessage(message: String?) : String {
+        return message?.let { this.replace("#MESSAGE#", message) } ?: this
     }
 
     private fun String.replaceIndexedParams(params: List<String>) =

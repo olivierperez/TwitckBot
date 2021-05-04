@@ -60,4 +60,17 @@ internal class StepFormatterTest {
         assertEquals("$$13$$", output)
     }
 
+    @Test
+    fun `should format with message`() {
+        // Given
+        val input = "//#MESSAGE#//"
+        val param = StepParams("", "", emptyList(), 0, "THE message")
+
+        // When
+        val output = formatter.format(input, param)
+
+        // Then
+        assertEquals("//THE message//", output)
+    }
+
 }
