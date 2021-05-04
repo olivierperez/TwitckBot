@@ -13,8 +13,8 @@ class Tags(
     val badges: List<Badge>
         get() = parseBadges(data.getValue("badges"))
 
-    val bits: Int // TODO OPZ Nullable ?
-        get() = data["bits"]?.toInt() ?: 0
+    val bits: Int?
+        get() = data["bits"]?.toInt()
 
     val customRewardId: String?
         get() = data["custom-reward-id"]

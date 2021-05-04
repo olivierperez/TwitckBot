@@ -1,6 +1,5 @@
 package fr.o80.twitck.lib.internal.service.line
 
-import fr.o80.twitck.lib.api.bean.Badge
 import fr.o80.twitck.lib.api.bean.Viewer
 import fr.o80.twitck.lib.api.bean.event.CommandEvent
 import fr.o80.twitck.lib.api.bean.event.WhisperEvent
@@ -41,7 +40,7 @@ internal class WhisperLineInterpreter(
                         messenger,
                         destination,
                         command,
-                        bits = 0,
+                        bits = null,
                         viewer
                     )
                 )

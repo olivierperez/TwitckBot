@@ -186,7 +186,7 @@ internal class TwitckBotImpl(
                 command = Command(tag, options),
                 messenger = messenger,
                 channel = "#${configuration.hostName}",
-                bits = 0,
+                bits = null,
                 viewer = Viewer(
                     login = configuration.hostName,
                     displayName = configuration.hostName,

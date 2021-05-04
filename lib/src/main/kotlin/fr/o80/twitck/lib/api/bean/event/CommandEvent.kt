@@ -8,6 +8,6 @@ data class CommandEvent(
     val messenger: Messenger,
     val channel: String,
     val command: Command,
-    val bits: Int,
+    val bits: Int?,
     val viewer: Viewer
 )

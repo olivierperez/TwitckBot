@@ -44,7 +44,7 @@ internal class PrivMsgLineInterpreter(
 
             val command = commandParser.parse(message)
 
-            tags.bits.takeIf { it > 0 }?.let { bits ->
+            tags.bits?.let { bits ->
                 logger.debug("Bits have been detected: \n=>$viewer\n=>$tags\n===================")
                 dispatchBits(channel, bits, viewer)
             }
